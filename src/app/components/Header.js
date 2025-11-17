@@ -8,6 +8,7 @@ export default function Header() {
   const handleNavigation = (path) => router.push(path);
   const MotionButton = motion.button;
 
+  // Small interaction animations
   const hover = { scale: 1.05 };
   const tap = { scale: 0.95 };
 
@@ -15,7 +16,9 @@ export default function Header() {
     <header className="w-full border-b border-gray-200 bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
         {/* Brand */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3"
+          onClick={() => handleNavigation("/")}
+        >
           <img
             src="/Danlogo.jpg"
             alt="Dan's Computer Repair Logo"
@@ -24,7 +27,7 @@ export default function Header() {
             className="h-16 w-16 rounded-md object-contain"
           />
           <div className="leading-tight">
-            <h1 className="text-xl font-semibold tracking-tight">
+            <h1 className="text-xl font-semibold tracking-tight text-gray-900">
               Dan&apos;s Computer Repair
             </h1>
             <p className="text-sm text-gray-600">
@@ -42,7 +45,7 @@ export default function Header() {
                 onClick={() => handleNavigation("/")}
                 whileHover={hover}
                 whileTap={tap}
-                className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
               >
                 Home
               </MotionButton>
@@ -51,29 +54,31 @@ export default function Header() {
             <li>
               <MotionButton
                 type="button"
-                onClick={() => handleNavigation("/about")}
+                onClick={() => handleNavigation("/products")}
                 whileHover={hover}
                 whileTap={tap}
-                className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-purple-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
               >
                 Products
               </MotionButton>
             </li>
 
-            {/* Computer Building button */}
+            {/* Computer Building */}
             <li>
               <MotionButton
                 type="button"
-                onClick={() => handleNavigation("/create-computer-configuration-form")}
+                onClick={() =>
+                  handleNavigation("/create-computer-configuration-form")
+                }
                 whileHover={hover}
                 whileTap={tap}
-                className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
               >
                 Computer Building
               </MotionButton>
             </li>
 
-            {/* Service Request button */}
+            {/* Service Request */}
             <li>
               <MotionButton
                 type="button"
@@ -85,23 +90,8 @@ export default function Header() {
                 Service Request
               </MotionButton>
             </li>
-
-            <li>
-              <MotionButton
-                type="button"
-                onClick={() => handleNavigation("/admin-log-in")}
-                whileHover={hover}
-                whileTap={tap}
-                className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
-              >
-                Admin Login
-              </MotionButton>
-            </li>
           </ul>
         </nav>
-
-        {/* (Optional) Mobile trigger placeholder */}
-        <div className="md:hidden" />
       </div>
     </header>
   );
