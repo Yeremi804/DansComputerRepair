@@ -127,8 +127,23 @@ If you need a section-specific layout:
 ```
 src/app/services/layout.js
 ```
+---
+# Prototype 
+**Home Page**
+<img width="145" height="282" alt="image" src="https://github.com/user-attachments/assets/f27f3208-92f6-414e-b885-cf5fb5eea408" />
+**Admin-Orders**
+<img width="145" height="282" alt="image" src="https://github.com/user-attachments/assets/d47805f3-59c0-4b15-a2e9-f9f3667e431f" />
+**Admin-Parts**
+<img width="145" height="282" alt="image" src="https://github.com/user-attachments/assets/bd5ff907-ad3a-4ccc-bcd4-21c7e7786dd3" />
+**Custom PC Form**
+<img width="145" height="282" alt="image" src="https://github.com/user-attachments/assets/95018f2a-dd55-44e5-a4c1-9f86823f519e" />
+  
+---
+# Flow 
+<img width="411" height="300" alt="image" src="https://github.com/user-attachments/assets/efecc552-5a7c-4105-a270-001a40153d30" />
 
 ---
+
 
 # 🔐 Using environment variables
 
