@@ -1,3 +1,5 @@
+<img width="1591" height="383" alt="image" src="https://github.com/user-attachments/assets/342fd859-2622-4889-9944-80f55de9872f" />
+
 # Local Setup Instructions and project structure information
 # Please read and setup accordingly
 
@@ -128,10 +130,10 @@ If you need a section-specific layout:
 src/app/services/layout.js
 ```
 ---
-# 🎨 Prototype 
-| 🏠 Home Page                                                                                                              | 📦 Admin – Orders                                                                                                            |
+# 🎨 Live Demo 
+| 🏠 Home Page                                                                                                              | 📦 Products page                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| <img width="350" alt="Home Page" src="https://github.com/user-attachments/assets/f27f3208-92f6-414e-b885-cf5fb5eea408" /> | <img width="350" alt="Admin Orders" src="https://github.com/user-attachments/assets/d47805f3-59c0-4b15-a2e9-f9f3667e431f" /> |
+| <img width="350" alt="Home Page" alt="image" src="https://github.com/user-attachments/assets/8614f00e-fe78-476a-bcfb-14d415717b9a" />| <img width="350" alt="Products Page" src="https://github.com/user-attachments/assets/c51e6012-a257-47c9-9919-3f9f30b9d2be" /> |
 
 | 🛠️ Admin – Parts                                                                                                           | 💻 Custom PC Form                                                                                                              |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -142,7 +144,6 @@ src/app/services/layout.js
 <img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/efecc552-5a7c-4105-a270-001a40153d30" />
 
 ---
-
 
 # 🔐 Using environment variables
 
