@@ -197,3 +197,13 @@ We commit:
 - **Port in use** → `PORT=3001 npm run dev` (or stop the other process).
 - **Env not loading** → Confirm file name is `.env.local` in the project root; restart dev server.
 - **Import paths messy** → Use alias `@/` (configured in `jsconfig.json`).
+
+# Authors
+Brandon Leyva
+Yeremi Navarrete
+James Crandall
+Diana Ravlo
+Dennis Ravlo
+Jaehee Jung
+Kevin Lai 
+Lance Wakamatsu
