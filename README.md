@@ -38,6 +38,10 @@ Open `.env.local` and fill in real values, for example:
 NEXT_PUBLIC_SITE_NAME=Dans Computer Repair
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
+# Supabase Database
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL_HERE
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY_HERE
+
 # Database (example for Postgres)
 DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DBNAME
 
@@ -51,6 +55,15 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DBNAME
 - All others are **server-only** and should only be read in server code (server actions, API routes, etc.).
 - `.env.local` is **gitignored**; `.env.example` is the template we keep in Git.
 
+ How to get the Supabase URL and Anon Key for `.env.local`
+- When you are added to the Supabase project, navigate to project settings on the sidebar
+<img width="294" height="353" alt="Image" src="https://github.com/user-attachments/assets/ce0eafd4-3288-4e43-ac29-8326f85f0c1f" />
+
+- Go to Data API project setting to copy the Supabase URL.
+<img width="1063" height="81" alt="Image" src="https://github.com/user-attachments/assets/e03904f2-c4ef-4a7d-9d7c-ff33fa034c7f" />
+
+- Go to API Keys project setting just below Data API and click the 2nd tab labeled "Legacy anon, service_role API keys" to copy the Supabase Anon Key.
+<img width="1076" height="125" alt="Image" src="https://github.com/user-attachments/assets/373c69d9-8079-47de-9cd4-36135a02fce6" />
 ---
 
 ## 3) Run the app
