@@ -198,6 +198,23 @@ We commit:
 - **Env not loading** → Confirm file name is `.env.local` in the project root; restart dev server.
 - **Import paths messy** → Use alias `@/` (configured in `jsconfig.json`).
 
+---
+
+# Creating an Admin Account (Testing Purposes)
+- Navigate to the page ./create-admin-account.
+- Follow the listed steps to create an account.
+- After redirect to login page, attempt to login.
+- You will be prompted to setup MFA. Please use Google Authenticator or similar.
+- After MFA is setup, you will be able to login successfully.
+
+# Removing MFA Factors
+- Through Supabase, access your account through the Authentication tab.
+- After finding your account, scroll down and click the button labelled "Remove MFA Factors"
+- Your MFA factors will be reset, allowing you to re-init another MFA method.
+- ! Please make to sure to remove existing MFA factors through your Authenticator app (Google Authenticator)
+
+---
+
 # Authors
 Brandon Leyva
 Yeremi Navarrete
