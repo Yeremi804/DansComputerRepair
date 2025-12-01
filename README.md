@@ -45,6 +45,10 @@ This project uses **[Tailwind CSS](https://tailwindcss.com/ )** for styling. Tai
 </button>
 ```
 
+### Useful Resources
+- 📖 [Tailwind CSS Documentation](https://tailwindcss.com/docs )
+- 🎨 [Tailwind UI Components](https://tailwindui.com/ )
+
 
 # Local Setup Instructions and project structure information
 # Please read and setup accordingly
