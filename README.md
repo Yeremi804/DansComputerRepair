@@ -243,11 +243,11 @@ We commit:
 ---
 
 # Authors
-Brandon Leyva
-Yeremi Navarrete
-James Crandall
-Diana Ravlo
-Dennis Ravlo
-Jaehee Jung
-Kevin Lai 
-Lance Wakamatsu
+-Brandon Leyva \
+-Yeremi Navarrete \
+-James Crandall \
+-Diana Ravlo \
+-Dennis Ravlo \
+-Jaehee Jung \
+-Kevin Lai \
+-Lance Wakamatsu
