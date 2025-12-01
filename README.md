@@ -164,6 +164,8 @@ src/app/services/layout.js
 ---
 
 # ⌚ Timeline
+
+## ✅ Past Work (Completed Fall 2025)
 Our focus during this semester was to create the Minimum Viable Product (MVP) and adjust based on client feedback.
 
 - Sprint 2: UI Development (47 stories)
@@ -174,6 +176,19 @@ Our focus during this semester was to create the Minimum Viable Product (MVP) an
 
 - Sprint 4: Refinement (17 stories)
   - Integrated client feedback, improved UX, and polished features
+
+---
+
+## 🚀 Future Work (To Be Done in Spring 2026)
+These items were found in the backlog but extend beyond the MVP.
+
+- Email Notification System (maintain consistency across all user interactions)
+- Testing & Bug Fixes
+- Fine tune the authentication system
+- Make adjustments to the website appearance based on client feedback
+- **Estimated Completion Time:** May 2026
+
+---
 
 # 🔐 Using environment variables
 
