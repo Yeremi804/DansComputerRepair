@@ -163,6 +163,18 @@ src/app/services/layout.js
 
 ---
 
+# ⌚ Timeline
+Our focus during this semester was to create the Minimum Viable Product (MVP) and adjust based on client feedback.
+
+- Sprint 2: UI Development (47 stories)
+  - Built all visual components and page layouts
+
+- Sprint 3: Backend Integration (13 stories)
+  - Connected frontend to the Supabase database and implemented core functionality
+
+- Sprint 4: Refinement (17 stories)
+  - Integrated client feedback, improved UX, and polished features
+
 # 🔐 Using environment variables
 
 **Server code** (server actions, API routes, or any file not marked `"use client"`):
