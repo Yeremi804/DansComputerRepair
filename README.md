@@ -4,6 +4,43 @@
 
 Dan's Computer Repair is a local web application designed to promote a small computer repair business and streamline customer interactions. The platform allows residents to submit reviews, request computer building services through an intake form, view pricing information from that very same form, and receive email updates on their repair status. This helps customers stay informed while giving the business owner an efficient way to manage requests and client communication. The site is built using Next.js/React as a framework with Node.js and Supabase handling the backend logic.
 
+# 🛠️ Technologies
+
+## Frontend
+- **[Next.js](https://nextjs.org/ )** → main React-based frontend framework
+- **[React](https://react.dev/ )** → component library that powers the UI
+- **[Tailwind CSS](https://tailwindcss.com/ )** → styling and layout framework
+- **[Lucide React](https://lucide.dev/ )** → icon library
+- **[JavaScript / JSX](https://developer.mozilla.org/en-US/docs/Web/JavaScript )** → language used for the frontend
+- **[npm](https://www.npmjs.com/ )** → package manager for frontend dependencies
+
+## Backend & Database
+- **[Supabase Auth API & Tables](https://supabase.com/ )** → user logins, MFA, session management
+- **[Supabase](https://supabase.com/ )** → main database
+- **[Node.js](https://nodejs.org/ )** → runtime environment for Next.js
+- **[ESLint](https://eslint.org/ )** → linter used to find and fix problems within JavaScript code
+
+## Development Tools
+- **[Visual Studio Code](https://code.visualstudio.com/ )** → IDE used for consistent workflow
+
+## Version Control
+- **[GitHub](https://github.com/ )** → public repository that stores all files; used for team collaboration and code review
+
+---
+
+## 🎨 Styling with Tailwind CSS
+
+This project uses **[Tailwind CSS](https://tailwindcss.com/ )** for styling. Tailwind is a utility-first CSS framework that allows you to build modern designs directly in your HTML/JSX.
+
+
+### Example Code Snippet
+
+```jsx
+<button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+  Click Me
+</button>
+```
+
 
 # Local Setup Instructions and project structure information
 # Please read and setup accordingly
@@ -187,6 +224,18 @@ These items were found in the backlog but extend beyond the MVP.
 - Fine tune the authentication system
 - Make adjustments to the website appearance based on client feedback
 - **Estimated Completion Time:** May 2026
+
+---
+
+# 🧪 Testing
+
+Testing guidelines and procedures will be documented in CSC 191.
+
+---
+
+# 🚀 Deployment
+
+Deployment instructions will be finalized in CSC 191.
 
 ---
 
