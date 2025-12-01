@@ -2,7 +2,7 @@
 
 # Synposis of Dan's Computer Repair 
 
-Dan's Computer Repair is a local web application designed to promote a small computer repair business and streamline customer interactions. The platform allows residents to submit review, request computer part through an online form, view pricing information from that very same form, and receive email updates on their repair status. This helps customers say informed while giving the business owner an efficient way to manage requests and communication progress. The site is built using React and Node.js, making easier to maintain, extend, and troubleshoots.
+Dan's Computer Repair is a local web application designed to promote a small computer repair business and streamline customer interactions. The platform allows residents to submit reviews, request computer building services through an intake form, view pricing information from that very same form, and receive email updates on their repair status. This helps customers stay informed while giving the business owner an efficient way to manage requests and client communication. The site is built using Next.js/React as a framework with Node.js and Supabase handling the backend logic.
 
 
 # Local Setup Instructions and project structure information
