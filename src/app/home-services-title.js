@@ -24,12 +24,6 @@ const services = [
     color: "from-cyan-600 to-cyan-700"
   },
   {
-    icon: Smartphone,
-    title: "Mobile Phone Repair",
-    description: "Screen replacement, battery service, charging port repair, and physical damage",
-    color: "from-pink-600 to-pink-700"
-  },
-  {
     icon: Printer,
     title: "Printer Support",
     description: "Printer setup, maintenance, troubleshooting, and cartridge replacement",
@@ -72,7 +66,7 @@ export default function Services() {
 
         </motion.div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, idx) => {
             const Icon = service.icon;
             return (

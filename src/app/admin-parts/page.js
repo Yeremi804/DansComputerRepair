@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
+import { LayoutDashboard, ShoppingBag, Package, MessageSquare, Settings } from "lucide-react";
 import "./PartsPage.css";
 
 export default function AdminPartsPage() {
@@ -212,10 +213,26 @@ export default function AdminPartsPage() {
           <h2>Dashboard</h2>
         </div>
         <ul>
-          <li onClick={() => router.push('/dashboard')}>Dashboard</li>
-          <li onClick={() => router.push('/dashboard')}>Orders</li>
-          <li className="active">Parts</li>
-          <li>Change password</li>
+          <li onClick={() => router.push('/dashboard')}>
+            <LayoutDashboard size={20} />
+            <span>Dashboard</span>
+          </li>
+          <li onClick={() => router.push('/dashboard')}>
+            <ShoppingBag size={20} />
+            <span>Orders</span>
+          </li>
+          <li className="active">
+            <Package size={20} />
+            <span>Parts</span>
+          </li>
+          <li>
+            <MessageSquare size={20} />
+            <span>Review</span>
+          </li>
+          <li>
+            <Settings size={20} />
+            <span>Setting</span>
+          </li>
         </ul>
       </div>
 

@@ -10,22 +10,22 @@ body {
 
 .sidebar {
   width: 250px;
-  background-color: #9B151C;
-  color: white;
+  background-color: #E2E8F0;
+  color: black;
   padding: 0;
   display: flex;
   flex-direction: column;
 }
 
 .sidebar-header {
-  background-color: #9B151C;
+  background-color: #E2E8F0;
   padding: 20px;
-  border-bottom: 2px solid #000;
+  border-bottom: 1px solid #cbd5e1;
 }
 
 .sidebar h2 {
   margin: 0;
-  color: white;
+  color: black;
   font-size: 24px;
   font-weight: normal;
   text-align: center;
@@ -41,19 +41,23 @@ body {
   margin: 0;
   padding: 20px;
   cursor: pointer;
-  color: white;
-  font-size: 18px;
+  color: black;
+  font-size: 16px;
   text-align: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #cbd5e1;
   font-weight: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .sidebar li:hover {
-  background-color: #7a1116;
+  background-color: #cbd5e1;
 }
 
 .sidebar li.active {
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: #cbd5e1;
   padding: 20px;
   border-radius: 0;
   font-weight: normal;
@@ -76,18 +80,21 @@ body {
 }
 
 .parts-container {
-  background-color: #C4B581;
+  background-color: #E2E8F0;
   padding: 20px;
-  border: 2px solid #333;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(11, 63, 115, 0.25), 0 2px 4px -1px rgba(11, 63, 115, 0.15);
+  border-radius: 8px;
 }
 
 .category {
-  background-color: transparent;
+  background-color: white;
   color: black;
-  padding: 10px;
+  padding: 15px;
   margin-bottom: 20px;
-  min-height: 300px;
-  border: none;
+  min-height: 250px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
 }
 
 .category h3 {
@@ -100,22 +107,23 @@ body {
   background-color: white;
   padding: 15px;
   color: black;
-  border: 2px solid #333;
-  min-height: 250px;
+  border: 1px solid #e5e7eb;
+  min-height: 200px;
   max-height: 400px;
   overflow-y: auto;
   overflow-x: hidden;
+  border-radius: 4px;
 }
 
 .item {
   display: inline-block;
-  background-color: #9B151C;
-  color: white;
+  background-color: #E2E8F0;
+  color: black;
   margin: 5px;
   padding: 15px 20px;
   border-radius: 3px;
   cursor: pointer;
-  border: 2px solid #333;
+  border: 1px solid #e5e7eb;
   font-size: 14px;
   font-weight: 500;
   max-width: 300px;
@@ -126,8 +134,8 @@ body {
 
 .add-btn {
   display: inline-block;
-  background-color: #C4B581;
-  border: 2px solid #333;
+  background-color: #FAFFCA;
+  border: 1px solid #e5e7eb;
   padding: 15px 25px;
   margin: 5px;
   cursor: pointer;
@@ -135,6 +143,7 @@ body {
   font-size: 14px;
   font-weight: 500;
   vertical-align: top;
+  color: black;
 }
 
 .modal {

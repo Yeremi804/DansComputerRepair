@@ -42,29 +42,36 @@ const MONTH_OPTIONS = [
 ];
 
 //badge component for status display
-function StatusBadge({ status, updateStatus, row, router }) {
+function StatusBadge({ status, row, router }) {
   const key = String(status || '').toLowerCase(); //uses tolowercase for easier comparison
 
-  const colorClass = () => {
-    if (key.includes('pending')) return 'bg-gray-200 text-gray-900';
-    if (
-      key.includes('in progress') ||
-      key.includes('in-progress') ||
-      key.includes('progress')
-    )
-      return 'bg-green-200 text-green-900';
-    if (key.includes('cancel')) return 'bg-red-200 text-red-900';
-    return 'bg-blue-200 text-blue-900';
-  };
+  // Restore original color logic (as in your previous version)
+  let colorClass = '';
+  if (key.includes('pending')) colorClass = 'bg-gray-200 text-gray-900';
+  else if (key.includes('in progress') || key.includes('in-progress') || key.includes('progress')) colorClass = 'bg-green-200 text-green-900';
+  else if (key.includes('complete')) colorClass = 'bg-blue-200 text-blue-900';
+  else if (key.includes('cancel')) colorClass = 'bg-red-200 text-red-900';
+  else colorClass = 'bg-blue-200 text-blue-900';
 
+  const handleStatusChange = async (Event) => {
+    const newStatus = Event.target.value;
+    // Call API route to update status
+    await fetch('/api/update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: row.ID,
+        source: row.Source,
+        newStatus,
+      }),
+    });
+    router.refresh();
+  };
   return (
-    <span className={`inline-block rounded-md px-2 py-1 font-semibold ${colorClass()}`}>
+    <span className={`inline-block rounded-md px-2 py-1 font-semibold ${colorClass}`}>
       <select
         value={status}
-        onChange={async Event => {
-          updateStatus(row.ID, Event.target.value);
-          router.refresh();
-        }}
+        onChange={handleStatusChange}
       >
         {STATUS_UPDATE_OPTIONS.map(option => (
           <option key={option.value} value={option.value}>
@@ -87,13 +94,14 @@ function normalizeValue(row, field) {
 }
 
 //main tile component
-export default function OrdersPanel({ rows, updateStatus }) {
+export default function OrdersPanel({ rows }) {
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortField, setSortField] = useState('az');
   const [monthFilter, setMonthFilter] = useState('all');
+  const [expandedRow, setExpandedRow] = useState(null);
 
   const filteredRows = useMemo(() => {
     const byStatus =
@@ -152,6 +160,58 @@ export default function OrdersPanel({ rows, updateStatus }) {
 
     return sorted;
   }, [rows, searchTerm, statusFilter, sortField, monthFilter]);
+
+  // Helper to render expanded details
+  function renderDetails(row) {
+    if (row.Source === 'Configuration_Form') {
+      return (
+        <tr>
+          <td colSpan={7} className="bg-gray-50 p-6 text-left text-sm border-t border-gray-200">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <strong>Processor:</strong> {row.cpu || 'N/A'}<br />
+                <strong>Motherboard:</strong> {row.motherboard || 'N/A'}<br />
+                <strong>Storage:</strong> {row.storage || 'N/A'}<br />
+                <strong>Case:</strong> {row.case || 'N/A'}<br />
+                <strong>Operating System:</strong> {row.operating_syst || 'N/A'}<br />
+                <strong>Other Requests/Notes:</strong> {row.other_requests || row.Notes || 'N/A'}<br />
+              </div>
+              <div>
+                <strong>Graphics Card:</strong> {row.gpu || 'N/A'}<br />
+                <strong>Memory:</strong> {row.memory || 'N/A'}<br />
+                <strong>Power Supply:</strong> {row.psu || 'N/A'}<br />
+                <strong>Cooling:</strong> {row.cooling || 'N/A'}<br />
+                <strong>Networking:</strong> {row.networking || 'N/A'}<br />
+              </div>
+            </div>
+            <div className="mt-4">
+              <strong>Phone/Email:</strong> <br /> {row.phone || 'N/A'} <br /> {row.email || 'N/A'}
+            </div>
+          </td>
+        </tr>
+      );
+    } else if (row.Source === 'service_requests') {
+      return (
+        <tr>
+          <td colSpan={7} className="bg-gray-50 p-6 text-left text-sm border-t border-gray-200">
+            <div>
+              <strong>Device Information:</strong> {row.device_type || 'N/A'}<br />
+              <strong>Problem Description:</strong>
+              <ul className="ml-4 mt-2">
+                <li><strong>When did the problem start?</strong> {row.problem_start || 'no specification.'}</li>
+                <li><strong>Do you have any idea when the problem occurred?</strong> {row.problem_cause || 'no specification.'}</li>
+                <li><strong>Other questions?</strong> {row.additional_ques || 'no specification.'}</li>
+              </ul>
+              <div className="mt-4">
+                <strong>Phone/Email:</strong> <br /> {row.phone_number || 'N/A'} <br /> {row.email || 'N/A'}
+              </div>
+            </div>
+          </td>
+        </tr>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className="rounded-lg bg-red-100 p-4 text-gray-900 shadow-sm hover:shadow-lg hover:border hover:border-pink-300">
@@ -222,40 +282,52 @@ export default function OrdersPanel({ rows, updateStatus }) {
         <table className="w-full border-collapse text-left text-sm">
           <thead className="sticky top-0 bg-gray-50 text-gray-700">
             <tr className="border-b-2 border-gray-200">
+              <th></th>
               <th className="px-3 py-2 font-semibold">ID</th>
               <th className="px-3 py-2 font-semibold">Customer</th>
               <th className="px-3 py-2 font-semibold">Status</th>
               <th className="px-3 py-2 font-semibold">Date</th>
               <th className="px-3 py-2 font-semibold">Notes</th>
+              <th className="px-3 py-2 font-semibold">Source</th>
             </tr>
           </thead>
           <tbody className="text-gray-900">
             {filteredRows.map((row, index) => (
-              <tr
-                key={row.ID ?? index}
-                className="odd:bg-white even:bg-gray-50"
-              >
-                <td className="px-3 py-3 align-top">{row.ID}</td>
-                <td className="px-3 py-3 align-top">{row.Customer}</td>
-                <td className="px-3 py-3 align-top">
-                  <StatusBadge
-                    status={row.Status}
-                    updateStatus={updateStatus}
-                    row={row}
-                    router={router}
-                  />
-                </td>
-                <td className="px-3 py-3 align-top">
-                  {normalizeValue(row, 'Dates')}
-                </td>
-                <td className="px-3 py-3 align-top">{row.Notes}</td>
-              </tr>
+              <>
+                <tr
+                  key={row.ID ?? index}
+                  className="odd:bg-white even:bg-gray-50"
+                >
+                  <td className="px-1 py-3 align-top">
+                    <button
+                      className="text-lg cursor-pointer hover:opacity-70"
+                      onClick={() => setExpandedRow(expandedRow === row.ID ? null : row.ID)}
+                    >
+                      {expandedRow === row.ID ? '▼' : '▶'}
+                    </button>
+                  </td>
+                  <td className="px-3 py-3 align-top">{row.ID}</td>
+                  <td className="px-3 py-3 align-top">{row.Customer}</td>
+                  <td className="px-3 py-3 align-top">
+                      <StatusBadge
+                        status={row.Status}
+                      row={row}
+                      router={router}
+                    />
+                  </td>
+                  <td className="px-3 py-3 align-top">
+                    {normalizeValue(row, 'Dates')}
+                  </td>
+                  <td className="px-3 py-3 align-top">{row.Notes}</td>
+                  <td className="px-3 py-3 align-top">{row.Source}</td>
+                </tr>
+                {expandedRow === row.ID && renderDetails(row)}
+              </>
             ))}
-
             {filteredRows.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={7}
                   className="px-3 py-6 text-center text-sm text-gray-500"
                 >
                   No orders match the search.

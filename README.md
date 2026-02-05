@@ -1,3 +1,4 @@
+![alt text](image.png)
 # Local Setup Instructions and project structure information
 # Please read and setup accordingly
 
@@ -142,7 +143,13 @@ src/app/services/layout.js
 <img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/efecc552-5a7c-4105-a270-001a40153d30" />
 
 ---
+# 🔁 Live Demo 
+**Homepage**
+![alt text](image-1.png)
 
+**Products page**
+![alt text](image-2.png)
+---
 
 # 🔐 Using environment variables
 

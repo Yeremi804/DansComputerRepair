@@ -1,29 +1,8 @@
-import React from 'react'
-import dayjs from 'dayjs';
 import Link from 'next/link';
-import { ClipboardList, UsersRound, Package, Settings as SettingsIcon } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
-import OrdersPanel from './OrdersPanel';
 
-//creating a function to update status to Database
-  export async function updateStatus(id, newStatus) {
-    "use server";
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    );
-
-    const { data ,error } = await supabase
-      .from('Admin_Page_Order')
-      .update({ Status: newStatus})
-      .eq('ID', id);
-    if (error) {
-      console.error('Error updating status:', error);
-    } else {
-      console.log('Status updated successfully:');
-    }
-  }
+import DashboardOrdersPanel from './DashboardOrdersPanel';
 
 
 export const metadata = {
@@ -51,60 +30,105 @@ export default async function DashboardPage() {
 
   // connect to supabase once env is present
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
-  //Fetching data for the whole information Admin Data
-  const { data: rows, error } = await supabase.from('Admin_Page_Order').select('*');
-   if (error) console.error('Supabase error:', error);
-  //Fetching total order
-  const { count: totalOrder, error: totalOrderError } = await supabase.from('Admin_Page_Order').select('ID', { count: 'exact'});
-  if (totalOrderError) console.error('Supabase error:', totalOrderError);
-  //Fetching data for ongoing orders
-  const { count: ongoingOrders, error: ongoingOrdersError } = await supabase.from('Admin_Page_Order').select('Status', { count: 'exact'}).eq('Status', 'In progress');
-  if (ongoingOrdersError) console.error('Supabase error:', ongoingOrdersError);
-  //Fetching data for completed orders
-  const { count: completedOrders, error: completedOrdersError } = await supabase.from('Admin_Page_Order').select('Status', { count: 'exact'}).eq('Status', 'Completed');
-  if (completedOrdersError) console.error('Supabase error:', completedOrdersError);
-  console.log('Rows:', rows);
+
+  // Fetch data from Configuration_Form
+  const { data: configRows, error: configError } = await supabase.from('Configuration_Form').select('*');
+  if (configError) console.error('Supabase error (Configuration_Form):', configError);
+
+  // Fetch data from service_requests
+  const { data: serviceRows, error: serviceError } = await supabase.from('service_requests').select('*');
+  if (serviceError) console.error('Supabase error (service_requests):', serviceError);
+
+  // Combine and normalize data for OrdersPanel
+  const combinedRows = [
+    ...(configRows || []).map(row => ({
+      ID: row.id,
+      Customer: row.name,
+      Status: row.Status || 'Pending',
+      Dates: row.created_at,
+      Notes: row.other_requests,
+      Source: 'Configuration_Form',
+      phone: row.phone,
+      email: row.email,
+      budget_range: row.budget_range,
+      intended_use: row.intended_use,
+      processor: row.cpu,
+      graphics_card: row.gpu,
+      motherboard: row.motherboard,
+      memory: row.memory,
+      storage: row.storage,
+      power_supply: row.psu,
+      case: row.case,
+      cooling: row.cooling,
+      operating_system: row.operating_syst,
+      networking: row.networking,
+      other_requests: row.other_requests,
+    })),
+    ...(serviceRows || []).map(row => ({
+      ID: row.serial_id, // Use serial_id for service_requests
+      Customer: row.customer_name,
+      Status: row.Status || 'Pending',
+      Dates: row.Create_at,
+      Notes: row.additional_ques,
+      Source: 'service_requests',
+    })),
+  ];
+
+  // Split rows by source for separate panels
+  const configFormRows = combinedRows.filter(row => row.Source === 'Configuration_Form');
+  const serviceRequestRows = combinedRows.filter(row => row.Source === 'service_requests');
+
+  // Calculate total, ongoing, completed orders from both tables
+  const totalOrder = combinedRows.length;
+  const ongoingOrders = combinedRows.filter(r => String(r.Status).toLowerCase() === 'in progress').length;
+  const completedOrders = combinedRows.filter(r => String(r.Status).toLowerCase() === 'completed' || String(r.Status).toLowerCase() === 'complete').length;
 
   return (
     <div className="flex min-h-screen">
-      <aside className="w-[220px] py-8 px-4 bg-gray-300 text-black">
-        <h2 className="mb-6 text-4xl">Dashboard</h2>
-        <nav aria-label="Sidebar" className="flex flex-col gap-3">
-          <button className="text-xl inline-flex items-center justify-center gap-2 hover:underline">
-            <ClipboardList size={18} />
+      <aside className="w-[250px] bg-[#E2E8F0] text-black">
+        <div className="p-5 border-b border-[#cbd5e1]">
+          <h2 className="text-2xl text-center">Dashboard</h2>
+        </div>
+        <nav aria-label="Sidebar" className="flex flex-col">
+          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1] bg-[#cbd5e1]">
+            <LayoutDashboard size={20} />
+            <span>Dashboard</span>
+          </button>
+          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
+            <ShoppingBag size={20} />
             <span>Orders</span>
           </button>
-          <button className="text-xl inline-flex items-center justify-center gap-2 hover:underline">
-            <UsersRound size={18} />
-            <span>Customer</span>
-          </button>
-          <Link href="/admin-parts" className="text-xl inline-flex items-center justify-center gap-2 hover:underline">
-            <Package size={18} />
+          <Link href="/admin-parts" className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
+            <Package size={20} />
             <span>Parts</span>
           </Link>
-          <button className="text-xl inline-flex items-center justify-center gap-2 hover:underline">
-            <SettingsIcon size={18} />
-            <span>Settings</span>
+          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
+            <MessageSquare size={20} />
+            <span>Review</span>
+          </button>
+          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
+            <SettingsIcon size={20} />
+            <span>Setting</span>
           </button>
         </nav>
       </aside>
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 bg-white">
         <h1 className="mb-4 text-3xl font-bold">Dashboard</h1>
 
         <section className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
-          <div className="p-4 bg-gray-300 border border-black flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:border-pink-300">
+          <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
             <h3 className="text-gray-900">Total Orders</h3>
             <p className="text-2xl my-2 text-gray-900">{totalOrder}</p>
           </div>
 
-          <div className="p-4 bg-gray-300 border border-black flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:border-pink-300">
+          <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
             <h3 className="text-gray-900">Ongoing</h3>
             <p className="text-2xl my-2 text-gray-900">{ongoingOrders}</p>
             <p className="text-gray-900">Open support tickets</p>
           </div>
 
-          <div className="p-4 bg-gray-300 border border-black flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:border-pink-300">
+          <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
             <h3 className="text-gray-900">Completed</h3>
             <p className="text-2xl my-2 text-gray-900">{completedOrders}</p>
             <p className="text-gray-900">job(s)</p>
@@ -112,10 +136,8 @@ export default async function DashboardPage() {
         </section>
 
         <section className="mt-8">
-          <h2 className="text-2xl font-bold">Orders</h2>
-          <OrdersPanel rows={rows ?? []}  updateStatus={updateStatus}/>
+          <DashboardOrdersPanel supabaseUrl={SUPABASE_URL} supabaseAnonKey={SUPABASE_ANON} />
         </section>
-
       </main>
     </div>
   )
