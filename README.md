@@ -1,4 +1,55 @@
-![alt text](image.png)
+<img width="1591" height="383" alt="image" src="https://github.com/user-attachments/assets/342fd859-2622-4889-9944-80f55de9872f" />
+
+# Synposis of Dan's Computer Repair 
+
+Dan's Computer Repair is a local web application designed to promote a small computer repair business and streamline customer interactions. The platform allows residents to submit reviews, request computer building services through an intake form, view pricing information from that very same form, and receive email updates on their repair status. This helps customers stay informed while giving the business owner an efficient way to manage requests and client communication. The site is built using Next.js/React as a framework with Node.js and Supabase handling the backend logic.
+
+---
+
+# 🛠️ Technologies
+
+## Frontend
+- **[Next.js](https://nextjs.org/ )** → main React-based frontend framework
+- **[React](https://react.dev/ )** → component library that powers the UI
+- **[Tailwind CSS](https://tailwindcss.com/ )** → styling and layout framework
+- **[Lucide React](https://lucide.dev/ )** → icon library
+- **[JavaScript / JSX](https://developer.mozilla.org/en-US/docs/Web/JavaScript )** → language used for the frontend
+- **[npm](https://www.npmjs.com/ )** → package manager for frontend dependencies
+
+## Backend & Database
+- **[Supabase Auth API & Tables](https://supabase.com/ )** → user logins, MFA, session management
+- **[Supabase](https://supabase.com/ )** → main database
+- **[Node.js](https://nodejs.org/ )** → runtime environment for Next.js
+- **[ESLint](https://eslint.org/ )** → linter used to find and fix problems within JavaScript code
+
+## Development Tools
+- **[Visual Studio Code](https://code.visualstudio.com/ )** → IDE used for consistent workflow
+
+## Version Control
+- **[GitHub](https://github.com/ )** → public repository that stores all files; used for team collaboration and code review
+
+---
+
+## 🎨 Styling with Tailwind CSS
+
+This project uses **[Tailwind CSS](https://tailwindcss.com/ )** for styling. Tailwind is a utility-first CSS framework that allows you to build modern designs directly in your HTML/JSX.
+
+![tailwindcss-icon](https://github.com/user-attachments/assets/f9453fb3-8c18-429a-9711-521ed0badc2e)<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><defs><linearGradient x1="0" y1="-21.333" y2="85.333" id="A" x2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#2383ae" offset="0%"/><stop stop-color="#6dd7b9" offset="100%"/></linearGradient></defs><path d="M16 25.6c2.133-8.533 7.467-12.8 16-12.8 12.8 0 14.4 9.6 20.8 11.2 4.267 1.067 8-.533 11.2-4.8C61.867 27.733 56.533 32 48 32c-12.8 0-14.4-9.6-20.8-11.2-4.267-1.067-8 .533-11.2 4.8zM0 44.8C2.133 36.267 7.467 32 16 32c12.8 0 14.4 9.6 20.8 11.2 4.267 1.067 8-.533 11.2-4.8-2.133 8.533-7.467 12.8-16 12.8-12.8 0-14.4-9.6-20.8-11.2-4.267-1.067-8 .533-11.2 4.8z" fill="url(#A)" fill-rule="evenodd"/></svg>
+
+
+### Example Code Snippet
+
+```jsx
+<button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+  Click Me
+</button>
+```
+
+### Useful Resources
+- 📖 [Tailwind CSS Documentation](https://tailwindcss.com/docs )
+- 🎨 [Tailwind UI Components](https://tailwindui.com/ )
+
+
 # Local Setup Instructions and project structure information
 # Please read and setup accordingly
 
@@ -32,6 +83,10 @@ Open `.env.local` and fill in real values, for example:
 NEXT_PUBLIC_SITE_NAME=Dans Computer Repair
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
+# Supabase Database
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL_HERE
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY_HERE
+
 # Database (example for Postgres)
 DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DBNAME
 
@@ -45,6 +100,15 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DBNAME
 - All others are **server-only** and should only be read in server code (server actions, API routes, etc.).
 - `.env.local` is **gitignored**; `.env.example` is the template we keep in Git.
 
+ How to get the Supabase URL and Anon Key for `.env.local`
+- When you are added to the Supabase project, navigate to project settings on the sidebar
+<img width="294" height="353" alt="Image" src="https://github.com/user-attachments/assets/ce0eafd4-3288-4e43-ac29-8326f85f0c1f" />
+
+- Go to Data API project setting to copy the Supabase URL.
+<img width="1063" height="81" alt="Image" src="https://github.com/user-attachments/assets/e03904f2-c4ef-4a7d-9d7c-ff33fa034c7f" />
+
+- Go to API Keys project setting just below Data API and click the 2nd tab labeled "Legacy anon, service_role API keys" to copy the Supabase Anon Key.
+<img width="1076" height="125" alt="Image" src="https://github.com/user-attachments/assets/373c69d9-8079-47de-9cd4-36135a02fce6" />
 ---
 
 ## 3) Run the app
@@ -129,10 +193,10 @@ If you need a section-specific layout:
 src/app/services/layout.js
 ```
 ---
-# 🎨 Prototype 
-| 🏠 Home Page                                                                                                              | 📦 Admin – Orders                                                                                                            |
+# 🎨 Live Demo 
+| 🏠 Home Page                                                                                                              | 📦 Products page                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| <img width="350" alt="Home Page" src="https://github.com/user-attachments/assets/f27f3208-92f6-414e-b885-cf5fb5eea408" /> | <img width="350" alt="Admin Orders" src="https://github.com/user-attachments/assets/d47805f3-59c0-4b15-a2e9-f9f3667e431f" /> |
+| <img width="350" alt="Home Page" alt="image" src="https://github.com/user-attachments/assets/8614f00e-fe78-476a-bcfb-14d415717b9a" />| <img width="350" alt="Products Page" src="https://github.com/user-attachments/assets/c51e6012-a257-47c9-9919-3f9f30b9d2be" /> |
 
 | 🛠️ Admin – Parts                                                                                                           | 💻 Custom PC Form                                                                                                              |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -147,8 +211,43 @@ src/app/services/layout.js
 **Homepage**
 ![alt text](image-1.png)
 
-**Products page**
-![alt text](image-2.png)
+# ⌚ Timeline
+
+## ✅ Past Work (Completed Fall 2025)
+Our focus during this semester was to create the Minimum Viable Product (MVP) and adjust based on client feedback.
+
+- Sprint 2: UI Development (47 stories)
+  - Built all visual components and page layouts
+
+- Sprint 3: Backend Integration (13 stories)
+  - Connected frontend to the Supabase database and implemented core functionality
+
+- Sprint 4: Refinement (17 stories)
+  - Integrated client feedback, improved UX, and polished features
+
+---
+
+## 🚀 Future Work (To Be Done in Spring 2026)
+These items were found in the backlog but extend beyond the MVP.
+
+- Email Notification System (maintain consistency across all user interactions)
+- Testing & Bug Fixes
+- Fine tune the authentication system
+- Make adjustments to the website appearance based on client feedback
+- **Estimated Completion Time:** May 2026
+
+---
+
+# 🧪 Testing
+
+Testing guidelines and procedures will be documented in CSC 191.
+
+---
+
+# 🚀 Deployment
+
+Deployment instructions will be finalized in CSC 191.
+
 ---
 
 # 🔐 Using environment variables
@@ -185,3 +284,30 @@ We commit:
 - **Port in use** → `PORT=3001 npm run dev` (or stop the other process).
 - **Env not loading** → Confirm file name is `.env.local` in the project root; restart dev server.
 - **Import paths messy** → Use alias `@/` (configured in `jsconfig.json`).
+
+---
+
+# Creating an Admin Account (Testing Purposes)
+- Navigate to the page ./create-admin-account.
+- Follow the listed steps to create an account.
+- After redirect to login page, attempt to login.
+- You will be prompted to setup MFA. Please use Google Authenticator or similar.
+- After MFA is setup, you will be able to login successfully.
+
+# Removing MFA Factors
+- Through Supabase, access your account through the Authentication tab.
+- After finding your account, scroll down and click the button labelled "Remove MFA Factors"
+- Your MFA factors will be reset, allowing you to re-init another MFA method.
+- ! Please make to sure to remove existing MFA factors through your Authenticator app (Google Authenticator)
+
+---
+
+# Authors
+-Brandon Leyva \
+-Yeremi Navarrete \
+-James Crandall \
+-Diana Ravlo \
+-Dennis Ravlo \
+-Jaehee Jung \
+-Kevin Lai \
+-Lance Wakamatsu
