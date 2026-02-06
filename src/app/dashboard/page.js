@@ -107,7 +107,7 @@ export default async function DashboardPage() {
             className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
           >
             <MessageSquare size={20} />
-            <span>Review</span>
+            <span>Reviews</span>
           </Link>
           <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
             <SettingsIcon size={20} />
