@@ -225,7 +225,7 @@ export default function AdminPartsPage() {
             <Package size={20} />
             <span>Parts</span>
           </li>
-          <li>
+          <li onClick={() => router.push('/dashboard/admin-reviews')}>
             <MessageSquare size={20} />
             <span>Review</span>
           </li>

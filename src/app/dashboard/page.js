@@ -102,10 +102,13 @@ export default async function DashboardPage() {
             <Package size={20} />
             <span>Parts</span>
           </Link>
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
+          <Link
+            href="/dashboard/admin-reviews"
+            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
+          >
             <MessageSquare size={20} />
             <span>Review</span>
-          </button>
+          </Link>
           <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
             <SettingsIcon size={20} />
             <span>Setting</span>

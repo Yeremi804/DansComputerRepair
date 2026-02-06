@@ -30,16 +30,21 @@ export default function Home() {
 
       console.log("Fetched from Supabase:", data, "error:", error);
 
-      if (error) console.error(error);
-      const mappedReviews = data.map((review) => ({
+      if (error) {
+        console.error(error);
+        setLocalReviews([]);
+        return;
+      }
+
+      const visibleReviews = (data || []).filter((review) => review.show_on_site !== false);
+      const mappedReviews = visibleReviews.map((review) => ({
         name: review.name,
         rating: review.rating,
         date: new Date(review.creationTime).toLocaleDateString(),
         text: review.reviewText,
         photos: review.photoUrl ? [review.photoUrl] : [],
       }));
-      if (data) setLocalReviews(mappedReviews);
-      else setLocalReviews(data);
+      setLocalReviews(mappedReviews);
     }
 
     fetchLocalReviews();
@@ -56,10 +61,12 @@ export default function Home() {
 
         if (error) {
           console.error(error);
+          setYelpReviews([]);
           return;
         }
 
-        const mapped = data.map(row => ({
+        const visibleYelp = (data || []).filter((row) => row.show_on_site !== false);
+        const mapped = visibleYelp.map(row => ({
           embed: row.embed
         }));
 
