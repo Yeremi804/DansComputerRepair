@@ -15,8 +15,8 @@ import { createServerClient } from "@supabase/ssr";
 
 // Regular expressions representing admin-only routes.
 // Patterns are tested against the request pathname.
-// Current being "/dashboard" and "/admin-parts"
-const ADMIN_MATCH = [/^\/dashboard(\/|$)/, /^\/admin-parts(\/|$)/];
+// Current being "/dashboard", "/admin-parts", and "/admin-reviews"
+const ADMIN_MATCH = [/^\/dashboard(\/|$)/, /^\/admin-parts(\/|$)/, /^\/admin-reviews(\/|$)/];
 
 
 // Function determining whether a given pathname matches one of the
@@ -97,5 +97,5 @@ export async function middleware(req: NextRequest) {
 // Note - ":path*" just means it applies to all subpaths under the base route.
 // For example: based on the current defined paths in config, /dashboard/settings is also valid.
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin-parts/:path*"],
+  matcher: ["/dashboard/:path*", "/admin-parts/:path*", "/admin-reviews/:path*"],
 };
