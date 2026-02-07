@@ -1,3 +1,11 @@
+"use client";
+
+import dynamic from 'next/dynamic';
+
+const MapComponent = dynamic(() => import('./MapComponent'), {
+  ssr: false,
+});
+
 export function Footer() {
     return (
       <footer className="bg-white text-gray-800 border-t mt-12">
@@ -22,7 +30,10 @@ export function Footer() {
             <p className="text-sm mt-1">Mon - Sat: 7 AM - 9 PM</p>
             <p className="text-sm mt-2">(916) 320-6955</p>
             <p className="text-sm">(279) 241-0963</p>
+            
           </div>
+        
+          
   
           {/* Customer Support */}
           <div>
@@ -35,7 +46,14 @@ export function Footer() {
               <li>Contact technician</li>
             </ul>
           </div>
+          
         </div>
+        <div className="md:col-span-2 mt-4 h-72 md:h-96 w-full rounded overflow-hidden border">
+  <MapComponent />
+</div>
+
+        
+         
   
         {/* WIP */}
         <div className="border-t text-center text-xs text-gray-500 py-4">
