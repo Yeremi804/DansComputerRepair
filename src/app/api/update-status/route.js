@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import sendEmail from '../emailSend/EmailSender';
 
 export async function POST(request) {
   const body = await request.json();
@@ -26,6 +27,16 @@ export async function POST(request) {
     idField = 'ID';
   }
 
+  //Collecting information of the order to have email being send
+  const {data: rowData, error: fetcherror } = await supabase
+    .from(table)
+    .select('*')
+    .eq(idField, id)
+    .single();
+  if (fetcherror) {
+    return NextResponse.json({ error: fetcherror.message }, { status: 500 });
+  }
+
   const { error } = await supabase
     .from(table)
     .update({ Status: newStatus })
@@ -33,6 +44,14 @@ export async function POST(request) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  //Fetch email notification if it ever exist
+  const customerEmail = rowData.email;
+  if(customerEmail) {
+    const subject = `Your order with ID ${id} has been updated to ${newStatus}`;
+    const text = `Dear Customer,\n\nYour order with ID ${id} has been updated to ${newStatus}.\n\nThank you for your business!`;
+    await sendEmail(customerEmail, subject, text); 
   }
   return NextResponse.json({ success: true });
 }
