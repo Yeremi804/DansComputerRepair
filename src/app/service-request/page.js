@@ -14,6 +14,7 @@ export default function ServiceRequest() {
     started: '',
     idea: '',
     questions: '',
+    smsConsent: false,
   });
 
   // status tracks the submission lifecycle: null | 'sending' | 'submitted' | 'error'
@@ -21,8 +22,8 @@ export default function ServiceRequest() {
 
   // A generic onChange handler to update the form state for any input.
   function update(e) {
-    const { name, value } = e.target;
-    setForm((s) => ({ ...s, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((s) => ({ ...s, [name]: type === 'checkbox' ? checked : value }));
   }
 
   // Replace the handleSubmit function's logic.
@@ -53,6 +54,7 @@ export default function ServiceRequest() {
         problem_start_date: form.started,
         problem_cause_idea: form.idea,
         additional_questions: form.questions,
+        sms_consent: form.smsConsent,
       };
 
       // Send the data to the 'service_requests' table in Supabase.
@@ -67,7 +69,7 @@ export default function ServiceRequest() {
       // Set status to 'submitted' for user feedback.
       setStatus('submitted');
       // Reset the form fields to be empty for the next submission.
-      setForm({ name: '', phone: '', email: '', deviceSelect: '', deviceText: '', started: '', idea: '', questions: '' });
+      setForm({ name: '', phone: '', email: '', deviceSelect: '', deviceText: '', started: '', idea: '', questions: '', smsConsent: false });
 
     } catch (err) {
       // If any error occurs during the 'try' block:
@@ -104,6 +106,19 @@ export default function ServiceRequest() {
             <input name="email" value={form.email} onChange={update} className={styles.input} type="email" required />
           </label>
         </div>
+
+        <label className={styles.checkboxField}>
+          <input
+            type="checkbox"
+            name="smsConsent"
+            checked={form.smsConsent}
+            onChange={update}
+            className={styles.checkbox}
+          />
+          <span className={styles.checkboxLabel}>
+            I agree to receive SMS notifications about my repair status.
+          </span>
+        </label>
 
         {/* Device information group */}
         <div className={styles.sectionHeader}>Device Information</div>

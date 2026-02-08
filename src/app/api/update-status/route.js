@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import sendEmail from '../emailSend/EmailSender';
+import sendSms from '../smsSend/SmsSender';
 
 export async function POST(request) {
   const body = await request.json();
@@ -61,5 +62,29 @@ export async function POST(request) {
     await sendEmail(customerEmail, subject, text); 
     }
   }
-  return NextResponse.json({ success: true });
+
+  // SMS notification
+  const customerPhone = rowData.phone_number || rowData.phone;
+  const smsConsent = rowData.sms_consent;
+
+  // Check if the customer has provided a phone number AND consented to SMS.
+  if (customerPhone && smsConsent) {
+    let smsText = '';
+    if (newStatus === 'Completed') {
+      // A shorter message for SMS
+      smsText = `Your order #${id} is complete! Please consider leaving a review on our website. Thank you! -Dan's Computer Repair`;
+    } else {
+      smsText = `Your order #${id} has been updated to '${newStatus}'. -Dan's Computer Repair`;
+    }
+
+    // Use a try-catch block to prevent SMS errors from crashing the API.
+    try {
+      await sendSms(customerPhone, smsText);
+      console.log(`SMS notification sent to: ${customerPhone}`);
+    } catch (smsError) {
+      console.error(`Failed to send SMS to ${customerPhone}:`, smsError);
+    }
+  }
+
+  return NextResponse.json({ success: true }); 
 }
