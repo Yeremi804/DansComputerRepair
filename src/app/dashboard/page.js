@@ -107,12 +107,14 @@ export default async function DashboardPage() {
             className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
           >
             <MessageSquare size={20} />
-            <span>Reviews</span>
+            <span>Review</span>
           </Link>
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
+          <Link
+           href="/settings"
+           className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
             <SettingsIcon size={20} />
-            <span>Setting</span>
-          </button>
+            <span>Settings</span>
+          </Link>
         </nav>
       </aside>
 

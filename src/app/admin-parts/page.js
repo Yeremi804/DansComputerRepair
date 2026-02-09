@@ -231,7 +231,7 @@ export default function AdminPartsPage() {
           </li>
           <li>
             <Settings size={20} />
-            <span>Setting</span>
+            <span>Settings</span>
           </li>
         </ul>
       </div>
