@@ -1,4 +1,11 @@
+"use client";
+
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
+
+const MapComponent = dynamic(() => import('./MapComponent'), {
+  ssr: false,
+});
 
 export function Footer() {
   return (
@@ -40,44 +47,55 @@ export function Footer() {
           </a>
         </div>
 
-        {/* About Us */}
-        <div className="text-center md:text-left">
-          <h3 className="font-semibold mb-3">About Us</h3>
-          <ul className="space-y-1 text-sm">
-            <li>Computer diagnostics</li>
-            <li>Laptop & desktop repair</li>
-            <li>Virus and malware removal</li>
-            <li>Data recovery</li>
-            <li>Custom PC builds</li>
-            <li>System upgrades</li>
-          </ul>
+          {/* About Us */}
+          <div>
+            <h3 className="font-semibold mb-3">About Us</h3>
+            <ul className="space-y-1 text-sm">
+              <li>Computer diagnostics</li>
+              <li>Laptop & desktop repair</li>
+              <li>Virus and malware removal</li>
+              <li>Data recovery</li>
+              <li>Custom PC builds</li>
+              <li>System upgrades</li>
+            </ul>
+          </div>
+  
+          {/* Location */}
+          <div>
+            <h3 className="font-semibold mb-3">Location</h3>
+            <p className="text-sm">Sacramento, CA 95842</p>
+            <p className="text-sm mt-1">Mon - Sat: 7 AM - 9 PM</p>
+            <p className="text-sm mt-2">(916) 320-6955</p>
+            <p className="text-sm">(279) 241-0963</p>
+            
+          </div>
+        
+          
+  
+          {/* Customer Support */}
+          <div>
+            <h3 className="font-semibold mb-3">Customer Support</h3>
+            <ul className="space-y-1 text-sm">
+              <li>Request a repair</li>
+              <li>Track your service</li>
+              <li>Warranty information</li>
+              <li>Troubleshooting tips</li>
+              <li>Contact technician</li>
+            </ul>
+          </div>
+          
         </div>
+        <div className="md:col-span-2 mt-4 h-72 md:h-96 w-full rounded overflow-hidden border">
+  <MapComponent />
+</div>
 
-        {/* Location */}
-        <div className="text-center md:text-left">
-          <h3 className="font-semibold mb-3">Location</h3>
-          <p className="text-sm">Sacramento, CA 95842</p>
-          <p className="text-sm mt-1">Mon - Sat: 7 AM - 9 PM</p>
-          <p className="text-sm mt-2">(916) 320-6955</p>
+        
+         
+  
+        {/* Copyright section */}
+        <div className="border-t text-center text-xs text-gray-500 py-4">
+          © {new Date().getFullYear()} Dan's Computer Repair — All rights reserved.
         </div>
-
-        {/* Customer Support */}
-        <div className="text-center md:text-left">
-          <h3 className="font-semibold mb-3">Customer Support</h3>
-          <ul className="space-y-1 text-sm">
-            <li>Request a repair</li>
-            <li>Track your service</li>
-            <li>Warranty information</li>
-            <li>Troubleshooting tips</li>
-            <li>Contact technician</li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Copyright */}
-      <div className="border-t text-center text-xs text-gray-500 py-4">
-        © {new Date().getFullYear()} Dan&apos;s Computer Repair — All rights reserved.
-      </div>
-    </footer>
-  );
-}
+      </footer>
+    );
+  }

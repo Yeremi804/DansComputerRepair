@@ -15,8 +15,8 @@ import { createServerClient } from "@supabase/ssr";
 
 // Regular expressions representing admin-only routes.
 // Patterns are tested against the request pathname.
-// Current being "/dashboard" and "/admin-parts"
-const ADMIN_MATCH = [/^\/dashboard(\/|$)/, /^\/admin-parts(\/|$)/];
+// Current being "/dashboard", "/admin-parts", and "/admin-reviews"
+const ADMIN_MATCH = [/^\/dashboard(\/|$)/, /^\/admin-parts(\/|$)/, /^\/admin-reviews(\/|$)/];
 
 
 // Function determining whether a given pathname matches one of the
@@ -56,7 +56,8 @@ export async function middleware(req: NextRequest) {
           res.cookies.set({ name, value, ...options });
         },
         remove(name, options) {
-          res.cookies.set({ name, value: "", ...options });
+          // To make remove actually REMOVE the cookie, we set it with an expired maxAge
+          res.cookies.set({ name, value: "", ...options, maxAge: 0 });
         },
       },
     }
@@ -64,9 +65,10 @@ export async function middleware(req: NextRequest) {
 
   // Fetch user sessions from supabase to verify authentication status.
   // 1) Must be logged in
-  const { data: { session } } = await supabase.auth.getSession();
+  // Using getUser instead of getSession because we only need to check if user exists, not the full session details
+  const { data: { user } } = await supabase.auth.getUser();
   // If user is not logged in -> redirect 
-  if (!session) {
+  if (!user) {
     const url = new URL("/admin-log-in", req.url);
     // Assists with preserving intended destination so we can redirect after login.
     url.searchParams.set("redirectTo", nextUrl.pathname);
@@ -78,7 +80,7 @@ export async function middleware(req: NextRequest) {
   const { data: profile, error } = await supabase
     .from("profiles")           // Fetching from profile table
     .select("role")             // Fetching from role column
-    .eq("id", session.user.id)  // For matching authenticated user ID
+    .eq("id", user.id)          // For matching authenticated user ID
     .single();                  // Expecting only one results
 
   // If user is logged in somehow, but not an admin, redirect to home.
@@ -95,5 +97,5 @@ export async function middleware(req: NextRequest) {
 // Note - ":path*" just means it applies to all subpaths under the base route.
 // For example: based on the current defined paths in config, /dashboard/settings is also valid.
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin-parts/:path*"],
+  matcher: ["/dashboard/:path*", "/admin-parts/:path*", "/admin-reviews/:path*"],
 };
