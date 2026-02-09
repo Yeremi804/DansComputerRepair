@@ -20,6 +20,7 @@ export default function Header() {
   // State to track if the user is an admin and if we're still checking
   const [isAdmin, setIsAdmin] = useState(false); // Default to false until we check
   const [checking, setChecking] = useState(true); // Track if we're still checking the admin status
+  const [userPresent, setUserPresent] = useState(false); // Track if *any* user is logged in
 
   // Small interaction animations
   const hover = { scale: 1.05 };
@@ -36,55 +37,76 @@ export default function Header() {
   ];
 
   // Check admin status on mount and on auth state changes
-  useEffect(() => { // Create a Supabase client for browser use
+  useEffect(() => {
+    // Create a Supabase client for browser use
     const supabase = createSupabaseBrowserClient();
 
-    // Function to check if the user is an admin
-    async function loadAdminStatus() { // Set checking to true while we verify admin status
+    // Function to check if the user is logged in and/or an admin
+    async function loadAdminStatus() {
+      // Set checking to true while we verify admin status
       setChecking(true);
 
       // Get the current user
-      const { data: { user } } = await supabase.auth.getUser(); // If no user is logged in, set admin status to false and stop checking
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // If no user is logged in, clear all auth-related state
       if (!user) {
+        setUserPresent(false);
         setIsAdmin(false);
         setChecking(false);
         return;
       }
 
+      // A user *is* logged in
+      setUserPresent(true);
+
       // Fetch the user's profile to check their role
       const { data: profile } = await supabase
-        .from("profiles") // Access the profiles table to get the user's role
+        .from("profiles") // Access the profiles table
         .select("role")   // Select only the role column
         .eq("id", user.id) // Filter by the current user's ID
         .single(); // Expect a single result since user IDs are unique
 
-        // Set admin status based on the role
-      setIsAdmin(profile?.role === "admin"); // If the role is "admin", set isAdmin to true, otherwise false
-      setChecking(false); // Set checking to false after we've determined the admin status
-    } 
+      // Set admin status based on the role
+      setIsAdmin(profile?.role === "admin");
+      setChecking(false); // Done checking
+    }
 
     // Initial check on mount
     loadAdminStatus();
 
     // Listen for auth state changes to update admin status in real-time
     const { data: sub } = supabase.auth.onAuthStateChange(() => {
-      loadAdminStatus(); // Re-check admin status whenever the authentication state changes (e.g., login/logout)
-
+      loadAdminStatus();
     });
+
     // Clean up the subscription on unmount
-    return () => sub.subscription.unsubscribe(); // Unsubscribe from auth state changes when the component unmounts to prevent memory leaks
-  }, []); // Empty dependency array means this effect runs once on mount and sets up the auth state listener
+    return () => {
+      // Supabase SDK shape differs by version, so be defensive
+      if (sub?.subscription?.unsubscribe) {
+        sub.subscription.unsubscribe();
+      } else if (typeof sub?.unsubscribe === "function") {
+        sub.unsubscribe();
+      }
+    };
+  }, []);
 
-  // Handle logout for admin users
-  async function handleLogout() { // Create a Supabase client for browser use
-    const supabase = createSupabaseBrowserClient(); // Sign out the user from Supabase and also call the logout API route to clear any server-side session
-    await supabase.auth.signOut(); // Call the logout API route to clear any server-side session or cookies related to admin authentication
-    await fetch("/api/logout", { method: "POST" }); // After logging out, clear the admin status and redirect to the login page
+  // Handle logout for logged-in users
+  async function handleLogout() {
+    // Create a Supabase client for browser use
+    const supabase = createSupabaseBrowserClient();
 
-    // Clear admin status and redirect to login page
+    // Sign out client-side
+    await supabase.auth.signOut();
+
+    // Call the logout API route to clear any server-side session/cookies
+    await fetch("/api/logout", { method: "POST" });
+
+    // Clear auth state and redirect to admin login
+    setUserPresent(false);
     setIsAdmin(false);
-    router.replace("/admin-log-in"); // Use replace to prevent going back to the protected page after logout
-    router.refresh(); // Refresh the page to ensure all state is reset and the user sees the login page without any cached admin state
+    router.replace("/admin-log-in"); // Prevent back-navigation into admin pages
+    router.refresh(); // Ensure all cached state is cleared
   }
 
   return (
@@ -96,9 +118,6 @@ export default function Header() {
           onClick={() => handleNavigation("/")}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") handleNavigation("/");
-          }}
         >
           <img
             src="/Danlogo.jpg"
@@ -108,7 +127,7 @@ export default function Header() {
             className="h-12 w-12 md:h-16 md:w-16 rounded-md object-contain flex-shrink-0"
           />
           <div className="leading-tight">
-            <h1 className="font-semibold tracking-tight text-gray-900 text-base sm:text-lg md:text-xl truncate">
+            <h1 className="font-semibold tracking-tight text-gray-900">
               Dan&apos;s Computer Repair
             </h1>
             <p className="text-sm text-gray-600">
@@ -127,38 +146,49 @@ export default function Header() {
                   onClick={() => handleNavigation(l.path)}
                   whileHover={hover}
                   whileTap={tap}
-                  className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                  className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-red-100"
                 >
                   {l.label}
                 </MotionButton>
               </li>
             ))}
+
+            {/* Logout button for logged-in users */}
+            {!checking && userPresent && (
+              <li>
+                <MotionButton
+                  type="button"
+                  onClick={handleLogout}
+                  whileHover={hover}
+                  whileTap={tap}
+                  className="rounded px-3 py-1 bg-red-50 text-red-700 hover:bg-red-100"
+                >
+                  Logout
+                </MotionButton>
+              </li>
+            )}
           </ul>
         </nav>
 
-        {/* Mobile Hamburger Button*/}
-        <div className="md:hidden flex items-center flex-shrink-0">
+        {/* Mobile Hamburger Button */}
+        <div className="md:hidden flex items-center">
           <button
             type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="rounded px-3 py-2 text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+            className="rounded px-3 py-2 text-gray-700 hover:bg-gray-100"
           >
             {open ? "✕" : "☰"}
           </button>
         </div>
       </div>
 
-      {/* Mobile dropdown for navigation to different pages*/}
+      {/* Mobile dropdown for navigation to different pages */}
       <AnimatePresence>
         {open && (
           <motion.div
-            key="mobile-menu"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
             className="md:hidden overflow-hidden border-t border-gray-200 bg-white"
           >
             <div className="mx-auto max-w-6xl px-4 py-3">
@@ -168,12 +198,27 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={() => handleNavigation(l.path)}
-                      className="w-full rounded px-3 py-2 text-left text-gray-700 hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+                      className="w-full rounded px-3 py-2 text-left text-gray-700 hover:bg-red-100"
                     >
                       {l.label}
                     </button>
                   </li>
                 ))}
+
+                {!checking && userPresent && (
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full rounded px-3 py-2 text-left bg-red-50 text-red-700 hover:bg-red-100"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                )}
               </ul>
             </div>
           </motion.div>
