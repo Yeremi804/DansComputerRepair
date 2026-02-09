@@ -100,3 +100,23 @@
   opacity: 0.6;               /* Make it slightly transparent */
   border-color: #dddddd;      /* Lighter border */
 }
+
+.checkboxField {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px; /* Add some space below the checkbox */
+  margin-top: 8px; /* Add some space above the checkbox */
+}
+
+.checkbox {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-size: 0.875rem; /* 14px */
+  color: #333;
+  cursor: pointer;
+}
