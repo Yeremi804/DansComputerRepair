@@ -88,29 +88,75 @@ export default function ServiceRequest() {
         {/* Contact information group */}
         <div className={styles.sectionHeader}>1. Contact Information</div>
 
-        <div className={styles.grid3}>
+        {/* minimal, responsive tweak: auto-fit columns so fields wrap cleanly on mobile */}
+        <div
+          className={styles.grid3}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+          }}
+        >
           <label className={styles.field}>
             <span className={styles.label}>Name</span>
-            <input name="name" value={form.name} onChange={update} className={styles.input} required />
+            <input
+              name="name"
+              value={form.name}
+              onChange={update}
+              className={styles.input}
+              required
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
           </label>
 
           <label className={styles.field}>
             <span className={styles.label}>Phone number</span>
-            <input name="phone" value={form.phone} onChange={update} className={styles.input} type="tel" required/>
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={update}
+              className={styles.input}
+              type="tel"
+              required
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
           </label>
 
           <label className={styles.field}>
             <span className={styles.label}>Email address</span>
-            <input name="email" value={form.email} onChange={update} className={styles.input} type="email" required />
+            <input
+              name="email"
+              value={form.email}
+              onChange={update}
+              className={styles.input}
+              type="email"
+              required
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
           </label>
         </div>
 
         {/* Device information group */}
         <div className={styles.sectionHeader}>Device Information</div>
-        <div className={styles.grid2}>
+
+        <div
+          className={styles.grid2}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+          }}
+        >
           <label className={styles.field}>
             <span className={styles.label}>Device</span>
-            <select name="deviceSelect" value={form.deviceSelect} onChange={update} className={styles.input} disabled={!!form.deviceText}>
+            <select
+              name="deviceSelect"
+              value={form.deviceSelect}
+              onChange={update}
+              className={styles.input}
+              disabled={!!form.deviceText}
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            >
               <option value="">Select a device here</option>
               <option>Desktop</option>
               <option>Laptop</option>
@@ -121,28 +167,63 @@ export default function ServiceRequest() {
 
           <label className={styles.field}>
             <span className={styles.label}>Or specify</span>
-            <input name="deviceText" placeholder="Type your device here" value={form.deviceText} onChange={update} className={styles.input} disabled={!!form.deviceSelect}/>
+            <input
+              name="deviceText"
+              placeholder="Type your device here"
+              value={form.deviceText}
+              onChange={update}
+              className={styles.input}
+              disabled={!!form.deviceSelect}
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
           </label>
         </div>
 
         {/* Problem description group */}
         <div className={styles.sectionHeader}>2. Problem Description</div>
-        <div className={styles.grid2}>
+
+        <div
+          className={styles.grid2}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+          }}
+        >
           <label className={styles.field}>
             <span className={styles.label}>When did the problem start?</span>
-            <input name="started" value={form.started} onChange={update} className={styles.input} type="date"/>
+            <input
+              name="started"
+              value={form.started}
+              onChange={update}
+              className={styles.input}
+              type="date"
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
           </label>
 
           <label className={styles.field}>
             <span className={styles.label}>Do you have any idea when the problem occurred?</span>
-            <input name="idea" value={form.idea} onChange={update} className={styles.input} />
+            <input
+              name="idea"
+              value={form.idea}
+              onChange={update}
+              className={styles.input}
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
           </label>
         </div>
 
         {/* Additional questions freeform */}
         <label className={styles.field}>
           <span className={styles.label}>Any other questions you have?</span>
-          <textarea name="questions" value={form.questions} onChange={update} className={styles.textarea} />
+          <textarea
+            name="questions"
+            value={form.questions}
+            onChange={update}
+            className={styles.textarea}
+            style={{ width: '100%', boxSizing: 'border-box' }}
+          />
         </label>
 
         {/* Submit button area */}

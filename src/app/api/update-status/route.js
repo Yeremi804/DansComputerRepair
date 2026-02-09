@@ -49,9 +49,17 @@ export async function POST(request) {
   //Fetch email notification if it ever exist
   const customerEmail = rowData.email;
   if(customerEmail) {
-    const subject = `Your order with ID ${id} has been updated to ${newStatus}`;
-    const text = `Dear Customer,\n\nYour order with ID ${id} has been updated to ${newStatus}.\n\nThank you for your business!`;
+    let subject = '';
+    let text = '';
+    if (newStatus === 'Completed') {
+      subject = `Your order #${id} is complete - Please leave a review!`;
+      text = `Dear Customer,\n\nYour order #${id} has been completed!\n\nWe'd love to hear about your experience. Please take a moment to leave a review:\n\n/review-form\n\nThank you for your business!\n\nBest regards,\nDan's Computer Repair Team`;
+      await sendEmail(customerEmail, subject, text);
+    }else {
+     subject = `Your order with ID ${id} has been updated to ${newStatus}`;
+     text = `Dear Customer,\n\nYour order with ID ${id} has been updated to ${newStatus}.\n\nThank you for your business!`;
     await sendEmail(customerEmail, subject, text); 
+    }
   }
   return NextResponse.json({ success: true });
 }
