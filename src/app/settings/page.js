@@ -36,6 +36,7 @@ export default function SettingsPage() {
     setLoading(true);
 
     try {
+      // 1) Update password
       let res;
       if (supabase?.auth?.updateUser) {
         res = await supabase.auth.updateUser({ password: newPassword });
@@ -47,6 +48,30 @@ export default function SettingsPage() {
 
       const error = res?.error ?? null;
       if (error) throw error;
+
+      // 2) Fetch current user
+      const { data: userRes, error: userErr } = await supabase.auth.getUser();
+      if (userErr) throw userErr;
+
+      const u = userRes?.user;
+      if (u) {
+        // 3) Insert audit log (RLS should allow admin-only insert)
+        const { error: auditErr } = await supabase.from("audit_logs").insert([
+          {
+            actor_user_id: u.id,
+            actor_email: u.email,
+            action: "PASSWORD_CHANGED",
+            entity_type: "auth.user",
+            entity_id: u.id,
+            metadata: { source: "SettingsPage" },
+          },
+        ]);
+
+        // If audit insert fails, we still want password to be updated, but show warning
+        if (auditErr) {
+          console.error("Audit insert error:", auditErr);
+        }
+      }
 
       setMessage({ type: "success", text: "Password updated successfully." });
     } catch (err) {
