@@ -34,6 +34,7 @@ export default function Header() {
       path: "/create-computer-configuration-form",
     },
     { label: "Service Request", path: "/service-request" },
+    { label: "FAQ", path: "/faq" },
   ];
 
   // Check admin status on mount and on auth state changes
