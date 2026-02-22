@@ -4,33 +4,100 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
-import { LayoutDashboard,Settings as SettingsIcon,Package,Lock,Eye,EyeOff,ShieldCheck,} from "lucide-react";
+import {
+  LayoutDashboard,
+  Settings as SettingsIcon,
+  Package,
+  Lock,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  MessageSquare,   // review icon
+  ClipboardList,   // audit icon
+} from "lucide-react";
 import "./SettingsPage.css";
+
+/**
+ * SettingsPage
+ *
+ * - Allows the current user to change their password.
+ * - Supports MFA flow (when Supabase requires AAL2).
+ * - Inserts a best-effort audit row into `audit_logs` after a successful password change.
+ *
+ * IMPORTANT: audit rows MUST NOT contain secrets (passwords). We only record metadata.
+ */
 
 export default function SettingsPage() {
   const router = useRouter();
 
-  // useStates for changing password, form handling, and toast notifications
+  // form state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+
+  // visibility toggles for inputs
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // modal + MFA state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState(null);
   const [mfaLoading, setMfaLoading] = useState(false);
 
+  // small toast helper
   const pushToast = (type, text) => {
     setToast({ type, text });
     window.clearTimeout(pushToast._t);
     pushToast._t = window.setTimeout(() => setToast(null), 4500);
   };
 
+  // -----------------------------
+  // Audit helper (best-effort)
+  // -----------------------------
+  // Inserts a row into `audit_logs`. Does NOT store secrets.
+  // If insert fails we log and continue (non-blocking).
+  const insertAudit = async ({
+    action,
+    entity_type = "users",
+    entity_id = null,
+    metadata = {},
+  }) => {
+    try {
+      const { data: userRes, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userRes?.user) {
+        console.warn("Audit: could not get user for audit_log:", userErr);
+        return;
+      }
+
+      const u = userRes.user;
+
+      const { error: auditErr } = await supabase.from("audit_logs").insert([
+        {
+          actor_user_id: u.id,
+          actor_email: u.email,
+          action, // e.g. "PASSWORD_CHANGED"
+          entity_type,
+          entity_id: entity_id ?? u.id,
+          metadata, // JSON object; avoid secrets
+        },
+      ]);
+
+      if (auditErr) {
+        console.error("Audit insert error:", auditErr);
+      }
+    } catch (err) {
+      console.error("Audit logging failed:", err);
+    }
+  };
+
+  // -----------------------------
+  // Modal focus / escape handling
+  // -----------------------------
   useEffect(() => {
     if (!isModalOpen) return;
 
@@ -57,12 +124,15 @@ export default function SettingsPage() {
     }
   }, [isModalOpen]);
 
+  // -----------------------------
+  // Helpers for MFA & update flow
+  // -----------------------------
   const getFriendlyError = (err) => {
     const raw = String(err?.message || "");
     const message = raw.toLowerCase();
 
     if (message.includes("aal2") || message.includes("mfa")) {
-      return "Please complete MFA first, then try updating your password again.";
+      return "Please complete MFA first, then try updating your password.";
     }
     if (message.includes("invalid")) {
       return "Invalid MFA code. Please try again.";
@@ -70,6 +140,7 @@ export default function SettingsPage() {
     return raw || "Failed to update account settings.";
   };
 
+  // Kick off client-side flow to locate a verified TOTP factor and mark MFA required
   const beginMfaFlow = async () => {
     const { data: factors, error: listErr } = await supabase.auth.mfa.listFactors();
     if (listErr) throw listErr;
@@ -84,13 +155,17 @@ export default function SettingsPage() {
     setMfaRequired(true);
   };
 
-  const performPasswordUpdate = async () => {
+  // Centralized password update function.
+  // Optionally accepts { viaMfa: true } to indicate MFA was used.
+  const performPasswordUpdate = async ({ viaMfa = false } = {}) => {
     const updates = { password: newPassword };
 
     let res;
     if (supabase?.auth?.updateUser) {
+      // modern Supabase client
       res = await supabase.auth.updateUser(updates);
     } else if (supabase?.auth?.update) {
+      // older client shape
       res = await supabase.auth.update(updates);
     } else {
       throw new Error("Supabase auth client does not expose updateUser/update.");
@@ -98,8 +173,18 @@ export default function SettingsPage() {
 
     const error = res?.error ?? null;
     if (error) throw error;
+
+    // AUDIT: record that the password was changed (best-effort).
+    // metadata should not contain sensitive data.
+    await insertAudit({
+      action: "PASSWORD_CHANGED",
+      entity_type: "users",
+      entity_id: null, // helper will default to current user
+      metadata: { via_mfa: Boolean(viaMfa) },
+    });
   };
 
+  // Clear form values
   const clearPasswordForm = () => {
     setCurrentPassword("");
     setNewPassword("");
@@ -109,6 +194,9 @@ export default function SettingsPage() {
     setMfaFactorId(null);
   };
 
+  // -----------------------------
+  // Handlers: submit / verify MFA
+  // -----------------------------
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
     setToast(null);
@@ -135,22 +223,24 @@ export default function SettingsPage() {
     }
 
     setLoading(true);
-    // First, re-authenticate the user with their current password to ensure they are who they say they are and 
-    // to check if MFA is required. If the session is too old, Supabase will require MFA before allowing sensitive operations like password updates.
     let updated = false;
 
     try {
+      // Check the current authenticator assurance level.
+      // If it's not AAL2, Supabase may require MFA verification for sensitive ops.
       const { data: aalData, error: aalError } =
         await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (aalError) throw aalError;
 
       if (aalData?.currentLevel !== "aal2") {
+        // Start MFA flow — this sets mfaRequired and shows the MFA input in the modal.
         await beginMfaFlow();
         pushToast("error", "Complete MFA below to finish updating your password.");
         return;
       }
 
-      await performPasswordUpdate();
+      // No extra MFA step required — perform update and audit
+      await performPasswordUpdate({ viaMfa: false });
       updated = true;
 
       pushToast("success", "Password updated successfully.");
@@ -162,9 +252,8 @@ export default function SettingsPage() {
       if (updated) clearPasswordForm();
     }
   };
-  // This function is called when the user submits the MFA code after being prompted that MFA verification is required. 
-  // It attempts to verify the provided MFA code, and if successful, proceeds with updating the password. 
-  // If there are any errors during MFA verification or password update, it shows appropriate error messages.
+
+  // Called when user enters MFA code and clicks verify -> then update password.
   const handleVerifyMfaAndUpdate = async () => {
     setToast(null);
 
@@ -186,7 +275,8 @@ export default function SettingsPage() {
       });
       if (verifyErr) throw verifyErr;
 
-      await performPasswordUpdate();
+      // Verified — perform update and audit (viaMfa: true)
+      await performPasswordUpdate({ viaMfa: true });
       clearPasswordForm();
       pushToast("success", "MFA verified and password updated successfully.");
     } catch (err) {
@@ -197,6 +287,9 @@ export default function SettingsPage() {
     }
   };
 
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
     <div className="dashboard settings-only">
       <div className="sidebar">
@@ -215,6 +308,18 @@ export default function SettingsPage() {
             <span>Parts</span>
           </li>
 
+          {/* NEW: Review tab */}
+          <li onClick={() => router.push("/dashboard/admin-reviews")}>
+            <MessageSquare size={18} />
+            <span>Review</span>
+          </li>
+
+          {/* NEW: Audit Log tab */}
+          <li onClick={() => router.push("/dashboard/audit")}>
+            <ClipboardList size={18} />
+            <span>Audit Log</span>
+          </li>
+
           <li className="active">
             <SettingsIcon size={18} />
             <span>Settings</span>
@@ -226,7 +331,11 @@ export default function SettingsPage() {
         <div className="settings-panel">
           <h2>Password</h2>
           <p>Manage your login credentials and security preferences.</p>
-          <button className="open-modal-btn" type="button" onClick={() => setIsModalOpen(true)}>
+          <button
+            className="open-modal-btn"
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+          >
             Change Password
           </button>
         </div>
@@ -240,27 +349,24 @@ export default function SettingsPage() {
                     <ShieldCheck size={26} />
                   </div>
                   <h2>Change Credentials</h2>
-                  <p>
-                    Update your password. Enter your current password to verify the change.
-                  </p>
+                  <p>Update your password. Enter your current password to verify the change.</p>
                 </div>
-              
-                <form onSubmit={handleUpdatePassword} className="password-form">
 
+                <form onSubmit={handleUpdatePassword} className="password-form">
                   <div className="input-group">
                     <label htmlFor="current-password">Current Password</label>
                     <div className="input-row">
                       <span className="input-icon">
                         <Lock size={18} />
                       </span>
-                      // The current password field includes a toggle to show/hide the password for better usability, especially when entering complex passwords.
+                      {/* current password field */}
                       <input
                         id="current-password"
                         type={showCurrentPassword ? "text" : "password"}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        placeholder="Current password"  // The placeholder provides a hint to the user about what to enter in this field.
-                        autoComplete="current-password" // This helps browsers understand that this field is for the current password, which can improve autofill behavior and security.
+                        placeholder="Current password"
+                        autoComplete="current-password"
                       />
                       <button
                         type="button"
@@ -331,8 +437,8 @@ export default function SettingsPage() {
                       </button>
                     </div>
                   </div>
-                        // If MFA verification is required, show the input for the MFA code. because if the user's session is ended or too old, 
-                        // Supabase will require them to complete MFA verification before allowing sensitive operations like password updates.
+
+                  {/* If MFA is required show the input and verify button */}
                   {mfaRequired && (
                     <div className="input-group">
                       <label htmlFor="mfa-code">MFA Code</label>
