@@ -1,3 +1,5 @@
+import FAQAccordion from "./FAQAccordion";
+
 export const metadata = {
   title: "FAQ | Dan's Computer Repair",
   description: "Find answers to frequently asked questions about Dan's Computer Repair services.",
@@ -37,14 +39,7 @@ export default function FAQPage() {
                 <h1 className="text-3xl font-semibold tracking-tight text-pink-800 sm:text-4xl mb-8">
                     Frequently Asked Questions
                 </h1>
-                <div className="space-y-6">
-                    {faqItems.map((item, index) => (
-                        <div key={index} className="border rounded-lg p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                            <h2 className="text-xl font-semibold text-pink-800">{item.question}</h2>
-                            <p className="mt-2 text-gray-700">{item.answer}</p>
-                        </div>
-                    ))}
-                </div>
+                <FAQAccordion items={faqItems} />
             </section>
         </main>
     ); 
