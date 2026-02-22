@@ -1,28 +1,17 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
-import {
-  LayoutDashboard,
-  Settings as SettingsIcon,
-  Package,
-  Lock,
-  Mail,
-  Eye,
-  EyeOff,
-  ShieldCheck,
-} from "lucide-react";
+import { LayoutDashboard,Settings as SettingsIcon,Package,Lock,Eye,EyeOff,ShieldCheck,} from "lucide-react";
 import "./SettingsPage.css";
 
 export default function SettingsPage() {
   const router = useRouter();
 
-  // useStates for changing credentials
-  const [currentEmail, setCurrentEmail] = useState("");
+  // useStates for changing password, form handling, and toast notifications
   const [currentPassword, setCurrentPassword] = useState("");
-  const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,8 +20,10 @@ export default function SettingsPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const emailRegex = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/, []);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaFactorId, setMfaFactorId] = useState(null);
+  const [mfaLoading, setMfaLoading] = useState(false);
 
   const pushToast = (type, text) => {
     setToast({ type, text });
@@ -57,99 +48,148 @@ export default function SettingsPage() {
     };
   }, [isModalOpen]);
 
-  const handleUpdateCredentials = async (e) => {
+  useEffect(() => {
+    if (!isModalOpen) {
+      setMfaRequired(false);
+      setMfaCode("");
+      setMfaFactorId(null);
+      setMfaLoading(false);
+    }
+  }, [isModalOpen]);
+
+  const getFriendlyError = (err) => {
+    const raw = String(err?.message || "");
+    const message = raw.toLowerCase();
+
+    if (message.includes("aal2") || message.includes("mfa")) {
+      return "Please complete MFA first, then try updating your password again.";
+    }
+    if (message.includes("invalid")) {
+      return "Invalid MFA code. Please try again.";
+    }
+    return raw || "Failed to update account settings.";
+  };
+
+  const beginMfaFlow = async () => {
+    const { data: factors, error: listErr } = await supabase.auth.mfa.listFactors();
+    if (listErr) throw listErr;
+
+    const verifiedTotp = (factors?.totp || []).find((factor) => factor.status === "verified");
+    if (!verifiedTotp) {
+      throw new Error("No verified MFA factor found. Please set up MFA from the admin login flow.");
+    }
+
+    setMfaFactorId(verifiedTotp.id);
+    setMfaCode("");
+    setMfaRequired(true);
+  };
+
+  const performPasswordUpdate = async () => {
+    const updates = { password: newPassword };
+
+    let res;
+    if (supabase?.auth?.updateUser) {
+      res = await supabase.auth.updateUser(updates);
+    } else if (supabase?.auth?.update) {
+      res = await supabase.auth.update(updates);
+    } else {
+      throw new Error("Supabase auth client does not expose updateUser/update.");
+    }
+
+    const error = res?.error ?? null;
+    if (error) throw error;
+  };
+
+  const clearPasswordForm = () => {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setMfaRequired(false);
+    setMfaCode("");
+    setMfaFactorId(null);
+  };
+
+  const handleUpdatePassword = async (e) => {
     e.preventDefault();
     setToast(null);
 
-    if (!newEmail.trim() && !newPassword.trim()) {
-      pushToast("error", "Enter a new email or a new password.");
+    if (!currentPassword.trim()) {
+      pushToast("error", "Enter your current password.");
       return;
     }
-    if (newEmail.trim() && !emailRegex.test(newEmail.trim())) {
-      pushToast("error", "Enter a valid new email address.");
+    if (!newPassword.trim()) {
+      pushToast("error", "Enter a new password.");
       return;
     }
-    if (newPassword.trim()) {
-      if (!confirmPassword.trim()) {
-        pushToast("error", "Please confirm the new password.");
-        return;
-      }
-      if (newPassword !== confirmPassword) {
-        pushToast("error", "New password and confirm password do not match.");
-        return;
-      }
-      if (newPassword.length < 8) {
-        pushToast("error", "Password must be at least 8 characters.");
-        return;
-      }
+    if (!confirmPassword.trim()) {
+      pushToast("error", "Please confirm the new password.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      pushToast("error", "New password and confirm password do not match.");
+      return;
+    }
+    if (newPassword.length < 8) {
+      pushToast("error", "Password must be at least 8 characters.");
+      return;
     }
 
     setLoading(true);
+    let updated = false;
 
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
+      const { data: aalData, error: aalError } =
+        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aalError) throw aalError;
 
-      const userEmail = userData?.user?.email ?? "";
-      const normalizedUserEmail = userEmail.toLowerCase();
-      const normalizedCurrentEmail = currentEmail.trim().toLowerCase();
-
-      const isCurrentEmailMatch =
-        Boolean(normalizedCurrentEmail) && normalizedCurrentEmail === normalizedUserEmail;
-
-      let isCurrentPasswordMatch = false;
-      if (currentPassword.trim() && normalizedUserEmail) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: normalizedUserEmail,
-          password: currentPassword,
-        });
-        isCurrentPasswordMatch = !signInError;
-      }
-
-      if (!isCurrentEmailMatch && !isCurrentPasswordMatch) {
-        pushToast("error", "Enter your current email or password to verify this change.");
+      if (aalData?.currentLevel !== "aal2") {
+        await beginMfaFlow();
+        pushToast("error", "Complete MFA below to finish updating your password.");
         return;
       }
 
-      const updates = {};
-      if (newEmail.trim() && newEmail.trim().toLowerCase() !== normalizedUserEmail) {
-        updates.email = newEmail.trim();
-      }
-      if (newPassword.trim()) {
-        updates.password = newPassword;
-      }
+      await performPasswordUpdate();
+      updated = true;
 
-      if (Object.keys(updates).length === 0) {
-        pushToast("error", "No changes detected.");
-        return;
-      }
-
-      let res;
-      if (supabase?.auth?.updateUser) {
-        res = await supabase.auth.updateUser(updates);
-      } else if (supabase?.auth?.update) {
-        res = await supabase.auth.update(updates);
-      } else {
-        throw new Error("Supabase auth client does not expose updateUser/update.");
-      }
-
-      const error = res?.error ?? null;
-      if (error) throw error;
-
-      pushToast(
-        "success",
-        updates.email
-          ? "Update submitted. Check your inbox to confirm the email change."
-          : "Password updated successfully."
-      );
+      pushToast("success", "Password updated successfully.");
     } catch (err) {
       console.error("Password update error:", err);
-      pushToast("error", err?.message ?? "Failed to update account settings.");
+      pushToast("error", getFriendlyError(err));
     } finally {
       setLoading(false);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      if (updated) clearPasswordForm();
+    }
+  };
+
+  const handleVerifyMfaAndUpdate = async () => {
+    setToast(null);
+
+    if (!mfaFactorId) {
+      pushToast("error", "MFA setup not found. Click Update password to start MFA verification.");
+      return;
+    }
+    if (!/^\d{6}$/.test(mfaCode.trim())) {
+      pushToast("error", "Enter the 6-digit code from your authenticator app.");
+      return;
+    }
+
+    setMfaLoading(true);
+
+    try {
+      const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({
+        factorId: mfaFactorId,
+        code: mfaCode.trim(),
+      });
+      if (verifyErr) throw verifyErr;
+
+      await performPasswordUpdate();
+      clearPasswordForm();
+      pushToast("success", "MFA verified and password updated successfully.");
+    } catch (err) {
+      console.error("MFA verification error:", err);
+      pushToast("error", getFriendlyError(err));
+    } finally {
+      setMfaLoading(false);
     }
   };
 
@@ -197,28 +237,11 @@ export default function SettingsPage() {
                   </div>
                   <h2>Change Credentials</h2>
                   <p>
-                    Update your email and password. Provide your current email or password to verify
-                    the change.
+                    Update your password. Enter your current password to verify the change.
                   </p>
                 </div>
 
-                <form onSubmit={handleUpdateCredentials} className="password-form">
-                  <div className="input-group">
-                    <label htmlFor="current-email">Current Email</label>
-                    <div className="input-row">
-                      <span className="input-icon">
-                        <Mail size={18} />
-                      </span>
-                      <input
-                        id="current-email"
-                        type="email"
-                        value={currentEmail}
-                        onChange={(e) => setCurrentEmail(e.target.value)}
-                        placeholder="Current email"
-                        autoComplete="email"
-                      />
-                    </div>
-                  </div>
+                <form onSubmit={handleUpdatePassword} className="password-form">
 
                   <div className="input-group">
                     <label htmlFor="current-password">Current Password</label>
@@ -248,23 +271,6 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="divider" />
-
-                  <div className="input-group">
-                    <label htmlFor="new-email">New Email</label>
-                    <div className="input-row">
-                      <span className="input-icon">
-                        <Mail size={18} />
-                      </span>
-                      <input
-                        id="new-email"
-                        type="email"
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                        placeholder="New email"
-                        autoComplete="email"
-                      />
-                    </div>
-                  </div>
 
                   <div className="input-group">
                     <label htmlFor="new-password">New Password</label>
@@ -321,13 +327,46 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
+                  {mfaRequired && (
+                    <div className="input-group">
+                      <label htmlFor="mfa-code">MFA Code</label>
+                      <div className="input-row">
+                        <span className="input-icon">
+                          <ShieldCheck size={18} />
+                        </span>
+                        <input
+                          id="mfa-code"
+                          inputMode="numeric"
+                          pattern="[0-9]{6}"
+                          maxLength={6}
+                          value={mfaCode}
+                          onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
+                          placeholder="6-digit code"
+                          autoComplete="one-time-code"
+                        />
+                      </div>
+                      <span className="helper-text">
+                        Enter the 6-digit code from your authenticator app, then verify.
+                      </span>
+                      <motion.button
+                        type="button"
+                        className="save-btn"
+                        whileHover={{ scale: 1.02 }}
+                        disabled={mfaLoading}
+                        onClick={handleVerifyMfaAndUpdate}
+                      >
+                        {mfaLoading ? "Verifying..." : "Verify MFA and update password"}
+                      </motion.button>
+                    </div>
+                  )}
+
                   <motion.button
                     type="submit"
                     className="save-btn"
                     whileHover={{ scale: 1.02 }}
                     disabled={loading}
                   >
-                    {loading ? "Saving..." : "Update credentials"}
+                    {loading ? "Saving..." : "Update password"}
                   </motion.button>
                 </form>
               </div>
