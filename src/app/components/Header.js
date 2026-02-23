@@ -93,14 +93,16 @@ export default function Header() {
 
   // Handle logout for logged-in users
   async function handleLogout() {
+    
+    // Call the logout API route to clear any server-side session/cookies
+    await fetch("/api/logout", { method: "POST" });
+
     // Create a Supabase client for browser use
     const supabase = createSupabaseBrowserClient();
 
     // Sign out client-side
     await supabase.auth.signOut();
 
-    // Call the logout API route to clear any server-side session/cookies
-    await fetch("/api/logout", { method: "POST" });
 
     // Clear auth state and redirect to admin login
     setUserPresent(false);
