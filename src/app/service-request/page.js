@@ -58,74 +58,63 @@ export default function ServiceRequest() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 py-28 px-6">
-      <div className="max-w-4xl mx-auto">
+    <div className={styles.pageWrap}>
+      <h1 className={styles.title}>Service Request Form</h1>
 
-        {/* Clean, readable title */}
-        <h1 className="text-4xl font-medium font-semibold text-slate-900 text-center mb-14 tracking-tight">
-          Service Request Form
-        </h1>
+      <form onSubmit={handleSubmit} className={styles.formBox}>
+        {/* Contact information group */}
+        <div className={styles.sectionHeader}>1. Contact Information</div>
 
-        {/* Card with stronger visual separation */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-14 space-y-16"
+        {/* minimal, responsive tweak: auto-fit columns so fields wrap cleanly on mobile */}
+        <div
+          className={styles.grid3}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+          }}
         >
+          <label className={styles.field}>
+            <span className={styles.label}>Name</span>
+            <input
+              name="name"
+              value={form.name}
+              onChange={update}
+              className={styles.input}
+              placeholder="Name"
+              required
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
+          </label>
 
-          {/* Contact Section */}
-          <div className="space-y-8">
-            <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
-              Contact Information
-            </h2>
+          <label className={styles.field}>
+            <span className={styles.label}>Phone number</span>
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={update}
+              className={styles.input}
+              type="tel"
+              placeholder="Phone Number"
+              required
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
+          </label>
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: '1.75rem',
-              }}
-            >
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
-                  Name
-                </label>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={update}
-                  required
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  name="phone"
-                  value={form.phone}
-                  onChange={update}
-                  type="tel"
-                  required
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  name="email"
-                  value={form.email}
-                  onChange={update}
-                  type="email"
-                  required
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
-                />
-              </div>
-            </div>
+          <label className={styles.field}>
+            <span className={styles.label}>Email address</span>
+            <input
+              name="email"
+              value={form.email}
+              onChange={update}
+              className={styles.input}
+              type="email"
+              placeholder="Email Address"
+              required
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
+          </label>
+        </div>
 
             <label className="flex items-start gap-3">
               <input
@@ -189,58 +178,54 @@ export default function ServiceRequest() {
             </div>
           </div>
 
-          {/* Problem Section */}
-          <div className="space-y-8">
-            <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
-              Problem Description
-            </h2>
+        {/* Problem description group */}
+        <div className={styles.sectionHeader}>2. Problem Description</div>
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: '1.75rem',
-              }}
-            >
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
-                  When did the problem start?
-                </label>
-                <input
-                  name="started"
-                  value={form.started}
-                  onChange={update}
-                  type="date"
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
-                />
-              </div>
+        <div
+          className={styles.grid2}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+          }}
+        >
+          <label className={styles.field}>
+            <span className={styles.label}>When did the problem start?</span>
+            <input
+              name="started"
+              value={form.started}
+              onChange={update}
+              className={styles.input}
+              type="date"
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
+          </label>
 
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
-                  Do you have any idea when it occurred?
-                </label>
-                <input
-                  name="idea"
-                  value={form.idea}
-                  onChange={update}
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
-                />
-              </div>
-            </div>
+          <label className={styles.field}>
+            <span className={styles.label}>Do you have any idea when the problem occurred?</span>
+            <input
+              name="idea"
+              value={form.idea}
+              onChange={update}
+              className={styles.input}
+              placeholder="e.g. After a software update, dropped the device..."
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
+          </label>
+        </div>
 
-            <div className="flex flex-col">
-              <label className="text-sm text-gray-700 mb-2">
-                Additional Details
-              </label>
-              <textarea
-                name="questions"
-                value={form.questions}
-                onChange={update}
-                rows={4}
-                className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
-              />
-            </div>
-          </div>
+        {/* Additional questions freeform */}
+        <label className={styles.field}>
+          <span className={styles.label}>Any other questions you have?</span>
+          <textarea
+            name="questions"
+            value={form.questions}
+            onChange={update}
+            className={styles.textarea}
+            placeholder="Additional info, special requests, or questions"
+            style={{ width: '100%', boxSizing: 'border-box' }}
+          />
+        </label>
 
           {/* Submit */}
           <div className="text-center pt-4">
