@@ -38,6 +38,8 @@ export default function CreateComputerConfigurationForm() {
 
     async function fetchAll() {
       await Promise.all(types.map(async (t) => {
+        // Skip fetch if setter is null (mock data is used instead)
+        if (!setters[t]) return;
         try {
           const res = await fetch(`/api/options?type=${encodeURIComponent(t)}`);
           if (!res.ok) return setters[t]([]);
@@ -55,13 +57,8 @@ export default function CreateComputerConfigurationForm() {
   function handleSelectChange(e) {
     const el = e.target;
     if (!el) return;
-    if (el.value === '') {
-      el.classList.add('text-gray-400');
-      el.classList.remove('text-black');
-    } else {
-      el.classList.remove('text-gray-400');
-      el.classList.add('text-black');
-    }
+    // Update inline color directly since styles are applied via inline style (not Tailwind classes)
+    el.style.color = el.value === '' ? '#94a3b8' : '#0f172a';
   }
 
   function formatPrice(v) {
@@ -75,6 +72,7 @@ export default function CreateComputerConfigurationForm() {
     e.preventDefault();
     setStatus('sending');
 
+    // Save form reference before async operations — e.currentTarget becomes null after await
     const formEl = e.currentTarget;
     const fd = new FormData(formEl);
     const payload = {
@@ -91,8 +89,8 @@ export default function CreateComputerConfigurationForm() {
 
       if (!res.ok) throw new Error();
       setStatus('submitted');
-      setSmsConsent(false);
-      formEl.reset();
+      setSmsConsent(false); // Reset SMS consent checkbox on successful submission
+      formEl.reset(); // Use saved reference instead of e.currentTarget
     } catch {
       setStatus('error');
     }
