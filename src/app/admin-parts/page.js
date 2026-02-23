@@ -1,18 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Package,
-  MessageSquare,
-  Settings,
-  Pencil,
-  Trash2,
-  ClipboardList,
-} from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import Sidebar from "../components/Sidebar";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import "./PartsPage.css";
 
@@ -45,9 +36,6 @@ const CATEGORY_TO_TABLE = {
 };
 
 export default function AdminPartsPage() {
-  // Router for navigation (e.g. sidebar links)
-  const router = useRouter();
-
   // Supabase browser client (auth/session based in the browser)
   const supabase = createSupabaseBrowserClient();
 
@@ -361,46 +349,7 @@ export default function AdminPartsPage() {
 
   return (
     <div className="dashboard">
-      {/* ---------------- Sidebar Navigation ---------------- */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h2>Dashboard</h2>
-        </div>
-
-        <ul>
-          <li onClick={() => router.push("/dashboard")}>
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </li>
-
-          {/* NOTE: currently routes to same page as dashboard, change later if needed */}
-          <li onClick={() => router.push("/dashboard")}>
-            <ShoppingBag size={20} />
-            <span>Orders</span>
-          </li>
-
-          <li className="active">
-            <Package size={20} />
-            <span>Parts</span>
-          </li>
-
-          <li onClick={() => router.push("/dashboard/admin-reviews")}>
-            <MessageSquare size={20} />
-            <span>Review</span>
-          </li>
-
-          {/* Audit Log */}
-          <li onClick={() => router.push("/dashboard/audit")}>
-            <ClipboardList size={20} />
-            <span>Audit Log</span>
-          </li>
-
-          <li onClick={() => router.push("/settings")}>
-            <Settings size={20} />
-            <span>Settings</span>
-          </li>
-        </ul>
-      </div>
+      <Sidebar />
 
       {/* ---------------- Main Content ---------------- */}
       <div className="main">

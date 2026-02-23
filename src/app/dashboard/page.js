@@ -1,14 +1,5 @@
-import Link from 'next/link';
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Package,
-  MessageSquare,
-  Settings as SettingsIcon,
-  ClipboardList,
-} from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
-
+import Sidebar from "../components/Sidebar";
 import DashboardOrdersPanel from './DashboardOrdersPanel';
 
 export const metadata = {
@@ -93,56 +84,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="w-[250px] bg-[#E2E8F0] text-black">
-        <div className="p-5 border-b border-[#cbd5e1]">
-          <h2 className="text-2xl text-center">Dashboard</h2>
-        </div>
-
-        <nav aria-label="Sidebar" className="flex flex-col">
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1] bg-[#cbd5e1]">
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </button>
-
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
-            <ShoppingBag size={20} />
-            <span>Orders</span>
-          </button>
-
-          <Link
-            href="/admin-parts"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <Package size={20} />
-            <span>Parts</span>
-          </Link>
-
-          <Link
-            href="/dashboard/admin-reviews"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <MessageSquare size={20} />
-            <span>Review</span>
-          </Link>
-
-          {/* Audit Log side tab */}
-          <Link
-            href="/dashboard/audit"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <ClipboardList size={20} />
-            <span>Audit Log</span>
-          </Link>
-
-          <Link
-            href="/settings"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <SettingsIcon size={20} />
-            <span>Settings</span>
-          </Link>
-        </nav>
-      </aside>
+      <Sidebar />
 
       <main className="flex-1 p-8 bg-white">
         <h1 className="mb-4 text-3xl font-bold">Dashboard</h1>

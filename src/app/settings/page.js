@@ -1,20 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
-  Settings as SettingsIcon,
-  Package,
   Lock,
   Eye,
   EyeOff,
   ShieldCheck,
-  MessageSquare,   // review icon
-  ClipboardList,   // audit icon
 } from "lucide-react";
+import Sidebar from "../components/Sidebar";
 import "./SettingsPage.css";
 
 /**
@@ -28,8 +23,6 @@ import "./SettingsPage.css";
  */
 
 export default function SettingsPage() {
-  const router = useRouter();
-
   // form state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -292,40 +285,7 @@ export default function SettingsPage() {
   // -----------------------------
   return (
     <div className="dashboard settings-only">
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h2>Dashboard</h2>
-        </div>
-
-        <ul>
-          <li onClick={() => router.push("/dashboard")}>
-            <LayoutDashboard size={18} />
-            <span>Dashboard</span>
-          </li>
-
-          <li onClick={() => router.push("/admin-parts")}>
-            <Package size={18} />
-            <span>Parts</span>
-          </li>
-
-          {/* NEW: Review tab */}
-          <li onClick={() => router.push("/dashboard/admin-reviews")}>
-            <MessageSquare size={18} />
-            <span>Review</span>
-          </li>
-
-          {/* NEW: Audit Log tab */}
-          <li onClick={() => router.push("/dashboard/audit")}>
-            <ClipboardList size={18} />
-            <span>Audit Log</span>
-          </li>
-
-          <li className="active">
-            <SettingsIcon size={18} />
-            <span>Settings</span>
-          </li>
-        </ul>
-      </div>
+      <Sidebar />
 
       <main className="settings-main">
         <div className="settings-panel">

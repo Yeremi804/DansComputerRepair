@@ -103,6 +103,9 @@ return (
     {/* --- Blank space for future content --- */}
       <section className="flex-grow flex items-center justify-center"></section>
 
+      {/* Services Section */}
+      <Services />
+
       {/* --- About Us Section --- */}
       <section className="text-center pt-10 pb-6 px-6">
         <div className="max-w-3xl mx-auto">
@@ -112,9 +115,6 @@ return (
           </p>
         </div>
       </section>
-
-      {/* Services Section */}
-      <Services />
 
         {/* --- Yelp Reviews Section --- */}
         <section className="bg-white text-black py-16">
