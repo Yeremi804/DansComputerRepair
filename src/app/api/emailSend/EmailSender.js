@@ -1,6 +1,9 @@
 //Important note: This has a limited feature of 100 email per days, not suitable for medium to large scale application, for that you can use services like SendGrid, Mailgun, etc. which have free tiers and are easy to integrate with Node.js applications. This is just a simple implementation using nodemailer for demonstration purposes.
 //Another note: Make sure to remove comment deemed to be sensitive before deploying to production, and also make sure to set up the email account properly to avoid issues with sending emails.
 import nodemailer from "nodemailer";
+
+//using it to validate the email address before sending email, to avoid consumption of email quota due to invalid email addresses, you can remove this if you want to allow sending emails to any email address, but it's recommended to keep it for better user experience and to avoid issues with email delivery.
+import validator from "validator"
 // create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
     //Host has to be gmail for this to work, port 465 is for secure connection
@@ -18,6 +21,11 @@ const transporter = nodemailer.createTransport({
 
 //creating a function to send email, which will be used in the server action to send email when order status is completed, it takes target email, subject and text as parameters
 async function sendEmail(targetEmail, subject, text) {
+    //validate the email address before sending email, to avoid consumption of email quota due to invalid email addresses, you can remove this if you want to allow sending emails to any email address, but it's recommended to keep it for better user experience and to avoid issues with email delivery.
+    if (!validator.isEmail(targetEmail)) {
+        console.error("Invalid email address:", targetEmail);
+        return { success: false, error: "Invalid email address" };
+    }
     try {
         await transporter.sendMail({
             from: "Admin <" + process.env.EMAIL_USER + ">",
@@ -26,8 +34,10 @@ async function sendEmail(targetEmail, subject, text) {
             text: text
         });
         console.log("Email sent successfully to:", targetEmail);
+        return { success: true,}
     } catch (error) {
         console.error("Error sending email to", targetEmail, ":", error);
+        return { success: false, error: error.message }
     }
 }
 

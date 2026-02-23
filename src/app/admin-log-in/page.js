@@ -82,6 +82,8 @@ export default function AdminLoginPage() {
         return;
       }
 
+
+
       // Save cookies for the middleware
       const { data: sess } = await supabase.auth.getSession();
       await fetch("/api/session/sync", {
@@ -92,6 +94,15 @@ export default function AdminLoginPage() {
           refresh_token: sess?.session?.refresh_token,
         }),
       });
+
+      const {data: { user }, error: userError} = await supabase.auth.getUser(); // get the current user, if there is an error or no user, it means the login failed somehow, so we can just return a error response
+      if(user) {
+        await supabase
+          .from("profiles")
+          .update({ Last_sign_in: new Date().toISOString() })
+          .eq("id", user.id)
+          .select();
+      }
 
       // Checks the AAL
       const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -163,6 +174,19 @@ export default function AdminLoginPage() {
       return;
     }
 
+
+    //Included this part to ensure that it capture the cookeis or data to update and addinto the metric unit table. 
+    const { data: {user}} = await supabase.auth.getUser();
+    if(user) {
+      await supabase
+        .from("profiles")
+        .update({ last_sign_in: new Date().toISOString() })
+        .eq("id", user.id)
+        .select();
+
+        console.log("Last sign in time updated successfully for user:", user.id);
+    }
+
     // User login with MFA was successful
     setMfaOpen(false);
     setMfaCode("");
@@ -220,7 +244,7 @@ export default function AdminLoginPage() {
 
             {error && <div className="text-red-600 text-sm">{error}</div>}
 
-            {/*This is what the user clicks first */}
+            { /*This is what the user clicks first */}
             {!captchaVerified && (
               <div
                 // When the user clicks this box, it sets showCaptcha to true, which triggers the drawer to open with the captcha inside.
