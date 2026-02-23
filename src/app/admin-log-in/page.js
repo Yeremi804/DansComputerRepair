@@ -220,7 +220,7 @@ export default function AdminLoginPage() {
 
             {error && <div className="text-red-600 text-sm">{error}</div>}
 
-            { This is what the user clicks first */}
+            {/*This is what the user clicks first */}
             {!captchaVerified && (
               <div
                 // When the user clicks this box, it sets showCaptcha to true, which triggers the drawer to open with the captcha inside.
@@ -234,7 +234,7 @@ export default function AdminLoginPage() {
               </div>
             )}
 
-            { This pops open when showCaptcha is true */}
+            {/*This pops open when showCaptcha is true */}
             {showCaptcha && !captchaVerified && (
               <div className="border border-neutral-300 p-4 mb-4 space-y-4 bg-white animate-in slide-in-from-top-1">
                 {/* The SVG Image open from the string of line to have it shown on clients*/}
