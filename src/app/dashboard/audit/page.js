@@ -1,13 +1,4 @@
-import Link from "next/link";
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Package,
-  MessageSquare,
-  Settings as SettingsIcon,
-  ClipboardList,
-} from "lucide-react";
-
+import Sidebar from "../../components/Sidebar";
 import DashboardAuditPanel from "../DashboardAuditPanel.js";
 
 // Page metadata for Next.js (used by app router).
@@ -49,65 +40,7 @@ export default async function AuditLogPage() {
   // client component (it uses the browser Supabase client and hooks).
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-[250px] bg-[#E2E8F0] text-black">
-        <div className="p-5 border-b border-[#cbd5e1]">
-          <h2 className="text-2xl text-center">Dashboard</h2>
-        </div>
-
-        <nav aria-label="Sidebar" className="flex flex-col">
-          {/* Dashboard link */}
-          <Link
-            href="/dashboard"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </Link>
-
-          {/* Orders (button kept for parity with existing UI) */}
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
-            <ShoppingBag size={20} />
-            <span>Orders</span>
-          </button>
-
-          {/* Parts link */}
-          <Link
-            href="/admin-parts"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <Package size={20} />
-            <span>Parts</span>
-          </Link>
-
-          {/* Reviews */}
-          <Link
-            href="/dashboard/admin-reviews"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <MessageSquare size={20} />
-            <span>Review</span>
-          </Link>
-
-          {/* Active Audit Log tab (styled as active) */}
-          <Link
-            href="/dashboard/audit"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1] bg-[#cbd5e1]"
-          >
-            <ClipboardList size={20} />
-            <span>Audit Log</span>
-          </Link>
-
-          {/* Settings */}
-          <Link
-            href="/settings"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <SettingsIcon size={20} />
-            <span>Settings</span>
-          </Link>
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main content area */}
       <main className="flex-1 p-8 bg-white">
