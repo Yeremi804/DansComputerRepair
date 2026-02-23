@@ -93,121 +93,161 @@ export default function CreateComputerConfigurationForm() {
 
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '1.5rem',
-  };
-
-  const inputStyle = {
-    width: '100%',
-    boxSizing: 'border-box',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+    gap: '1.75rem',
   };
 
   return (
-    <main className="min-h-screen bg-white text-black">
-      <form onSubmit={handleSubmit} className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-3xl mb-6">Computer Configuration Form</h1>
+    <main className="min-h-screen bg-gray-100 py-28 px-6">
+      <div className="max-w-4xl mx-auto">
 
-        <div className="border border-neutral-300 bg-white px-6 py-4">
-          <h2 className="text-2xl mt-4 mb-6">1.Customer Information</h2>
+        {/* Title */}
+        <h1 className="text-4xl font-semibold text-slate-900 text-center mb-14 tracking-tight">
+          Computer Configuration Form
+        </h1>
 
-          <div style={gridStyle}>
-            {[
-              'Name',
-              'Phone Number',
-              'Email Address',
-              'Budget Range',
-              'Intended Use',
-            ].map((label) => (
-              <div key={label}>
-                <label className="block text-sm mb-1">{label}</label>
-                <input
-                  name={label}
-                  placeholder={label}
-                  className="border border-black px-3 py-2"
-                  style={inputStyle}
-                />
-              </div>
-            ))}
+        {/* Card */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-14 space-y-16"
+        >
+
+          {/* Customer Info */}
+          <div className="space-y-8">
+            <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+              Customer Information
+            </h2>
+
+            <div style={gridStyle}>
+              {[
+                'Name',
+                'Phone Number',
+                'Email Address',
+                'Budget Range',
+                'Intended Use',
+              ].map((label) => (
+                <div key={label} className="flex flex-col">
+                  <label className="text-sm text-gray-700 mb-2">
+                    {label}
+                  </label>
+                  <input
+                    name={label}
+                    placeholder={label}
+                    className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          <h3 className="mt-8 mb-6">2. Core Components</h3>
+          {/* Computer Parts Section */}
+          <div className="space-y-8">
+            <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+              Core Components
+            </h2>
 
-          <div style={gridStyle}>
-            {[
-              ['CPU', 'Select a CPU', cpus],
-              ['GPU', 'Select a GPU', gpus],
-              ['Motherboard', 'Select a Motherboard', motherboards],
-              ['Memory', 'Select RAM Size', memories],
-              ['Storage', 'Select Storage Option', storages],
-              ['PSU', 'Select a PSU', psus],
-              ['Case', 'Select a Case', casesList],
-            ].map(([name, placeholder, list]) => (
-              <div key={name}>
-                <label className="block text-sm mb-1">{name}</label>
-                <select
-                  name={name}
-                  onChange={handleSelectChange}
-                  className="border border-neutral-300 py-2 bg-white text-gray-400"
-                  style={inputStyle}
-                >
-                  <option value="">{placeholder}</option>
-                  {list.map((i) => (
-                    <option key={i.id ?? i.name} value={i.value ?? i.name}>
-                      {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
+            <div style={gridStyle}>
+              {[
+                ['CPU', 'Select a CPU', cpus],
+                ['GPU', 'Select a GPU', gpus],
+                ['Motherboard', 'Select a Motherboard', motherboards],
+                ['Memory', 'Select RAM Size', memories],
+                ['Storage', 'Select Storage Option', storages],
+                ['PSU', 'Select a PSU', psus],
+                ['Case', 'Select a Case', casesList],
+              ].map(([name, placeholder, list]) => (
+                <div key={name} className="flex flex-col">
+                  <label className="text-sm text-gray-700 mb-2">
+                    {name}
+                  </label>
+                  <select
+                    name={name}
+                    onChange={handleSelectChange}
+                    className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 text-gray-400 focus:outline-none focus:border-black"
+                  >
+                    <option value="">{placeholder}</option>
+                    {list.map((i) => (
+                      <option key={i.id ?? i.name} value={i.value ?? i.name}>
+                        {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <h3 className="mt-8 mb-4">3. Additional Options</h3>
+          {/* Extra Options */}
+          <div className="space-y-8">
+            <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+              Additional Options
+            </h2>
 
-          <div style={gridStyle}>
-            {[
-              ['Cooling', 'Select Cooling Option', coolings],
-              ['Operating System', 'Select an OS', operatingSystems],
-              ['Networking', 'Select Networking Option', networkings],
-            ].map(([name, placeholder, list]) => (
-              <div key={name}>
-                <label className="block text-sm mb-1">{name}</label>
-                <select
-                  name={name}
-                  onChange={handleSelectChange}
-                  className="border border-neutral-300 py-2 bg-white text-gray-400"
-                  style={inputStyle}
-                >
-                  <option value="">{placeholder}</option>
-                  {list.map((i) => (
-                    <option key={i.id ?? i.name} value={i.value ?? i.name}>
-                      {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
+            <div style={gridStyle}>
+              {[
+                ['Cooling', 'Select Cooling Option', coolings],
+                ['Operating System', 'Select an OS', operatingSystems],
+                ['Networking', 'Select Networking Option', networkings],
+              ].map(([name, placeholder, list]) => (
+                <div key={name} className="flex flex-col">
+                  <label className="text-sm text-gray-700 mb-2">
+                    {name}
+                  </label>
+                  <select
+                    name={name}
+                    onChange={handleSelectChange}
+                    className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 text-gray-400 focus:outline-none focus:border-black"
+                  >
+                    <option value="">{placeholder}</option>
+                    {list.map((i) => (
+                      <option key={i.id ?? i.name} value={i.value ?? i.name}>
+                        {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <h3 className="mt-8 mb-2">4. Other request / Questions</h3>
-          <textarea
-            name="otherRequests"
-            rows={6}
-            placeholder="Additional info, special requests, or questions"
-            className="border border-neutral-300 px-3 py-2"
-            style={inputStyle}
-          />
-        </div>
+          {/* Additional/Other Requests */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
+              Other Requests / Questions
+            </h2>
 
-        <div className="mt-6 flex justify-end">
-          <button type="submit" className="bg-green-600 text-white px-6 py-3 rounded-md">
-            Submit Configuration
-          </button>
-        </div>
+            <textarea
+              name="otherRequests"
+              rows={5}
+              placeholder="Additional info, special requests, or questions"
+              className="w-full rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+            />
+          </div>
 
-        {status === 'sending' && <p className="mt-4 text-sm">Sending…</p>}
-        {status === 'submitted' && <p className="mt-4 text-sm text-green-600">Submitted — we will contact you soon.</p>}
-        {status === 'error' && <p className="mt-4 text-sm text-red-600">Error sending — try again.</p>}
-      </form>
+          {/* Submit */}
+          <div className="text-center pt-4">
+            <button
+              type="submit"
+              disabled={status === 'sending'}
+              className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg"
+            >
+              {status === 'sending' ? 'Submitting...' : 'Submit Configuration'}
+            </button>
+          </div>
+
+          {status === 'submitted' && (
+            <p className="text-center text-green-600">
+              Submitted — we will contact you soon.
+            </p>
+          )}
+          {status === 'error' && (
+            <p className="text-center text-red-600">
+              Error sending — try again.
+            </p>
+          )}
+
+        </form>
+      </div>
     </main>
   );
 }
