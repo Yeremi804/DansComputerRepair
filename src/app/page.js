@@ -116,12 +116,158 @@ return (
       {/* Services Section */}
       <Services />
 
+      {/* --- Service Information Sections --- */}
+      <section className="bg-white py-16">
+        <div className="max-w-6xl mx-auto px-4 space-y-8">
+          
+          {/* General Services Section */}
+          <div id="general-services" className="scroll-mt-20">
+            <div className="rounded-xl border border-gray-200 p-8 shadow-sm transition hover:shadow-lg hover:border-pink-300">
+              <h2 className="text-2xl font-semibold text-pink-800 mb-4">
+                Computer Repair & IT Services
+              </h2>
+              <p className="text-lg leading-relaxed text-gray-700 mb-6">
+                Reliable, transparent service for laptops and desktops. We diagnose issues 
+                quickly, explain your options, and keep you updated at every step. Reach out 
+                any time to discuss your device.
+              </p>
+              
+              <div className="grid gap-6 md:grid-cols-2 mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-pink-800 mb-4">Services</h3>
+                  <ul className="space-y-2">
+                    <li className="flex gap-3 items-center">
+                      <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
+                      <span className="text-gray-700">PC and Mac diagnostics</span>
+                    </li>
+                    <li className="flex gap-3 items-center">
+                      <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
+                      <span className="text-gray-700">Virus and malware removal</span>
+                    </li>
+                    <li className="flex gap-3 items-center">
+                      <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
+                      <span className="text-gray-700">Hardware upgrades (RAM, SSD, GPU)</span>
+                    </li>
+                    <li className="flex gap-3 items-center">
+                      <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
+                      <span className="text-gray-700">Data backup and recovery</span>
+                    </li>
+                    <li className="flex gap-3 items-center">
+                      <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
+                      <span className="text-gray-700">Network setup and troubleshooting</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-semibold text-pink-800 mb-4">Service Steps</h3>
+                  <ol className="space-y-3 text-gray-700">
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">1.</span>
+                      <span className="leading-relaxed">Tell us what you need repaired or built.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">2.</span>
+                      <span className="leading-relaxed">Schedule drop-off or on-site support.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">3.</span>
+                      <span className="leading-relaxed">Receive a clear estimate.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">4.</span>
+                      <span className="leading-relaxed">We repair, test, and verify your device.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">5.</span>
+                      <span className="leading-relaxed">Pick up or delivery with post-service guidance.</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-gray-200 p-6 shadow-sm bg-gray-50">
+                <h3 className="text-xl font-semibold text-pink-800 mb-3">
+                  Unsure of what you need?
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  Describe your issue and we&apos;ll recommend the right service,
+                  timeline, and options to fit your budget.
+                </p>
+                <a
+                  href="/service-request"
+                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 text-pink-700 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                >
+                  Start a Service Request
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Computer Configuration Section */}
+          <div id="computer-configuration" className="scroll-mt-20">
+            <div className="rounded-xl border border-gray-200 p-8 shadow-sm transition hover:shadow-lg hover:border-pink-300">
+              <h2 className="text-2xl font-semibold text-pink-800 mb-4">
+                Custom PC Builds
+              </h2>
+              <p className="text-lg leading-relaxed text-gray-700 mb-6">
+                Looking for a custom-built PC tailored to your needs? Whether it&apos;s for gaming, 
+                creative work, or business, we&apos;ll help you design and build the perfect system 
+                within your budget. Our expert team ensures quality parts, proper installation, and 
+                thorough testing for optimal performance.
+              </p>
+              
+              <div className="grid gap-6 md:grid-cols-2 mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-pink-800 mb-4">Build Steps</h3>
+                  <ol className="space-y-3 text-gray-700">
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">1.</span>
+                      <span className="leading-relaxed">Tell us your needs and budget.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">2.</span>
+                      <span className="leading-relaxed">We recommend the best components.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">3.</span>
+                      <span className="leading-relaxed">We build and test your system.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-pink-700">4.</span>
+                      <span className="leading-relaxed">Pick up with setup guidance.</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-gray-200 p-6 shadow-sm bg-gray-50">
+                <h3 className="text-xl font-semibold text-pink-800 mb-3">
+                  Ready to build your dream PC?
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  Use our Computer Configuration tool to select your components and get started. 
+                  We&apos;ll guide you through the process and provide expert recommendations.
+                </p>
+                <a
+                  href="/create-computer-configuration-form"
+                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 text-pink-700 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                >
+                  Go to Computer Configuration
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
         {/* --- Yelp Reviews Section --- */}
         <section className="bg-white text-black py-16">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <div className="flex items-center justify-center gap-4 mb-10">
               <h2 className="text-2xl font-semibold mb-10">
-                {showYelp ? "Yelp Reviews For Dan’s Computer Repair" : "Local Reviews For Dan’s Computer Repair"}
+                {showYelp ? "Yelp Reviews For Dan's Computer Repair" : "Local Reviews For Dan's Computer Repair"}
               </h2>
               {/* Toggle Button */}
               <button

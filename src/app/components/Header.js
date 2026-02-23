@@ -28,7 +28,6 @@ export default function Header() {
 
   const links = [
     { label: "Home", path: "/" },
-    { label: "Products", path: "/products" },
     {
       label: "Computer Building",
       path: "/create-computer-configuration-form",
