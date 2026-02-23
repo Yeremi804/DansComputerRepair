@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase/client.js'; 
+import styles from './page.module.css';
 
 export default function ServiceRequest() {
 
@@ -58,7 +59,7 @@ export default function ServiceRequest() {
   }
 
   return (
-    <div className={styles.pageWrap}>
+    <main className={styles.pageWrap}>
       <h1 className={styles.title}>Service Request Form</h1>
 
       <form onSubmit={handleSubmit} className={styles.formBox}>
@@ -114,21 +115,22 @@ export default function ServiceRequest() {
               style={{ width: '100%', boxSizing: 'border-box' }}
             />
           </label>
-        </div>
+	        </div>
 
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                name="smsConsent"
-                checked={form.smsConsent}
-                onChange={update}
-                className="mt-1 h-4 w-4"
-              />
-              <span className="text-sm text-gray-700">
-                I agree to receive SMS notifications about my repair status.
-              </span>
-            </label>
-          </div>
+	        <div className="mb-6">
+	          <label className="flex items-start gap-3">
+	            <input
+	              type="checkbox"
+	              name="smsConsent"
+	              checked={form.smsConsent}
+	              onChange={update}
+	              className="mt-1 h-4 w-4"
+	            />
+	            <span className="text-sm text-gray-700">
+	              I agree to receive SMS notifications about my repair status.
+	            </span>
+	          </label>
+	        </div>
 
           {/* Device Section */}
           <div className="space-y-8">
@@ -249,8 +251,7 @@ export default function ServiceRequest() {
             </p>
           )}
 
-        </form>
-      </div>
-    </main>
-  );
-}
+	        </form>
+	    </main>
+	  );
+	}
