@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 
 export default function CreateComputerConfigurationForm() {
   const [status, setStatus] = useState(null);
+  // Tracks whether the user has consented to receive SMS notifications (mirrors service-request form)
+  const [smsConsent, setSmsConsent] = useState(false);
   const [cpus, setCpus] = useState([]);
   const [gpus, setGpus] = useState([]);
   const [motherboards, setMotherboards] = useState([]);
@@ -36,6 +38,8 @@ export default function CreateComputerConfigurationForm() {
 
     async function fetchAll() {
       await Promise.all(types.map(async (t) => {
+        // Skip fetch if setter is null (mock data is used instead)
+        if (!setters[t]) return;
         try {
           const res = await fetch(`/api/options?type=${encodeURIComponent(t)}`);
           if (!res.ok) return setters[t]([]);
@@ -53,13 +57,8 @@ export default function CreateComputerConfigurationForm() {
   function handleSelectChange(e) {
     const el = e.target;
     if (!el) return;
-    if (el.value === '') {
-      el.classList.add('text-gray-400');
-      el.classList.remove('text-black');
-    } else {
-      el.classList.remove('text-gray-400');
-      el.classList.add('text-black');
-    }
+    // Update inline color directly since styles are applied via inline style (not Tailwind classes)
+    el.style.color = el.value === '' ? '#94a3b8' : '#0f172a';
   }
 
   function formatPrice(v) {
@@ -73,8 +72,13 @@ export default function CreateComputerConfigurationForm() {
     e.preventDefault();
     setStatus('sending');
 
-    const fd = new FormData(e.currentTarget);
-    const payload = Object.fromEntries(fd.entries());
+    // Save form reference before async operations — e.currentTarget becomes null after await
+    const formEl = e.currentTarget;
+    const fd = new FormData(formEl);
+    const payload = {
+      ...Object.fromEntries(fd.entries()),
+      sms_consent: smsConsent, // Include SMS consent alongside the rest of the form data
+    };
 
     try {
       const res = await fetch('/api/config', {
@@ -85,7 +89,8 @@ export default function CreateComputerConfigurationForm() {
 
       if (!res.ok) throw new Error();
       setStatus('submitted');
-      e.currentTarget.reset();
+      setSmsConsent(false); // Reset SMS consent checkbox on successful submission
+      formEl.reset(); // Use saved reference instead of e.currentTarget
     } catch {
       setStatus('error');
     }
@@ -202,6 +207,32 @@ export default function CreateComputerConfigurationForm() {
               </div>
             ))}
           </div>
+
+          {/* SMS consent checkbox — identical pattern to service-request form */}
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '8px',
+            marginBottom: '20px',
+            cursor: 'pointer',
+          }}>
+            <input
+              type="checkbox"
+              checked={smsConsent}
+              onChange={(e) => setSmsConsent(e.target.checked)}
+              style={{
+                width: '16px',
+                height: '16px',
+                cursor: 'pointer',
+                accentColor: '#16a34a', /* Green accent to match the submit button */
+                flexShrink: 0,
+              }}
+            />
+            <span style={{ fontSize: '0.875rem', color: '#475569', lineHeight: '1.4' }}>
+              I agree to receive SMS notifications about my computer configuration status.
+            </span>
+          </label>
 
           {/* Section 2: Core Components */}
           <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
