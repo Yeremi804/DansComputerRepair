@@ -22,9 +22,13 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-leaflet": "^5.0.0",
+<<<<<<< HEAD
     "svg-captcha": "^1.4.0",
     "twilio": "^5.12.1",
     "validator": "^13.15.26"
+=======
+    "twilio": "^5.12.1"
+>>>>>>> 3b38e62e0bf25feeb6b7966d897e601e6e5f1fe4
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
