@@ -91,24 +91,98 @@ export default function CreateComputerConfigurationForm() {
     }
   }
 
+  /* --- Shared inline styles (structure unchanged, only visual values updated) --- */
+
+  /* Grid layout: auto-fit columns, consistent with service-request form */
   const gridStyle = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '1.5rem',
   };
 
+  /* Full-width input sizing */
   const inputStyle = {
     width: '100%',
     boxSizing: 'border-box',
   };
 
-  return (
-    <main className="min-h-screen bg-white text-black">
-      <form onSubmit={handleSubmit} className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-3xl mb-6">Computer Configuration Form</h1>
+  /* Shared style for all text inputs — font size matches service-request form (.input: 14px) */
+  const fieldInputStyle = {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '10px 12px',
+    border: '1px solid #cbd5e1',   /* Matches sidebar/card border color across the site */
+    borderRadius: '6px',
+    fontSize: '14px',              /* Matches .input font-size in service-request/page.module.css */
+    color: '#1e293b',
+    backgroundColor: '#ffffff',
+    outline: 'none',
+    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+  };
 
-        <div className="border border-neutral-300 bg-white px-6 py-4">
-          <h2 className="text-2xl mt-4 mb-6">1.Customer Information</h2>
+  /* Shared style for all select dropdowns */
+  const fieldSelectStyle = {
+    ...fieldInputStyle,
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    /* Custom dropdown arrow SVG */
+    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E\")",
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 12px center',
+    backgroundSize: '16px',
+    paddingRight: '36px',
+    color: '#94a3b8', /* Default placeholder color */
+  };
+
+  /* Label style consistent with service-request form (.label: 0.875rem / 14px) */
+  const labelStyle = {
+    display: 'block',
+    fontSize: '0.875rem',          /* Matches .label font-size in service-request/page.module.css */
+    fontWeight: '500',
+    color: '#475569',              /* Slate-600, matches service-request label color */
+    marginBottom: '6px',
+  };
+
+  /* Section heading style (h2, h3) */
+  const sectionHeadingStyle = {
+    fontWeight: '600',
+    color: '#334155',         /* Slate-700 */
+    paddingBottom: '8px',
+    borderBottom: '1px solid #e2e8f0', /* Subtle divider, matches service-request sectionHeader */
+    marginBottom: '20px',
+  };
+
+  return (
+    <main style={{ minHeight: '100vh', backgroundColor: '#f8fafc', padding: '32px 16px' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ margin: '0 auto', maxWidth: '960px' }}
+      >
+        {/* Page title: matches .title style from service-request form */}
+        <h1 style={{
+          fontSize: '1.875rem',
+          fontWeight: '600',
+          marginBottom: '24px',
+          color: '#1e293b',
+        }}>
+          Computer Configuration Form
+        </h1>
+
+        {/* Form card: matches .formBox style from service-request form */}
+        <div style={{
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          padding: '32px',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 4px 6px -1px rgba(11, 63, 115, 0.12), 0 2px 4px -1px rgba(11, 63, 115, 0.08)',
+        }}>
+
+          {/* Section 1: Customer Information */}
+          {/* Font size matches h3 section headings (1rem) for visual consistency */}
+          <h2 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '4px' }}>
+            1. Customer Information
+          </h2>
 
           <div style={gridStyle}>
             {[
@@ -119,18 +193,20 @@ export default function CreateComputerConfigurationForm() {
               'Intended Use',
             ].map((label) => (
               <div key={label}>
-                <label className="block text-sm mb-1">{label}</label>
+                <label style={labelStyle}>{label}</label>
                 <input
                   name={label}
                   placeholder={label}
-                  className="border border-black px-3 py-2"
-                  style={inputStyle}
+                  style={fieldInputStyle}
                 />
               </div>
             ))}
           </div>
 
-          <h3 className="mt-8 mb-6">2. Core Components</h3>
+          {/* Section 2: Core Components */}
+          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
+            2. Core Components
+          </h3>
 
           <div style={gridStyle}>
             {[
@@ -143,12 +219,11 @@ export default function CreateComputerConfigurationForm() {
               ['Case', 'Select a Case', casesList],
             ].map(([name, placeholder, list]) => (
               <div key={name}>
-                <label className="block text-sm mb-1">{name}</label>
+                <label style={labelStyle}>{name}</label>
                 <select
                   name={name}
                   onChange={handleSelectChange}
-                  className="border border-neutral-300 py-2 bg-white text-gray-400"
-                  style={inputStyle}
+                  style={fieldSelectStyle}
                 >
                   <option value="">{placeholder}</option>
                   {list.map((i) => (
@@ -161,7 +236,10 @@ export default function CreateComputerConfigurationForm() {
             ))}
           </div>
 
-          <h3 className="mt-8 mb-4">3. Additional Options</h3>
+          {/* Section 3: Additional Options */}
+          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
+            3. Additional Options
+          </h3>
 
           <div style={gridStyle}>
             {[
@@ -170,12 +248,11 @@ export default function CreateComputerConfigurationForm() {
               ['Networking', 'Select Networking Option', networkings],
             ].map(([name, placeholder, list]) => (
               <div key={name}>
-                <label className="block text-sm mb-1">{name}</label>
+                <label style={labelStyle}>{name}</label>
                 <select
                   name={name}
                   onChange={handleSelectChange}
-                  className="border border-neutral-300 py-2 bg-white text-gray-400"
-                  style={inputStyle}
+                  style={fieldSelectStyle}
                 >
                   <option value="">{placeholder}</option>
                   {list.map((i) => (
@@ -188,25 +265,48 @@ export default function CreateComputerConfigurationForm() {
             ))}
           </div>
 
-          <h3 className="mt-8 mb-2">4. Other request / Questions</h3>
+          {/* Section 4: Other Requests / Questions */}
+          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
+            4. Other Requests / Questions
+          </h3>
+
           <textarea
             name="otherRequests"
             rows={6}
             placeholder="Additional info, special requests, or questions"
-            className="border border-neutral-300 px-3 py-2"
-            style={inputStyle}
+            style={{
+              ...fieldInputStyle,
+              resize: 'vertical', /* Allow vertical resize only */
+              minHeight: '120px',
+            }}
           />
-        </div>
 
-        <div className="mt-6 flex justify-end">
-          <button type="submit" className="bg-green-600 text-white px-6 py-3 rounded-md">
-            Submit Configuration
-          </button>
-        </div>
+          {/* Submit button row: centered inside the form card */}
+          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
+            <button
+              type="submit"
+              disabled={status === 'sending'}
+              style={{
+                backgroundColor: status === 'sending' ? '#86efac' : '#16a34a', /* Green-300 when disabled, Green-600 otherwise */
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 80px', /* Matches .submitBtn padding in service-request/page.module.css */
+                borderRadius: '6px',
+                fontSize: '0.9375rem',
+                fontWeight: '600',
+                cursor: status === 'sending' ? 'not-allowed' : 'pointer',
+                transition: 'background-color 0.15s ease',
+              }}
+            >
+              {status === 'sending' ? 'Submitting...' : 'Submit'}
+            </button>
+          </div>
 
-        {status === 'sending' && <p className="mt-4 text-sm">Sending…</p>}
-        {status === 'submitted' && <p className="mt-4 text-sm text-green-600">Submitted — we will contact you soon.</p>}
-        {status === 'error' && <p className="mt-4 text-sm text-red-600">Error sending — try again.</p>}
+          {/* Status messages: inside the form card, left-aligned to match service-request form style */}
+          {status === 'sending'   && <p style={{ marginTop: '12px', fontSize: '0.875rem', color: '#475569' }}>Sending…</p>}
+          {status === 'submitted' && <p style={{ marginTop: '12px', fontSize: '0.875rem', color: '#065f46' }}>Submitted — we will contact you soon.</p>}
+          {status === 'error'     && <p style={{ marginTop: '12px', fontSize: '0.875rem', color: '#9b1c1c' }}>Error sending — try again.</p>}
+        </div>
       </form>
     </main>
   );

@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { LayoutDashboard, ShoppingBag, Package, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
+import Sidebar from "../../components/Sidebar";
 import { createClient } from '@supabase/supabase-js';
 
 import ReviewsPanel from './ReviewsPanel';
@@ -35,42 +34,7 @@ export default async function AdminReviewsPage() {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="w-[250px] bg-[#E2E8F0] text-black">
-        <div className="p-5 border-b border-[#cbd5e1]">
-          <h2 className="text-2xl text-center">Dashboard</h2>
-        </div>
-        <nav aria-label="Sidebar" className="flex flex-col">
-          <Link
-            href="/dashboard"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </Link>
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
-            <ShoppingBag size={20} />
-            <span>Orders</span>
-          </button>
-          <Link
-            href="/admin-parts"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <Package size={20} />
-            <span>Parts</span>
-          </Link>
-          <Link
-            href="/dashboard/admin-reviews"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1] bg-[#cbd5e1]"
-          >
-            <MessageSquare size={20} />
-            <span>Reviews</span>
-          </Link>
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
-            <SettingsIcon size={20} />
-            <span>Setting</span>
-          </button>
-        </nav>
-      </aside>
+      <Sidebar />
 
       <ReviewsPanel
         initialReviews={reviewsRows || []}

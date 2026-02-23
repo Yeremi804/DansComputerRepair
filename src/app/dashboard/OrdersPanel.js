@@ -1,7 +1,7 @@
 //needed to create new component file for this tile
 'use client';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 
 // Status choices for filtering and updates
@@ -94,7 +94,7 @@ function normalizeValue(row, field) {
 }
 
 //main tile component
-export default function OrdersPanel({ rows }) {
+export default function OrdersPanel({ rows, onFilteredChange }) {
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -160,6 +160,12 @@ export default function OrdersPanel({ rows }) {
 
     return sorted;
   }, [rows, searchTerm, statusFilter, sortField, monthFilter]);
+
+  useEffect(() => {
+  if (onFilteredChange) {
+    onFilteredChange(filteredRows);
+  }
+}, [filteredRows, onFilteredChange]);
 
   // Helper to render expanded details
   function renderDetails(row) {

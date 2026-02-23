@@ -28,12 +28,12 @@ export default function Header() {
 
   const links = [
     { label: "Home", path: "/" },
-    { label: "Products", path: "/products" },
     {
       label: "Computer Building",
       path: "/create-computer-configuration-form",
     },
     { label: "Service Request", path: "/service-request" },
+    { label: "FAQ", path: "/faq" },
   ];
 
   // Check admin status on mount and on auth state changes

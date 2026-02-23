@@ -1,9 +1,6 @@
-import Link from 'next/link';
-import { LayoutDashboard, ShoppingBag, Package, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
-
+import Sidebar from "../components/Sidebar";
 import DashboardOrdersPanel from './DashboardOrdersPanel';
-
 
 export const metadata = {
   title: 'Dashboard',
@@ -74,49 +71,20 @@ export default async function DashboardPage() {
     })),
   ];
 
-  // Split rows by source for separate panels
+  // Split rows by source for separate panels (kept even if unused)
   const configFormRows = combinedRows.filter(row => row.Source === 'Configuration_Form');
   const serviceRequestRows = combinedRows.filter(row => row.Source === 'service_requests');
 
   // Calculate total, ongoing, completed orders from both tables
   const totalOrder = combinedRows.length;
   const ongoingOrders = combinedRows.filter(r => String(r.Status).toLowerCase() === 'in progress').length;
-  const completedOrders = combinedRows.filter(r => String(r.Status).toLowerCase() === 'completed' || String(r.Status).toLowerCase() === 'complete').length;
+  const completedOrders = combinedRows.filter(
+    r => String(r.Status).toLowerCase() === 'completed' || String(r.Status).toLowerCase() === 'complete'
+  ).length;
 
   return (
     <div className="flex min-h-screen">
-      <aside className="w-[250px] bg-[#E2E8F0] text-black">
-        <div className="p-5 border-b border-[#cbd5e1]">
-          <h2 className="text-2xl text-center">Dashboard</h2>
-        </div>
-        <nav aria-label="Sidebar" className="flex flex-col">
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1] bg-[#cbd5e1]">
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </button>
-          <button className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
-            <ShoppingBag size={20} />
-            <span>Orders</span>
-          </button>
-          <Link href="/admin-parts" className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
-            <Package size={20} />
-            <span>Parts</span>
-          </Link>
-          <Link
-            href="/dashboard/admin-reviews"
-            className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]"
-          >
-            <MessageSquare size={20} />
-            <span>Review</span>
-          </Link>
-          <Link
-           href="/settings"
-           className="text-lg flex items-center justify-center gap-2.5 p-5 border-b border-[#cbd5e1] hover:bg-[#cbd5e1]">
-            <SettingsIcon size={20} />
-            <span>Settings</span>
-          </Link>
-        </nav>
-      </aside>
+      <Sidebar />
 
       <main className="flex-1 p-8 bg-white">
         <h1 className="mb-4 text-3xl font-bold">Dashboard</h1>

@@ -2,52 +2,61 @@
 import React from "react";
 import { HardDrive, Cpu, Network, Smartphone, Printer, Phone, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 
 const services = [
   {
     icon: HardDrive,
     title: "Data Recovery",
     description: "Recover lost data from failed hard drives, SSDs, and other storage devices",
-    color: "from-purple-600 to-purple-700"
+    color: "from-purple-600 to-purple-700",
+    scrollTo: "general-services"
   },
   {
     icon: Cpu,
     title: "Custom Builds",
     description: "Custom PC builds for gaming, work, or creative professionals",
-    color: "from-indigo-600 to-indigo-700"
+    color: "from-indigo-600 to-indigo-700",
+    scrollTo: "computer-configuration"
   },
   {
     icon: Network,
     title: "Telecom & Network Services",
     description: "Complete telecom solutions, VoIP setup, and enterprise network infrastructure",
-    color: "from-cyan-600 to-cyan-700"
+    color: "from-cyan-600 to-cyan-700",
+    scrollTo: "general-services"
   },
   {
     icon: Printer,
     title: "Printer Support",
     description: "Printer setup, maintenance, troubleshooting, and cartridge replacement",
-    color: "from-amber-600 to-amber-700"
+    color: "from-amber-600 to-amber-700",
+    scrollTo: "general-services"
   },
   {
     icon: Phone,
     title: "VoIP Services",
     description: "Business phone systems, VoIP installation, and unified communications",
-    color: "from-violet-600 to-violet-700"
+    color: "from-violet-600 to-violet-700",
+    scrollTo: "general-services"
   },
   {
     icon: MessageCircle,
     title: "Mobile Phone Support",
     description: "Software updates, app troubleshooting, data transfer, and device optimization",
-    color: "from-rose-600 to-rose-700"
+    color: "from-rose-600 to-rose-700",
+    scrollTo: "general-services"
   }
 ];
 
 export default function Services() {
-  const router = useRouter();
-
-  const handleCardClick = () => {
-    router.push('/products');
+  const handleCardClick = (scrollTo) => {
+    const element = document.getElementById(scrollTo);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
 
   return (
@@ -76,7 +85,7 @@ export default function Services() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                onClick={handleCardClick}
+                onClick={() => handleCardClick(service.scrollTo)}
                 className="group relative bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border border-slate-200 hover:border-blue-200 transition-all duration-300 hover:shadow-xl cursor-pointer"
               >
                 <div className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
