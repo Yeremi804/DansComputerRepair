@@ -106,6 +106,7 @@ export default function ServiceRequest() {
               value={form.name}
               onChange={update}
               className={styles.input}
+              placeholder="Name"
               required
               style={{ width: '100%', boxSizing: 'border-box' }}
             />
@@ -119,6 +120,7 @@ export default function ServiceRequest() {
               onChange={update}
               className={styles.input}
               type="tel"
+              placeholder="Phone Number"
               required
               style={{ width: '100%', boxSizing: 'border-box' }}
             />
@@ -132,6 +134,7 @@ export default function ServiceRequest() {
               onChange={update}
               className={styles.input}
               type="email"
+              placeholder="Email Address"
               required
               style={{ width: '100%', boxSizing: 'border-box' }}
             />
@@ -224,6 +227,7 @@ export default function ServiceRequest() {
               value={form.idea}
               onChange={update}
               className={styles.input}
+              placeholder="e.g. After a software update, dropped the device..."
               style={{ width: '100%', boxSizing: 'border-box' }}
             />
           </label>
@@ -237,6 +241,7 @@ export default function ServiceRequest() {
             value={form.questions}
             onChange={update}
             className={styles.textarea}
+            placeholder="Additional info, special requests, or questions"
             style={{ width: '100%', boxSizing: 'border-box' }}
           />
         </label>
