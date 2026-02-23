@@ -116,9 +116,6 @@ return (
         </div>
       </section>
 
-      {/* Services Section */}
-      <Services />
-
       {/* --- Service Information Sections --- */}
       <section className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-4 space-y-8">
