@@ -4,7 +4,7 @@ export const metadata = {
   title: "FAQ | Dan's Computer Repair",
   description: "Find answers to frequently asked questions about Dan's Computer Repair services.",
 };
-
+// questions and answers 
 export default function FAQPage() {
     const faqItems = [
         {
@@ -22,6 +22,10 @@ export default function FAQPage() {
         {
             question: "Do you offer on-site support?",
             answer: "Yes, we offer on-site support for certain services such as network setup and troubleshooting. Please contact us to discuss your specific needs."
+        },
+        {
+            question: "Do you have a storefront I can visit?",
+            answer: "We do not have a physical storefront at this time. All services are provided on-site or remotely."
         },
         {
             question: "What payment methods do you accept?",
