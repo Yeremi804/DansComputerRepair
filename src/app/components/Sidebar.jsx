@@ -8,6 +8,7 @@ import {
   MessageSquare,
   ClipboardList,
   Settings,
+  FileText,
 } from "lucide-react";
 
 import "./Sidebar.css";
@@ -22,6 +23,7 @@ export default function Sidebar() {
     { label: "Parts", href: "/admin-parts", Icon: Package },
     { label: "Review", href: "/dashboard/admin-reviews", Icon: MessageSquare },
     { label: "Audit Log", href: "/dashboard/audit", Icon: ClipboardList },
+    { label: "Home Content", href: "/dashboard/home-content", Icon: FileText },
     { label: "Settings", href: "/settings", Icon: Settings },
   ];
 
