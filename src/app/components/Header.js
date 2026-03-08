@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react"; // Import useState to manage admin status and checking state
+import { useEffect,useRef,useState } from "react"; // Import useState to manage admin status and checking state
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"; // Import the function to create a Supabase client for browser use
+import { ChevronDown, LayoutDashboard, LogOut, Settings } from "lucide-react";
 
 export default function Header() {
   const router = useRouter();
   
   const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [currentUserName, setCurrentUserName] = useState("");
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
 
   const handleNavigation = (path) => {
     setOpen(false);
@@ -17,10 +21,9 @@ export default function Header() {
 
   const MotionButton = motion.button;
 
-  // State to track if the user is an admin and if we're still checking
-  const [isAdmin, setIsAdmin] = useState(false); // Default to false until we check
-  const [checking, setChecking] = useState(true); // Track if we're still checking the admin status
-  const [userPresent, setUserPresent] = useState(false); // Track if *any* user is logged in
+  const [checking, setChecking] = useState(true);
+  const [userPresent, setUserPresent] = useState(false);
+  const profileMenuRef = useRef(null);
 
   // Small interaction animations
   const hover = { scale: 1.05 };
@@ -36,14 +39,28 @@ export default function Header() {
     { label: "FAQ", path: "/faq" },
   ];
 
-  // Check admin status on mount and on auth state changes
+  const getDisplayName = (user) => {
+    const meta = user?.user_metadata || {};
+    const byParts = [meta.firstName, meta.lastName].filter(Boolean).join(" ").trim();
+    const byFullName = String(meta.full_name || meta.name || "").trim();
+    const byEmail = String(user?.email || "").split("@")[0];
+
+    return byParts || byFullName || byEmail || "User";
+  };
+
+  const initials = String(currentUserName || "U")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+
+  // Check auth status on mount and on auth state changes
   useEffect(() => {
     // Create a Supabase client for browser use
     const supabase = createSupabaseBrowserClient();
 
-    // Function to check if the user is logged in and/or an admin
-    async function loadAdminStatus() {
-      // Set checking to true while we verify admin status
+    async function loadAuthState() {
       setChecking(true);
 
       // Get the current user
@@ -52,32 +69,24 @@ export default function Header() {
       // If no user is logged in, clear all auth-related state
       if (!user) {
         setUserPresent(false);
-        setIsAdmin(false);
+        setCurrentUserName("");
+        setCurrentUserEmail("");
+        setProfileOpen(false);
         setChecking(false);
         return;
       }
 
       // A user *is* logged in
       setUserPresent(true);
-
-      // Fetch the user's profile to check their role
-      const { data: profile } = await supabase
-        .from("profiles") // Access the profiles table
-        .select("role")   // Select only the role column
-        .eq("id", user.id) // Filter by the current user's ID
-        .single(); // Expect a single result since user IDs are unique
-
-      // Set admin status based on the role
-      setIsAdmin(profile?.role === "admin");
-      setChecking(false); // Done checking
+      setCurrentUserName(getDisplayName(user));
+      setCurrentUserEmail(String(user.email || ""));
+      setChecking(false);
     }
 
-    // Initial check on mount
-    loadAdminStatus();
+    loadAuthState();
 
-    // Listen for auth state changes to update admin status in real-time
     const { data: sub } = supabase.auth.onAuthStateChange(() => {
-      loadAdminStatus();
+      loadAuthState();
     });
 
     // Clean up the subscription on unmount
@@ -91,7 +100,29 @@ export default function Header() {
     };
   }, []);
 
-  // Handle logout for logged-in users
+  // Close profile dropdown on outside click / Escape.
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!profileMenuRef.current?.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEsc);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, []);
+
   async function handleLogout() {
     
     // Call the logout API route to clear any server-side session/cookies
@@ -106,10 +137,17 @@ export default function Header() {
 
     // Clear auth state and redirect to admin login
     setUserPresent(false);
-    setIsAdmin(false);
+    setCurrentUserName("");
+    setCurrentUserEmail("");
+    setProfileOpen(false);
     router.replace("/admin-log-in"); // Prevent back-navigation into admin pages
     router.refresh(); // Ensure all cached state is cleared
   }
+
+  const handleProfileNavigation = (path) => {
+    setProfileOpen(false);
+    handleNavigation(path);
+  };
 
   return (
     <header className="w-full border-b border-gray-200 bg-white">
@@ -157,16 +195,71 @@ export default function Header() {
 
             {/* Logout button for logged-in users */}
             {!checking && userPresent && (
-              <li>
+              <li className="relative" ref={profileMenuRef}>
                 <MotionButton
                   type="button"
-                  onClick={handleLogout}
+                  onClick={() => setProfileOpen((v) => !v)}
                   whileHover={hover}
                   whileTap={tap}
-                  className="rounded px-3 py-1 bg-red-50 text-red-700 hover:bg-red-100"
+                  className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-800 shadow-sm hover:border-slate-400"
                 >
-                  Logout
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E2E8F0] text-xs font-semibold text-slate-800">
+                    {initials || "U"}
+                  </span>
+                  <span className="max-w-[130px] truncate text-sm font-medium">
+                    {currentUserName}
+                  </span>
+                  <ChevronDown size={16} className="text-slate-600" />
                 </MotionButton>
+
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                      className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl"
+                    >
+                      <div className="bg-[#E2E8F0] px-4 py-4">
+                        <p className="text-sm text-slate-700">Signed in as</p>
+                        <p className="truncate text-lg font-semibold text-slate-900">{currentUserName}</p>
+                      </div>
+
+                      <div className="px-4 pb-4 pt-3">
+                        <p className="mb-3 truncate text-sm text-slate-600">{currentUserEmail}</p>
+
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => handleProfileNavigation("/dashboard")}
+                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-200"
+                          >
+                            <LayoutDashboard size={16} />
+                            Dashboard
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleProfileNavigation("/settings")}
+                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-200"
+                          >
+                            <Settings size={16} />
+                            Setting
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleLogout}
+                            className="flex w-full items-center gap-2 rounded-md bg-red-100 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-200"
+                          >
+                            <LogOut size={16} />
+                            Log out
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </li>
             )}
           </ul>
@@ -208,18 +301,46 @@ export default function Header() {
                 ))}
 
                 {!checking && userPresent && (
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpen(false);
-                        handleLogout();
-                      }}
-                      className="w-full rounded px-3 py-2 text-left bg-red-50 text-red-700 hover:bg-red-100"
-                    >
-                      Logout
-                    </button>
-                  </li>
+                  <>
+                    <li>
+                      <div className="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                        Signed in as <span className="font-semibold">{currentUserName}</span>
+                      </div>
+                    </li>
+
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => handleNavigation("/dashboard")}
+                        className="w-full rounded px-3 py-2 text-left text-gray-700 hover:bg-red-100"
+                      >
+                        Dashboard
+                      </button>
+                    </li>
+
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => handleNavigation("/settings")}
+                        className="w-full rounded px-3 py-2 text-left text-gray-700 hover:bg-red-100"
+                      >
+                        Setting
+                      </button>
+                    </li>
+
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full rounded px-3 py-2 text-left bg-red-50 text-red-700 hover:bg-red-100"
+                      >
+                        Log out
+                      </button>
+                    </li>
+                  </>
                 )}
               </ul>
             </div>
