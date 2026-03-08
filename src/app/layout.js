@@ -2,6 +2,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./components/Header.js";
 import { Footer } from "./components/footer.js";
+import Chatbot from "./components/chatbot.js";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,6 +28,9 @@ export default function RootLayout({ children }) {
       >
         {/* Header displayed on every page */}
         <Header />
+
+        {/* Chatbot component available on every page */}
+        <Chatbot />
 
         {/* Main content */}
         <main className="flex-grow">{children}</main>
