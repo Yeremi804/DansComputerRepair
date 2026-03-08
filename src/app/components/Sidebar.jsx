@@ -36,7 +36,7 @@ export default function Sidebar() {
           const active = pathname === href;
           return (
             <li
-              key={href}
+              key={label}
               className={`${"adminSidebarItem"} ${
                 active ? "adminSidebarItemActive" : ""
               }`}
