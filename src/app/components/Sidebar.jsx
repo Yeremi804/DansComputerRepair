@@ -8,6 +8,7 @@ import {
   MessageSquare,
   ClipboardList,
   Settings,
+  Clock,
 } from "lucide-react";
 
 import "./Sidebar.css";
@@ -23,6 +24,7 @@ export default function Sidebar() {
     { label: "Review", href: "/dashboard/admin-reviews", Icon: MessageSquare },
     { label: "Audit Log", href: "/dashboard/audit", Icon: ClipboardList },
     { label: "Settings", href: "/settings", Icon: Settings },
+    { label: "Metrics", href: "/dashboard/metric", Icon: Clock },
   ];
 
   return (

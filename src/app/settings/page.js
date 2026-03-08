@@ -284,10 +284,10 @@ export default function SettingsPage() {
   // Render
   // -----------------------------
   return (
-    <div className="dashboard settings-only">
+    <div className="flex min-h-screen bg-main-bg">
       <Sidebar />
 
-      <main className="settings-main, bg-main-bg">
+      <main className="flex-1 p-8">
         <div className="settings-panel">
           <h2>Password</h2>
           <p>Manage your login credentials and security preferences.</p>

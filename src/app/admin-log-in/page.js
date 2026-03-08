@@ -273,7 +273,7 @@ export default function AdminLoginPage() {
                   type="text"
                   // If there is a captcha error, show that as the placeholder. Otherwise, show the default "Type the characters above"
                   placeholder={captchaError ? captchaError : "Type the characters above"}
-                  className="w-full border  border-black rounded-sm px-3 py-2 text-"
+                  className="w-full border text-black border-black rounded-sm px-3 py-2 text-"
                   value={captchaInput}
                   onChange={(e) => setCaptchaInput(e.target.value)}
                 />
@@ -332,7 +332,7 @@ export default function AdminLoginPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="w-full max-w-sm bg-white rounded-md p-6 space-y-4 shadow-xl">
             <h2 className="text-lg font-semibold">Two-factor Verification</h2>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-black">
               Enter the 6-digit code from your authenticator app.
             </p>
 
