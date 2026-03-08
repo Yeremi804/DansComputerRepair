@@ -140,6 +140,14 @@ export default function CreateComputerConfigurationForm() {
     color: '#94a3b8', /* Default placeholder color */
   };
 
+  const placeholderOptionStyle = {
+    color: '#64748b',
+  };
+
+  const dropdownOptionStyle = {
+    color: '#0f172a',
+  };
+
   /* Label style consistent with service-request form (.label: 0.875rem / 14px) */
   const labelStyle = {
     display: 'block',
@@ -256,9 +264,9 @@ export default function CreateComputerConfigurationForm() {
                   onChange={handleSelectChange}
                   style={fieldSelectStyle}
                 >
-                  <option value="">{placeholder}</option>
+                  <option value="" style={placeholderOptionStyle}>{placeholder}</option>
                   {list.map((i) => (
-                    <option key={i.id ?? i.name} value={i.value ?? i.name}>
+                    <option key={i.id ?? i.name} value={i.value ?? i.name} style={dropdownOptionStyle}>
                       {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
                     </option>
                   ))}
@@ -285,9 +293,9 @@ export default function CreateComputerConfigurationForm() {
                   onChange={handleSelectChange}
                   style={fieldSelectStyle}
                 >
-                  <option value="">{placeholder}</option>
+                  <option value="" style={placeholderOptionStyle}>{placeholder}</option>
                   {list.map((i) => (
-                    <option key={i.id ?? i.name} value={i.value ?? i.name}>
+                    <option key={i.id ?? i.name} value={i.value ?? i.name} style={dropdownOptionStyle}>
                       {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
                     </option>
                   ))}

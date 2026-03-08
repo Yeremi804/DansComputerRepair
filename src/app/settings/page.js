@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import {
@@ -23,6 +23,11 @@ import "./SettingsPage.css";
  */
 
 export default function SettingsPage() {
+  // profile name form state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [nameLoading, setNameLoading] = useState(false);
+
   // form state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -37,6 +42,7 @@ export default function SettingsPage() {
 
   // modal + MFA state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState(null);
@@ -92,11 +98,12 @@ export default function SettingsPage() {
   // Modal focus / escape handling
   // -----------------------------
   useEffect(() => {
-    if (!isModalOpen) return;
+    if (!isModalOpen && !isNameModalOpen) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsModalOpen(false);
+        setIsNameModalOpen(false);
       }
     };
 
@@ -106,7 +113,7 @@ export default function SettingsPage() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isModalOpen]);
+  }, [isModalOpen, isNameModalOpen]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -117,6 +124,20 @@ export default function SettingsPage() {
     }
   }, [isModalOpen]);
 
+  // Load current profile name from auth metadata so users can edit it.
+  useEffect(() => {
+    const loadProfileName = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data?.user) return;
+
+      const meta = data.user.user_metadata || {};
+      setFirstName(String(meta.firstName || "").trim());
+      setLastName(String(meta.lastName || "").trim());
+    };
+
+    loadProfileName();
+  }, []);
+
   // -----------------------------
   // Helpers for MFA & update flow
   // -----------------------------
@@ -124,6 +145,9 @@ export default function SettingsPage() {
     const raw = String(err?.message || "");
     const message = raw.toLowerCase();
 
+    if (message.includes("current password is incorrect")) {
+      return "Current password is incorrect.";
+    }
     if (message.includes("aal2") || message.includes("mfa")) {
       return "Please complete MFA first, then try updating your password.";
     }
@@ -146,6 +170,32 @@ export default function SettingsPage() {
     setMfaFactorId(verifiedTotp.id);
     setMfaCode("");
     setMfaRequired(true);
+  };
+
+  // Verifies the entered current password before allowing a password change.
+  const verifyCurrentPassword = async () => {
+    const { data: userRes, error: userErr } = await supabase.auth.getUser();
+    if (userErr) throw userErr;
+
+    const currentUser = userRes?.user;
+    const email = currentUser?.email;
+
+    if (!currentUser?.id || !email) {
+      throw new Error("Unable to verify current password for this account.");
+    }
+
+    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+      email,
+      password: currentPassword,
+    });
+
+    if (signInErr || !signInData?.user) {
+      throw new Error("Current password is incorrect.");
+    }
+
+    if (signInData.user.id !== currentUser.id) {
+      throw new Error("Current password is incorrect.");
+    }
   };
 
   // Centralized password update function.
@@ -219,6 +269,8 @@ export default function SettingsPage() {
     let updated = false;
 
     try {
+      await verifyCurrentPassword();
+
       // Check the current authenticator assurance level.
       // If it's not AAL2, Supabase may require MFA verification for sensitive ops.
       const { data: aalData, error: aalError } =
@@ -250,6 +302,10 @@ export default function SettingsPage() {
   const handleVerifyMfaAndUpdate = async () => {
     setToast(null);
 
+    if (!currentPassword.trim()) {
+      pushToast("error", "Enter your current password.");
+      return;
+    }
     if (!mfaFactorId) {
       pushToast("error", "MFA setup not found. Click Update password to start MFA verification.");
       return;
@@ -262,6 +318,8 @@ export default function SettingsPage() {
     setMfaLoading(true);
 
     try {
+      await verifyCurrentPassword();
+
       const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({
         factorId: mfaFactorId,
         code: mfaCode.trim(),
@@ -279,6 +337,62 @@ export default function SettingsPage() {
       setMfaLoading(false);
     }
   };
+  
+
+  const handleUpdateName = async (e) => {
+    e.preventDefault();
+    setToast(null);
+
+    const first = firstName.trim();
+    const last = lastName.trim();
+    const fullName = [first, last].filter(Boolean).join(" ").trim();
+
+    if (!fullName) {
+      pushToast("error", "Please enter at least first name or last name.");
+      return;
+    }
+
+    setNameLoading(true);
+
+    try {
+      let res;
+      const metadata = {
+        firstName: first,
+        lastName: last,
+        full_name: fullName,
+        name: fullName,
+      };
+
+      if (supabase?.auth?.updateUser) {
+        res = await supabase.auth.updateUser({ data: metadata });
+      } else if (supabase?.auth?.update) {
+        res = await supabase.auth.update({ data: metadata });
+      } else {
+        throw new Error("Supabase auth client does not expose updateUser/update.");
+      }
+
+      const error = res?.error ?? null;
+      if (error) throw error;
+
+      await insertAudit({
+        action: "PROFILE_NAME_UPDATED",
+        entity_type: "users",
+        entity_id: null,
+        metadata: {
+          has_first_name: Boolean(first),
+          has_last_name: Boolean(last),
+        },
+      });
+
+      pushToast("success", "Profile name updated successfully.");
+      setIsNameModalOpen(false);
+    } catch (err) {
+      console.error("Profile name update error:", err);
+      pushToast("error", getFriendlyError(err));
+    } finally {
+      setNameLoading(false);
+    }
+  };
 
   // -----------------------------
   // Render
@@ -288,6 +402,19 @@ export default function SettingsPage() {
       <Sidebar />
 
       <main className="settings-main">
+        <div className="settings-panel">
+          <h2>Profile Name</h2>
+          <p>Modify your profile name.</p>
+
+          <button
+            className="open-modal-btn"
+            type="button"
+            onClick={() => setIsNameModalOpen(true)}
+          >
+            Update Name
+          </button>
+        </div>
+
         <div className="settings-panel">
           <h2>Password</h2>
           <p>Manage your login credentials and security preferences.</p>
@@ -439,6 +566,58 @@ export default function SettingsPage() {
                     disabled={loading}
                   >
                     {loading ? "Saving..." : "Update password"}
+                  </motion.button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isNameModalOpen && (
+          <div className="modal-backdrop" onClick={() => setIsNameModalOpen(false)}>
+            <div className="modal" onClick={(event) => event.stopPropagation()}>
+              <div className="settings-card">
+                <div className="settings-card__header">
+                  <h2>Update Name</h2>
+                  <p>Enter your preferred first and last name for the header profile display.</p>
+                </div>
+
+                <form onSubmit={handleUpdateName} className="password-form">
+                  <div className="input-group">
+                    <label htmlFor="first-name">First Name</label>
+                    <div className="input-row">
+                      <input
+                        id="first-name"
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="First name"
+                        autoComplete="given-name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="last-name">Last Name</label>
+                    <div className="input-row">
+                      <input
+                        id="last-name"
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Last name"
+                        autoComplete="family-name"
+                      />
+                    </div>
+                  </div>
+
+                  <motion.button
+                    type="submit"
+                    className="save-btn"
+                    whileHover={{ scale: 1.02 }}
+                    disabled={nameLoading}
+                  >
+                    {nameLoading ? "Saving..." : "Save Name"}
                   </motion.button>
                 </form>
               </div>
