@@ -34,6 +34,7 @@ export default function Header() {
     },
     { label: "Service Request", path: "/service-request" },
     { label: "FAQ", path: "/faq" },
+    { label: "Contact", path: "/contact-form" },
   ];
 
   // Check admin status on mount and on auth state changes
