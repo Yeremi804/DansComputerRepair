@@ -284,7 +284,7 @@ return (
               {/* < Button */}
               <button
                 onClick={prevReview}
-                className="text-3xl bg-black text-black px-4 py-2 rounded-full hover:bg-gray-700 transition"
+                className="text-3xl bg-white text-black px-4 py-2 rounded-full hover:bg-gray-700 transition"
               >
                 {'<'}
               </button>
