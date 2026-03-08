@@ -195,7 +195,8 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    //only bg-main-bg, don't change  text black or else it becomes unreadable in the dark mode
+    <main className="min-h-screen bg-main-bg text-main-text transition-colors duration-300">
       <section className="mx-auto max-w-3xl p-6">
         <h1 className="text-3xl font-semibold mb-6">Admin Log in</h1>
 
@@ -204,7 +205,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-4">
             {/* Email Only */}
             <div>
-              <label className="block text-sm mb-1">Email address</label>
+              <label className="text-black text-sm mb-1">Email address</label>
               <input
                 type="email"
                 name="email"
@@ -218,7 +219,7 @@ export default function AdminLoginPage() {
 
             {/* Password + Eye toggle */}
             <div>
-              <label className="block text-sm mb-1">Password</label>
+              <label className="block text-black text-sm mb-1">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -254,7 +255,7 @@ export default function AdminLoginPage() {
                 <div className="w-6 h-6 border-2 rounded-sm border-neutral-400 flex items-center justify-center">
                   {showCaptcha && <div className="w-3 h-3 bg-black rounded-sm" />}
                 </div>
-                <span className="text-sm font-medium">I am not a robot      🤖</span>
+                <span className="text-sm text-black font-medium">I am not a robot      🤖</span>
               </div>
             )}
 
@@ -272,7 +273,7 @@ export default function AdminLoginPage() {
                   type="text"
                   // If there is a captcha error, show that as the placeholder. Otherwise, show the default "Type the characters above"
                   placeholder={captchaError ? captchaError : "Type the characters above"}
-                  className="w-full border border-black rounded-sm px-3 py-2 text-sm"
+                  className="w-full border  border-black rounded-sm px-3 py-2 text-"
                   value={captchaInput}
                   onChange={(e) => setCaptchaInput(e.target.value)}
                 />
@@ -291,7 +292,7 @@ export default function AdminLoginPage() {
 
             {/* Remember me + Forgot password */}
             <div className="flex items-center justify-between text-sm mb-8">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center text-black gap-2">
                 <input type="checkbox" className="accent-black" />
                 Remember me
               </label>

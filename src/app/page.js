@@ -107,17 +107,17 @@ return (
       <Services />
 
       {/* --- About Us Section --- */}
-      <section className="text-center pt-10 pb-6 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">About Us</h2>
-          <p className="text-lg text-gray-700 leading-relaxed">
+      <section className="text-center bg-main-bg pt-10 pb-6 px-6">
+        <div className="max-w-3xl bg-main-bg mx-auto">
+          <h2 className="text-4xl md:text-4xl font-bold text-main-text mb-4">About Us</h2>
+          <p className="text-lg text-main-text leading-relaxed">
             At Dan's Computer Repair, we provide fast, reliable, and affordable solutions for all your tech needs right here in the Sacramento area. From fixing slow computers to custom PC builds and hardware upgrades, we are proud to serve our local community with honest service you can trust.
           </p>
         </div>
       </section>
 
       {/* --- Service Information Sections --- */}
-      <section className="bg-white py-16">
+      <section className="bg-main-bg py-16">
         <div className="max-w-6xl mx-auto px-4 space-y-8">
           
           {/* General Services Section */}
@@ -263,7 +263,7 @@ return (
       </section>
 
         {/* --- Yelp Reviews Section --- */}
-        <section className="bg-white text-black py-16">
+        <section className="bg-main-bg text-main-text py-16">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <div className="flex items-center justify-center gap-4 mb-10">
               <h2 className="text-2xl font-semibold mb-10">
@@ -284,7 +284,7 @@ return (
               {/* < Button */}
               <button
                 onClick={prevReview}
-                className="text-3xl bg-white text-black px-4 py-2 rounded-full hover:bg-gray-700 transition"
+                className="text-3xl bg-black text-black px-4 py-2 rounded-full hover:bg-gray-700 transition"
               >
                 {'<'}
               </button>

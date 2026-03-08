@@ -43,8 +43,8 @@ export default async function AuditLogPage() {
       <Sidebar />
 
       {/* Main content area */}
-      <main className="flex-1 p-8 bg-white">
-        <h1 className="mb-4 text-3xl font-bold">Audit Log</h1>
+      <main className="flex-1 p-8 bg-main-bg">
+        <h1 className="mb-4 text-3xl text-main-text font-bold">Audit Log</h1>
 
         {/*
           DashboardAuditPanel is a client component that:

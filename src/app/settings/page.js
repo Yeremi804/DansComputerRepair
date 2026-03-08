@@ -287,7 +287,7 @@ export default function SettingsPage() {
     <div className="dashboard settings-only">
       <Sidebar />
 
-      <main className="settings-main">
+      <main className="settings-main, bg-main-bg">
         <div className="settings-panel">
           <h2>Password</h2>
           <p>Manage your login credentials and security preferences.</p>
