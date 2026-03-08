@@ -2,12 +2,6 @@
 import React, { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// Page metadata for Next.js (used by app router).
-export const metadata = {
-  title: "Contact Us",
-  description: "Get in touch with us by leaving a message",
-};
-
 // main component for contact form page
 export default function ContactFormPage() {
 
