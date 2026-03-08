@@ -4,8 +4,10 @@ import CustomerMessagesPanel from "./CustomerMessagesPanel";
 
 
 export default async function CustomerMessagesPage() {
+
     const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
     if (!SUPABASE_URL || !SUPABASE_ANON) {
         return (
             <div className="p-8">
@@ -18,6 +20,7 @@ export default async function CustomerMessagesPage() {
         );
     }
 
+  // render the dashboard layout with sidebar and customer messages panel
   return (
     <div className="flex min-h-screen">
         <Sidebar />
