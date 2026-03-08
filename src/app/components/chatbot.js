@@ -122,7 +122,7 @@ export default function Chatbot() {
       >
         <div className="flex items-center justify-between bg-gradient-to-r from-sky-600 to-blue-700 px-4 py-3 text-white">
           <div>
-            <p className="text-sm font-semibold">Dan&apos;s AI Assistant</p>
+            <p className="text-sm font-semibold">Dan&apos;s Assistant</p>
             <p className="text-xs text-blue-100">Ask about services and support</p>
           </div>
           <button
