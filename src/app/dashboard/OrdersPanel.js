@@ -2,7 +2,56 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState, useEffect } from 'react';
-import dayjs from 'dayjs';
+// Convert UTC timestamp to California time using Intl.DateTimeFormat
+// Intl is built-in (Node.js + browser) and handles DST automatically — no extra packages needed
+const CA_TZ = 'America/Los_Angeles';
+
+// Normalize any Supabase timestamp to a valid ISO string that new Date() can parse as UTC.
+// Handles all formats Supabase may return:
+//   - "2026-03-08 07:40:10.406509"         (service_requests: space, no tz → append Z)
+//   - "2026-03-07T23:30:00.406509+00:00"   (Configuration_Form: ISO with offset → leave as-is)
+//   - "2026-03-07T23:30:00.406509Z"         (ISO with Z → leave as-is)
+function toUTCIso(value) {
+  if (!value) return null;
+  let s = typeof value === 'string' ? value : String(value);
+  s = s.replace(' ', 'T'); // space → T
+  // Only append Z if there is no timezone info at all
+  if (!/Z$/.test(s) && !/[+-]\d{2}:\d{2}$/.test(s)) {
+    s = s + 'Z';
+  }
+  return s;
+}
+
+function formatDateCA(value) {
+  if (!value) return '';
+  const date = new Date(toUTCIso(value));
+  if (isNaN(date.getTime())) return '';
+  // Use Intl to get month/day/year in California timezone
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: CA_TZ,
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  }).formatToParts(date);
+  const p = {};
+  parts.forEach(({ type, value: v }) => { p[type] = v; });
+  return `${p.month} ${p.day} ${p.year}`;
+}
+
+function formatDateCALong(value) {
+  if (!value) return 'N/A';
+  const date = new Date(toUTCIso(value));
+  if (isNaN(date.getTime())) return 'N/A';
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: CA_TZ,
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  }).formatToParts(date);
+  const p = {};
+  parts.forEach(({ type, value: v }) => { p[type] = v; });
+  return `${p.month} ${p.day}, ${p.year}`;
+}
 
 // Status choices for filtering and updates
 const STATUS_FILTER_OPTIONS = [
@@ -88,7 +137,8 @@ function normalizeValue(row, field) {
   const value = row?.[field];
   if (value == null) return '';
   if (field === 'Dates') {
-    return dayjs(value).format('MMM DD YYYY');
+    // Both sources: UTC timestamp → California time via Intl.DateTimeFormat (consistent)
+    return formatDateCA(value);
   }
   return String(value);
 }
@@ -156,9 +206,13 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
       monthFilter === 'all'
         ? byStatus
         : byStatus.filter(row => {
-            const date = dayjs(row?.Dates);
-            if (!date.isValid()) return false;
-            return date.format('MMM') === monthFilter;
+            const raw = row?.Dates;
+            if (!raw) return false;
+            // Both sources: UTC timestamp → California month via toUTCIso() (consistent)
+            const d = new Date(toUTCIso(raw));
+            if (isNaN(d.getTime())) return false;
+            const mon = new Intl.DateTimeFormat('en-US', { timeZone: CA_TZ, month: 'short' }).format(d);
+            return mon === monthFilter;
           });
 
     const term = searchTerm.trim().toLowerCase();
@@ -177,12 +231,13 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
         );
       }
       if (sortField === 'date') {
-        const aDate = dayjs(a?.Dates);
-        const bDate = dayjs(b?.Dates);
-        if (!aDate.isValid() && !bDate.isValid()) return 0;
-        if (!aDate.isValid()) return 1;
-        if (!bDate.isValid()) return -1;
-        return bDate.valueOf() - aDate.valueOf();
+        // Both sources: sort by UTC ms via toUTCIso() — timezone doesn't affect sort order
+        const aMs = a?.Dates ? new Date(toUTCIso(a.Dates)).getTime() : NaN;
+        const bMs = b?.Dates ? new Date(toUTCIso(b.Dates)).getTime() : NaN;
+        if (isNaN(aMs) && isNaN(bMs)) return 0;
+        if (isNaN(aMs)) return 1;
+        if (isNaN(bMs)) return -1;
+        return bMs - aMs;
       }
       if (sortField === 'id') {
         const aId = a?.ID ?? '';
@@ -220,7 +275,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                 </span>
                 <span className="text-gray-300">·</span>
                 <span className="text-xs text-gray-400">
-                  {row.Dates ? dayjs(row.Dates).format('MMM DD, YYYY') : 'N/A'}
+                  {formatDateCALong(row.Dates)}
                 </span>
               </div>
               <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
@@ -294,7 +349,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                 </span>
                 <span className="text-gray-300">·</span>
                 <span className="text-xs text-gray-400">
-                  {row.Dates ? dayjs(row.Dates).format('MMM DD, YYYY') : 'N/A'}
+                  {formatDateCALong(row.Dates)}
                 </span>
               </div>
               <span className="inline-flex items-center rounded-full bg-teal-50 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold text-teal-700">
