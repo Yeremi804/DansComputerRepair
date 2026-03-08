@@ -19,6 +19,7 @@ export default function Sidebar() {
 
   const items = [
     { label: "Dashboard", href: "/dashboard", Icon: LayoutDashboard },
+    //{ label: "Orders", href: "/dashboard", Icon: ShoppingBag }, // temp fix; update when you have orders route
     //{ label: "Orders", href: "/dashboard", Icon: ShoppingBag }, // update when you have orders route
     { label: "Parts", href: "/admin-parts", Icon: Package },
     { label: "Review", href: "/dashboard/admin-reviews", Icon: MessageSquare },

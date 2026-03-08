@@ -48,6 +48,12 @@ export default function SettingsPage() {
   const [mfaFactorId, setMfaFactorId] = useState(null);
   const [mfaLoading, setMfaLoading] = useState(false);
 
+  const [isMfaUnenrollOpen, setIsMfaUnenrollOpen] = useState(false);
+  const [unenrollMfaRequired, setUnenrollMfaRequired] = useState(false);
+  const [unenrollMfaCode, setUnenrollMfaCode] = useState("");
+  const [unenrollMfaFactorId, setUnenrollMfaFactorId] = useState(null);
+  const [unenrollMfaLoading, setUnenrollMfaLoading] = useState(false);
+
   // small toast helper
   const pushToast = (type, text) => {
     setToast({ type, text });
@@ -170,6 +176,25 @@ export default function SettingsPage() {
     setMfaFactorId(verifiedTotp.id);
     setMfaCode("");
     setMfaRequired(true);
+  };
+
+  const beginUnenrollMfaFlow = async () => {
+    const { data: factors, error: listErr } =
+      await supabase.auth.mfa.listFactors();
+
+    if (listErr) throw listErr;
+
+    const verifiedTotp = (factors?.totp || []).find(
+      (factor) => factor.status === "verified"
+    );
+
+    if (!verifiedTotp) {
+      throw new Error("No verified MFA factor found.");
+    }
+
+    setUnenrollMfaFactorId(verifiedTotp.id);
+    setUnenrollMfaCode("");
+    setUnenrollMfaRequired(true);
   };
 
   // Verifies the entered current password before allowing a password change.
@@ -337,6 +362,131 @@ export default function SettingsPage() {
       setMfaLoading(false);
     }
   };
+
+  // Handle MFA Unenroll
+  const handleUnenrollMfa = async (e) => {
+    e.preventDefault();
+    setToast(null);
+
+    if (!currentPassword.trim()) {
+      pushToast("error", "Enter your current password.");
+      return;
+    }
+
+    try {
+      // Get current user
+      const { data: userRes, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userRes?.user) {
+        throw new Error("User not authenticated.");
+      }
+
+      const email = userRes.user.email;
+
+      // Re-auth
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email,
+        password: currentPassword,
+      });
+
+      if (signInErr) {
+        throw new Error("Current password is incorrect.");
+      }
+
+      const { data: aalData, error: aalError } =
+        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+      if (aalError) throw aalError;
+
+      if (aalData?.currentLevel !== "aal2") {
+        await beginUnenrollMfaFlow();
+        pushToast("error", "Complete MFA below to finish unenrolling.");
+        return;
+      }
+
+      // List the MFA factors
+      const { data: factors, error: listErr } =
+        await supabase.auth.mfa.listFactors();
+
+      if (listErr) throw listErr;
+
+      const verifiedTotp = (factors?.totp || []).find(
+        (factor) => factor.status === "verified"
+      );
+
+      if (!verifiedTotp) {
+        throw new Error("No verified MFA factor found.");
+      }
+
+      // Unenroll the factor
+      const { error: unenrollErr } =
+        await supabase.auth.mfa.unenroll({
+          factorId: verifiedTotp.id,
+        });
+
+      if (unenrollErr) throw unenrollErr;
+
+      // audit
+      await insertAudit({
+        action: "MFA_UNENROLLED",
+        metadata: { factor_id: verifiedTotp.id },
+      });
+
+      pushToast("success", "MFA successfully unenrolled.");
+      setCurrentPassword("");
+      setIsMfaUnenrollOpen(false);
+
+    } catch (err) {
+      console.error("MFA unenroll error:", err);
+      pushToast("error", err.message || "Failed to unenroll MFA.");
+    }
+  };
+
+  const handleVerifyMfaAndUnenroll = async () => {
+    setToast(null);
+
+    if (!unenrollMfaFactorId) {
+      pushToast("error", "MFA setup not found. Click Confirm Unenroll to start.");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(unenrollMfaCode.trim())) {
+      pushToast("error", "Enter the 6-digit code from your authenticator app.");
+      return;
+    }
+
+    setUnenrollMfaLoading(true);
+
+    try {
+      const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({
+        factorId: unenrollMfaFactorId,
+        code: unenrollMfaCode.trim(),
+      });
+
+      if (verifyErr) throw verifyErr;
+
+      // Now we are AAL2 — safe to unenroll
+      const { error: unenrollErr } = await supabase.auth.mfa.unenroll({
+        factorId: unenrollMfaFactorId,
+      });
+
+      if (unenrollErr) throw unenrollErr;
+
+      await insertAudit({
+        action: "MFA_UNENROLLED",
+        metadata: { factor_id: unenrollMfaFactorId },
+      });
+
+      pushToast("success", "MFA successfully unenrolled.");
+      setCurrentPassword("");
+      setIsMfaUnenrollOpen(false);
+
+    } catch (err) {
+      console.error("MFA verify+unenroll error:", err);
+      pushToast("error", err.message || "Failed to verify MFA and unenroll.");
+    } finally {
+      setUnenrollMfaLoading(false);
+    }
+  };
   
 
   const handleUpdateName = async (e) => {
@@ -424,6 +574,18 @@ export default function SettingsPage() {
             onClick={() => setIsModalOpen(true)}
           >
             Change Password
+          </button>
+        </div>
+
+        <div className="settings-panel">
+          <h2>MFA Unenroll</h2>
+          <p>Remove multi-factor authentication from your account.</p>
+          <button
+            className="open-modal-btn"
+            type="button"
+            onClick={() => setIsMfaUnenrollOpen(true)}
+          >
+            Unenroll MFA
           </button>
         </div>
 
@@ -566,6 +728,106 @@ export default function SettingsPage() {
                     disabled={loading}
                   >
                     {loading ? "Saving..." : "Update password"}
+                  </motion.button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isMfaUnenrollOpen && (
+          <div
+            className="modal-backdrop"
+            onClick={() => setIsMfaUnenrollOpen(false)}
+          >
+            <div
+              className="modal"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="settings-card">
+                <div className="settings-card__header">
+                  <div className="settings-card__icon">
+                    <ShieldCheck size={26} />
+                  </div>
+                  <h2>Unenroll MFA</h2>
+                  <p>
+                    Enter your current password to remove multi-factor authentication
+                    from your account.
+                  </p>
+                </div>
+
+                <form onSubmit={handleUnenrollMfa} className="password-form">
+                  <div className="input-group">
+                    <label htmlFor="unenroll-current-password">
+                      Current Password
+                    </label>
+                    <div className="input-row">
+                      <span className="input-icon">
+                        <Lock size={18} />
+                      </span>
+                      <input
+                        id="unenroll-current-password"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Current password"
+                        autoComplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        className="toggle-visibility"
+                        onClick={() =>
+                          setShowCurrentPassword((prev) => !prev)
+                        }
+                      >
+                        {showCurrentPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                      {unenrollMfaRequired && (
+                        <div className="input-group">
+                          <label htmlFor="unenroll-mfa-code">MFA Code</label>
+                          <div className="input-row">
+                            <span className="input-icon">
+                              <ShieldCheck size={18} />
+                            </span>
+                            <input
+                              id="unenroll-mfa-code"
+                              inputMode="numeric"
+                              pattern="[0-9]{6}"
+                              maxLength={6}
+                              value={unenrollMfaCode}
+                              onChange={(e) =>
+                                setUnenrollMfaCode(e.target.value.replace(/\D/g, ""))
+                              }
+                              placeholder="6-digit code"
+                              autoComplete="one-time-code"
+                            />
+                          </div>
+
+                          <motion.button
+                            type="button"
+                            className="save-btn"
+                            whileHover={{ scale: 1.02 }}
+                            disabled={unenrollMfaLoading}
+                            onClick={handleVerifyMfaAndUnenroll}
+                          >
+                            {unenrollMfaLoading ? "Verifying..." : "Verify MFA and Unenroll"}
+                          </motion.button>
+                        </div>
+                      )}
+
+                  <motion.button
+                    type="submit"
+                    className="save-btn"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    Confirm Unenroll
                   </motion.button>
                 </form>
               </div>
