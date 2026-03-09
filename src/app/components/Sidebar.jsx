@@ -5,9 +5,10 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Package,
-  MessageSquare,
   ClipboardList,
   Settings,
+  MessageSquareText,
+  UserStar,
   Clock,
   FileText,
 } from "lucide-react";
@@ -23,7 +24,8 @@ export default function Sidebar() {
     //{ label: "Orders", href: "/dashboard", Icon: ShoppingBag }, // temp fix; update when you have orders route
     //{ label: "Orders", href: "/dashboard", Icon: ShoppingBag }, // update when you have orders route
     { label: "Parts", href: "/admin-parts", Icon: Package },
-    { label: "Review", href: "/dashboard/admin-reviews", Icon: MessageSquare },
+    { label: "Contacts", href: "/dashboard/customer-messages", Icon: MessageSquareText },
+    { label: "Review", href: "/dashboard/admin-reviews", Icon: UserStar },
     { label: "Audit Log", href: "/dashboard/audit", Icon: ClipboardList },
     { label: "Home Content", href: "/dashboard/home-content", Icon: FileText },
     { label: "Settings", href: "/settings", Icon: Settings },
