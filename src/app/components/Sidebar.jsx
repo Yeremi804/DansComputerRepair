@@ -8,6 +8,7 @@ import {
   MessageSquare,
   ClipboardList,
   Settings,
+  Clock,
   FileText,
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ export default function Sidebar() {
     { label: "Audit Log", href: "/dashboard/audit", Icon: ClipboardList },
     { label: "Home Content", href: "/dashboard/home-content", Icon: FileText },
     { label: "Settings", href: "/settings", Icon: Settings },
+    { label: "Metrics", href: "/dashboard/metric", Icon: Clock },
   ];
 
   return (

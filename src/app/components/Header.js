@@ -60,6 +60,23 @@ export default function Header() {
     { label: "FAQ", path: "/faq" },
   ];
 
+  //creating function to switch the theme between light and dark mode
+  const toggleTheme = () => {
+    //flipes the dark class on the <html> tag
+    document.documentElement.classList.toggle("dark");
+
+    //Optional: Save preference so it doesn't reset on refresh
+    const isDark = document.documentElement.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  };
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
   const getDisplayName = (user) => {
     const meta = user?.user_metadata || {};
     const byParts = [meta.firstName, meta.lastName].filter(Boolean).join(" ").trim();
@@ -286,11 +303,13 @@ export default function Header() {
     handleNavigation(path);
   };
 
+  //Changing the bg-white to custom global and layout color to switch dark mode incase color variable wants to be
   return (
     <header className="w-full border-b border-gray-200 bg-white">
       {/* Notification sound */}
       <audio ref={audioRef} src="/notify.mp3" preload="auto"/>
 
+    <header className="w-full border-b border-gray-200 bg-main-bg text-main-text transition-colors duration-300">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
         {/* Brand */}
         <div
@@ -307,14 +326,21 @@ export default function Header() {
             className="h-12 w-12 md:h-16 md:w-16 rounded-md object-contain flex-shrink-0"
           />
           <div className="leading-tight">
-            <h1 className="font-semibold tracking-tight text-gray-900">
+            <h1 className="font-semibold tracking-tight text-main-text">
               Dan&apos;s Computer Repair
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-main-text">
               IT Services and Computer Repair
             </p>
           </div>
         </div>
+
+        <button 
+          onClick={toggleTheme}
+          className="ml-4 rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200"
+        >
+          🌓 Toggle Theme
+        </button>
 
         {/* Desktop Nav */}
         <nav className="hidden md:block">
@@ -326,7 +352,7 @@ export default function Header() {
                   onClick={() => handleNavigation(l.path)}
                   whileHover={hover}
                   whileTap={tap}
-                  className="rounded px-2 py-1 text-gray-700 hover:text-gray-900 hover:underline hover:bg-red-100"
+                  className="rounded px-2 py-1 text-main-text hover:text-gray-900 hover:underline hover:bg-red-100"
                 >
                   {l.label}
                 </MotionButton>
@@ -551,7 +577,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="rounded px-3 py-2 text-gray-700 hover:bg-gray-100"
+            className="rounded px-3 py-2 text-main-text hover:bg-gray-100"
           >
             {open ? "✕" : "☰"}
           </button>
@@ -565,7 +591,7 @@ export default function Header() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden overflow-hidden border-t border-gray-200 bg-white"
+            className="md:hidden overflow-hidden border-t border-gray-200 bg-main-bg text-main-text transition-colors duration-300"
           >
             <div className="mx-auto max-w-6xl px-4 py-3">
               <ul className="flex flex-col gap-2">
@@ -574,7 +600,7 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={() => handleNavigation(l.path)}
-                      className="w-full rounded px-3 py-2 text-left text-gray-700 hover:bg-red-100"
+                      className="w-full rounded px-3 py-2 text-left text-main-text hover:bg-red-400"
                     >
                       {l.label}
                     </button>

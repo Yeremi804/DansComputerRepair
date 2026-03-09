@@ -548,10 +548,10 @@ export default function SettingsPage() {
   // Render
   // -----------------------------
   return (
-    <div className="dashboard settings-only">
+    <div className="flex min-h-screen bg-main-bg">
       <Sidebar />
 
-      <main className="settings-main">
+      <main className="flex-1 p-8">
         <div className="settings-panel">
           <h2>Profile Name</h2>
           <p>Modify your profile name.</p>

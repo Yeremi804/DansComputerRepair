@@ -96,9 +96,9 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
   }, [reviews, filterSource, sortOrder]);
 
   return (
-    <main className="flex-1 p-8 bg-white">
+    <main className="flex-1 p-8 bg-main-bg">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h1 className="text-3xl font-bold">Customer Reviews</h1>
+        <h1 className="text-3xl font-bold text-main-text">Customer Reviews</h1>
 
         <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-200">
           <Filter size={18} className="text-gray-500" />

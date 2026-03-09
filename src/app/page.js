@@ -166,7 +166,7 @@ return (
 </section>
 
       {/* --- Service Information Sections --- */}
-      <section className="bg-white py-16">
+      <section className="bg-main-bg py-16">
         <div className="max-w-6xl mx-auto px-4 space-y-8">
           
           {/* General Services Section */}
@@ -312,7 +312,7 @@ return (
       </section>
 
         {/* --- Yelp Reviews Section --- */}
-        <section className="bg-white text-black py-16">
+        <section className="bg-main-bg text-main-text py-16">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <div className="flex items-center justify-center gap-4 mb-10">
               <h2 className="text-2xl font-semibold mb-10">

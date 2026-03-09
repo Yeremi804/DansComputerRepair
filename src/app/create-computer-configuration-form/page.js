@@ -166,8 +166,9 @@ export default function CreateComputerConfigurationForm() {
     marginBottom: '20px',
   };
 
+  //change teh background color and text color to match the current theme. use var(--current-bg) and var(--current-text) for the colors, which are set in the global styles based on the theme (light/dark)
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#f8fafc', padding: '32px 16px' }}>
+    <main style={{ minHeight: '100vh', backgroundColor: 'var(--current-bg)', padding: '32px 16px' }}>
       <form
         onSubmit={handleSubmit}
         style={{ margin: '0 auto', maxWidth: '960px' }}
@@ -177,7 +178,7 @@ export default function CreateComputerConfigurationForm() {
           fontSize: '1.875rem',
           fontWeight: '600',
           marginBottom: '24px',
-          color: '#1e293b',
+          color: 'var(--current-text)',
         }}>
           Computer Configuration Form
         </h1>

@@ -1,10 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class", // Enable class-based dark mode
   content: [
     "./src/**/*.{js,ts,jsx,tsx}", // include all your src files
   ],
   theme: {
     extend: {
+      colors:{
+        'main-bg': '#FFFFFF',      // Light mode
+        'main-dark': '#121212',    // Dark mode
+        'main-text': '#d3dae3',
+        'text-dark': '#e5e7eb',
+    },
       keyframes: {
         // 🔴 Shake animation for error banner
         shake: {

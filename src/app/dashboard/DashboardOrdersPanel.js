@@ -230,7 +230,7 @@ useEffect(() => {
      <>
     <section className="mt-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl text-main-text font-bold">
           Orders (Configuration Form)
         </h2>
         <button
@@ -245,7 +245,7 @@ useEffect(() => {
     </section>
     <section className="mt-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl text-main-text font-bold">
           Orders (Service Requests)
         </h2>
         <button

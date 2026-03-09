@@ -60,7 +60,7 @@ export default function Services() {
   };
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-main-bg text-main-text">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -69,7 +69,8 @@ export default function Services() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">
+          {/* included text-main-text to ensure it works in both light and dark mode */}
+          <h2 className="text-4xl md:text-4xl font-bold text-main-text mb-4">
             Our Services
           </h2>
 

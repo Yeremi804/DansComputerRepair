@@ -1,8 +1,9 @@
+/*changes occurred with var(--current-bg) and var(--current-text)*/
 .adminSidebar {
   width: 250px;
   min-height: 100vh;
-  background-color: #E2E8F0;
-  color: black;
+  background-color: var(--current-bg);
+  color: var(--current-text);
   display: flex;
   flex-direction: column;
 
@@ -12,7 +13,7 @@
 .adminSidebarHeader {
   padding: 20px;
   border-bottom: 1px solid #cbd5e1;
-  background-color: #E2E8F0;
+  background-color: var(--current-bg);
 
   display: flex;
   justify-content: center;
@@ -28,7 +29,7 @@
   font-size: 26px;
   font-weight: 400;
   line-height: 1.2;
-  color: black;
+  color: var(--current-text);
 }
 
 .adminSidebarNav {
@@ -52,7 +53,7 @@
   font-size: 18px;
   font-weight: 400;
   text-align: center;
-  color: black;
+  color: var(--current-text);
 
   background-color: transparent;
   transition: background-color 0.15s ease;
