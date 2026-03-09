@@ -1,8 +1,57 @@
 //needed to create new component file for this tile
 'use client';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState, useEffect } from 'react';
-import dayjs from 'dayjs';
+import React, { useMemo, useState, useEffect } from 'react';
+// Convert UTC timestamp to California time using Intl.DateTimeFormat
+// Intl is built-in (Node.js + browser) and handles DST automatically — no extra packages needed
+const CA_TZ = 'America/Los_Angeles';
+
+// Normalize any Supabase timestamp to a valid ISO string that new Date() can parse as UTC.
+// Handles all formats Supabase may return:
+//   - "2026-03-08 07:40:10.406509"         (service_requests: space, no tz → append Z)
+//   - "2026-03-07T23:30:00.406509+00:00"   (Configuration_Form: ISO with offset → leave as-is)
+//   - "2026-03-07T23:30:00.406509Z"         (ISO with Z → leave as-is)
+function toUTCIso(value) {
+  if (!value) return null;
+  let s = typeof value === 'string' ? value : String(value);
+  s = s.replace(' ', 'T'); // space → T
+  // Only append Z if there is no timezone info at all
+  if (!/Z$/.test(s) && !/[+-]\d{2}:\d{2}$/.test(s)) {
+    s = s + 'Z';
+  }
+  return s;
+}
+
+function formatDateCA(value) {
+  if (!value) return '';
+  const date = new Date(toUTCIso(value));
+  if (isNaN(date.getTime())) return '';
+  // Use Intl to get month/day/year in California timezone
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: CA_TZ,
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  }).formatToParts(date);
+  const p = {};
+  parts.forEach(({ type, value: v }) => { p[type] = v; });
+  return `${p.month} ${p.day} ${p.year}`;
+}
+
+function formatDateCALong(value) {
+  if (!value) return 'N/A';
+  const date = new Date(toUTCIso(value));
+  if (isNaN(date.getTime())) return 'N/A';
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: CA_TZ,
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  }).formatToParts(date);
+  const p = {};
+  parts.forEach(({ type, value: v }) => { p[type] = v; });
+  return `${p.month} ${p.day}, ${p.year}`;
+}
 
 // Status choices for filtering and updates
 const STATUS_FILTER_OPTIONS = [
@@ -88,10 +137,50 @@ function normalizeValue(row, field) {
   const value = row?.[field];
   if (value == null) return '';
   if (field === 'Dates') {
-    return dayjs(value).format('MMM DD YYYY');
+    // Both sources: UTC timestamp → California time via Intl.DateTimeFormat (consistent)
+    return formatDateCA(value);
   }
   return String(value);
 }
+
+// ─── Detail panel sub-components (modern UI) ──────────────────────────
+
+// Section card wrapper — white card with label, matches Shopify/Stripe sidebar card pattern
+function DetailCard({ title, children }) {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">{title}</p>
+      </div>
+      <div className="px-4 py-3 flex flex-col gap-2.5">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Single key-value row inside a card — label on top, value below (Shopify pattern)
+function DetailRow({ label, value }) {
+  return (
+    <div>
+      <p className="text-[11px] text-gray-400 font-medium mb-0.5">{label}</p>
+      <p className="text-sm text-gray-800 font-medium leading-snug">{value || 'N/A'}</p>
+    </div>
+  );
+}
+
+// Spec chip — compact pill for hardware components (used in Config Form)
+function SpecChip({ label, value }) {
+  if (!value) return null;
+  return (
+    <div className="flex items-start gap-2 py-1.5 border-b border-gray-100 last:border-0">
+      <span className="text-xs text-gray-400 w-28 shrink-0 pt-0.5">{label}</span>
+      <span className="text-xs text-gray-800 font-medium leading-snug">{value}</span>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 //main tile component
 export default function OrdersPanel({ rows, onFilteredChange }) {
@@ -117,9 +206,13 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
       monthFilter === 'all'
         ? byStatus
         : byStatus.filter(row => {
-            const date = dayjs(row?.Dates);
-            if (!date.isValid()) return false;
-            return date.format('MMM') === monthFilter;
+            const raw = row?.Dates;
+            if (!raw) return false;
+            // Both sources: UTC timestamp → California month via toUTCIso() (consistent)
+            const d = new Date(toUTCIso(raw));
+            if (isNaN(d.getTime())) return false;
+            const mon = new Intl.DateTimeFormat('en-US', { timeZone: CA_TZ, month: 'short' }).format(d);
+            return mon === monthFilter;
           });
 
     const term = searchTerm.trim().toLowerCase();
@@ -138,12 +231,13 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
         );
       }
       if (sortField === 'date') {
-        const aDate = dayjs(a?.Dates);
-        const bDate = dayjs(b?.Dates);
-        if (!aDate.isValid() && !bDate.isValid()) return 0;
-        if (!aDate.isValid()) return 1;
-        if (!bDate.isValid()) return -1;
-        return bDate.valueOf() - aDate.valueOf();
+        // Both sources: sort by UTC ms via toUTCIso() — timezone doesn't affect sort order
+        const aMs = a?.Dates ? new Date(toUTCIso(a.Dates)).getTime() : NaN;
+        const bMs = b?.Dates ? new Date(toUTCIso(b.Dates)).getTime() : NaN;
+        if (isNaN(aMs) && isNaN(bMs)) return 0;
+        if (isNaN(aMs)) return 1;
+        if (isNaN(bMs)) return -1;
+        return bMs - aMs;
       }
       if (sortField === 'id') {
         const aId = a?.ID ?? '';
@@ -167,50 +261,128 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
   }
 }, [filteredRows, onFilteredChange]);
 
-  // Helper to render expanded details
+  // ─── Modern detail panel ──────────────────────────────────
   function renderDetails(row) {
     if (row.Source === 'Configuration_Form') {
       return (
         <tr>
-          <td colSpan={7} className="bg-gray-50 p-6 text-left text-sm border-t border-gray-200">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <strong>Processor:</strong> {row.cpu || 'N/A'}<br />
-                <strong>Motherboard:</strong> {row.motherboard || 'N/A'}<br />
-                <strong>Storage:</strong> {row.storage || 'N/A'}<br />
-                <strong>Case:</strong> {row.case || 'N/A'}<br />
-                <strong>Operating System:</strong> {row.operating_syst || 'N/A'}<br />
-                <strong>Other Requests/Notes:</strong> {row.other_requests || row.Notes || 'N/A'}<br />
+          <td colSpan={7} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
+            {/* Top meta bar — order ID + date stamp (Shopify/Stripe header pattern) */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+                  Order #{row.ID}
+                </span>
+                <span className="text-gray-300">·</span>
+                <span className="text-xs text-gray-400">
+                  {formatDateCALong(row.Dates)}
+                </span>
               </div>
-              <div>
-                <strong>Graphics Card:</strong> {row.gpu || 'N/A'}<br />
-                <strong>Memory:</strong> {row.memory || 'N/A'}<br />
-                <strong>Power Supply:</strong> {row.psu || 'N/A'}<br />
-                <strong>Cooling:</strong> {row.cooling || 'N/A'}<br />
-                <strong>Networking:</strong> {row.networking || 'N/A'}<br />
+              <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                Computer Configuration
+              </span>
+            </div>
+
+            {/* 3-column card grid — Shopify sidebar card pattern */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+              {/* Card 1: Customer — Budget Range & Intended Use here */}
+              <DetailCard title="Customer">
+                <DetailRow label="Name" value={row.Customer} />
+                <DetailRow label="Phone" value={row.phone} />
+                <DetailRow label="Email" value={row.email} />
+                {/* Budget Range and Intended Use */}
+                <div className="mt-1 pt-2 border-t border-gray-100 flex flex-col gap-2">
+                  <DetailRow
+                    label="Budget Range"
+                    value={row.budget_range || 'Not specified'}
+                  />
+                  <DetailRow
+                    label="Intended Use"
+                    value={row.intended_use || 'Not specified'}
+                  />
+                </div>
+              </DetailCard>
+
+              {/* Card 2: Component Specs — compact chip list pattern */}
+              <DetailCard title="Component Specifications">
+                <SpecChip label="Processor" value={row.cpu} />
+                <SpecChip label="Graphics Card" value={row.gpu} />
+                <SpecChip label="Memory" value={row.memory} />
+                <SpecChip label="Storage" value={row.storage} />
+                <SpecChip label="Motherboard" value={row.motherboard} />
+              </DetailCard>
+
+              {/* Card 3: Build Details */}
+              <DetailCard title="Build Details">
+                <SpecChip label="Case" value={row.case} />
+                <SpecChip label="OS" value={row.operating_system} />
+                <SpecChip label="Power Supply" value={row.psu} />
+                <SpecChip label="Cooling" value={row.cooling} />
+                <SpecChip label="Networking" value={row.networking} />
+              </DetailCard>
+            </div>
+
+            {/* Notes — only shown if present, amber tinted (Shopify "Notes" card pattern) */}
+            {(row.other_requests || row.Notes) && (
+              <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500 mb-1">
+                  Notes / Other Requests
+                </p>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {row.other_requests || row.Notes}
+                </p>
               </div>
-            </div>
-            <div className="mt-4">
-              <strong>Phone/Email:</strong> <br /> {row.phone || 'N/A'} <br /> {row.email || 'N/A'}
-            </div>
+            )}
           </td>
         </tr>
       );
     } else if (row.Source === 'service_requests') {
       return (
         <tr>
-          <td colSpan={7} className="bg-gray-50 p-6 text-left text-sm border-t border-gray-200">
-            <div>
-              <strong>Device Information:</strong> {row.device_type || 'N/A'}<br />
-              <strong>Problem Description:</strong>
-              <ul className="ml-4 mt-2">
-                <li><strong>When did the problem start?</strong> {row.problem_start || 'no specification.'}</li>
-                <li><strong>Do you have any idea when the problem occurred?</strong> {row.problem_cause || 'no specification.'}</li>
-                <li><strong>Other questions?</strong> {row.additional_ques || 'no specification.'}</li>
-              </ul>
-              <div className="mt-4">
-                <strong>Phone/Email:</strong> <br /> {row.phone_number || 'N/A'} <br /> {row.email || 'N/A'}
+          <td colSpan={7} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
+            {/* Top meta bar */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+                  Order #{row.ID}
+                </span>
+                <span className="text-gray-300">·</span>
+                <span className="text-xs text-gray-400">
+                  {formatDateCALong(row.Dates)}
+                </span>
               </div>
+              <span className="inline-flex items-center rounded-full bg-teal-50 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold text-teal-700">
+                Service Request
+              </span>
+            </div>
+
+            {/* 2-column card grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+              {/* Card 1: Customer */}
+              <DetailCard title="Customer">
+                <DetailRow label="Name" value={row.Customer} />
+                <DetailRow label="Phone" value={row.phone_number} />
+                <DetailRow label="Email" value={row.email} />
+                <DetailRow label="Device Type" value={row.device_type} />
+              </DetailCard>
+
+              {/* Card 2: Problem Description */}
+              <DetailCard title="Problem Description">
+                <DetailRow
+                  label="When did the problem start?"
+                  value={row.problem_start_date || 'No specification.'}
+                />
+                <DetailRow
+                  label="Do you know what caused it?"
+                  value={row.problem_cause_idea || 'No specification.'}
+                />
+                <DetailRow
+                  label="Additional questions"
+                  value={row.additional_questions || 'No specification.'}
+                />
+              </DetailCard>
             </div>
           </td>
         </tr>
@@ -218,6 +390,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     }
     return null;
   }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   return (
     <div className="rounded-lg bg-red-100 p-4 text-gray-900 shadow-sm hover:shadow-lg hover:border hover:border-pink-300">
@@ -299,11 +472,9 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
           </thead>
           <tbody className="text-gray-900">
             {filteredRows.map((row, index) => (
-              <>
+              <React.Fragment key={`${row.Source}-${row.ID ?? index}`}>
                 <tr
-                  key={row.ID ?? index}
-                  className="odd:bg-white even:bg-gray-50"
-                >
+                  className="odd:bg-white even:bg-gray-50">
                   <td className="px-1 py-3 align-top">
                     <button
                       className="text-lg cursor-pointer hover:opacity-70"
@@ -328,7 +499,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                   <td className="px-3 py-3 align-top">{row.Source}</td>
                 </tr>
                 {expandedRow === row.ID && renderDetails(row)}
-              </>
+              </React.Fragment>
             ))}
             {filteredRows.length === 0 && (
               <tr>

@@ -43,6 +43,8 @@ export async function POST(req) {
       networking: toNull(body['Networking']),
       other_requests: toNull(body.otherRequests),
       sms_consent: body.sms_consent === true,
+      // new orders must default to 'Pending' instead of 'Completed'
+      Status: 'Pending',
     }
 
     console.log('Prepared DB row for insert:', row)

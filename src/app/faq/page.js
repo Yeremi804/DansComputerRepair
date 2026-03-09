@@ -38,7 +38,7 @@ export default function FAQPage() {
     ];
 
     return (
-        <main className="bg-white text-gray-800">
+        <main className="bg-main-bg text-main-text">
             <section className="mx-auto max-w-4xl px-4 py-12 md:px-6">
                 <h1 className="text-3xl font-semibold tracking-tight text-pink-800 sm:text-4xl mb-8">
                     Frequently Asked Questions

@@ -20,7 +20,7 @@ export default function DashboardOrdersPanel({ supabaseUrl, supabaseAnonKey }) {
     // Build CSV string with proper escaping for commas and quotes
   return [headers, ...exportRows.map(row =>
       headers.map(h =>
-        `"${String(row[h]).replace(/"/g, '""')}"`
+        `"${String(row[h] ?? '').replace(/"/g, '""')}"`
       )
     )]
       .map(row => row.join(','))
@@ -53,34 +53,33 @@ const downloadCSV = (rows, filename) => {
       const { data: serviceRows } = await supabase.from("service_requests").select("*");
       setConfigFormRows(
         (configRows || []).map(row => ({
-          // Display fields
+          // All database fields first (so explicit fields below take priority)
+          ...row,
+          // Display fields (override any conflicting keys from ...row)
           ID: row.id,
           Customer: row.name,
           Status: row.Status || "Pending",
           Dates: row.created_at,
           Notes: row.other_requests,
           Source: "Configuration_Form",
-          // All database fields
-          ...row,
         }))
       );
       setServiceRequestRows(
         (serviceRows || []).map(row => ({
-          // Display fields
+          // All database fields first (so explicit fields below take priority)
+          ...row,
+          // Display fields (override any conflicting keys from ...row)
           ID: row.serial_id,
           Customer: row.customer_name,
           Status: row.Status || "Pending",
           Dates: row.Create_at,
-          Notes: row.additional_ques,
+          Notes: row.additional_questions,
           Source: "service_requests",
-          // All database fields
-          ...row,
         }))
       );
     }, 1000);
     return () => clearInterval(interval);
   }, [supabaseUrl, supabaseAnonKey]);
-
   // Function to build export row based on source type
   const buildExportRow = (row) => {
     // Base fields included in all exports
@@ -96,18 +95,21 @@ const downloadCSV = (rows, filename) => {
   if (row.Source === 'Configuration_Form') {
     return {
       ...base,
+      Phone: row.phone ?? '',
+      Email: row.email ?? '',
+      // BudgetRange and IntendedUse added after basic customer info, before component specs
+      BudgetRange: row.budget_range ?? '',
+      IntendedUse: row.intended_use ?? '',
       Processor: row.cpu ?? '',
       Motherboard: row.motherboard ?? '',
       Storage: row.storage ?? '',
       Case: row.case ?? '',
-      OperatingSystem: row.operating_syst ?? '',
+      OperatingSystem: row.operating_system ?? '',
       GPU: row.gpu ?? '',
       Memory: row.memory ?? '',
       PSU: row.psu ?? '',
       Cooling: row.cooling ?? '',
       Networking: row.networking ?? '',
-      Phone: row.phone ?? '',
-      Email: row.email ?? '',
     };
   }
   // If the source is service_requests, include specific fields related to service requests
@@ -115,26 +117,21 @@ const downloadCSV = (rows, filename) => {
     return {
       ...base,
       DeviceType: row.device_type ?? '',
-      ProblemStart: row.problem_start ?? '',
-      ProblemCause: row.problem_cause ?? '',
-      AdditionalQuestions: row.additional_ques ?? '',
+      ProblemStart: row.problem_start_date ?? '',
+      ProblemCause: row.problem_cause_idea ?? '',
+      AdditionalQuestions: row.additional_questions ?? '',
       Phone: row.phone_number ?? '',
       Email: row.email ?? '',
     };
   }
-
   return base;
 };
-
 // Test cases for CSV generation
 useEffect(() => {
   if (!RUN_TESTS) return; // Skip tests if RUN_TESTS is false
   if (hasRunTests.current) return; // prevent double run in Strict Mode
-
   hasRunTests.current = true; // Mark tests as run
-
   console.log("----- RUNNING CSV TESTS -----");
-
   const assert = (testName, condition) => {
     if (condition) {
       console.log(`✅ PASS: ${testName}`);
@@ -150,12 +147,12 @@ useEffect(() => {
       Status: 'Pending',
       Dates: '2024-01-01',
       Notes: 'Test note',
-      Source: 'Configuration_Form'
+      Source: 'Configuration_Form',
+      budget_range: '$1000-$1500',
+      intended_use: 'Gaming',
     }
   ];
-
   const csv = buildCSVContent(testRows);
-
   const headerLine = csv.split('\n')[0];   
   const headerArray = headerLine.split(',');
   console.log("HEADER LINE:", headerLine);
@@ -166,12 +163,29 @@ useEffect(() => {
     ['ID','Customer','Status','Date','Notes','Source']
     .every(h => headerArray.includes(h))
   );
+  // Test that BudgetRange and IntendedUse headers are present
+  assert(
+    "BudgetRange header exists in Configuration_Form CSV",
+    headerArray.includes('BudgetRange')
+  );
+  assert(
+    "IntendedUse header exists in Configuration_Form CSV",
+    headerArray.includes('IntendedUse')
+  );
+  // Test that BudgetRange and IntendedUse values appear in CSV
+  assert(
+    "CSV includes BudgetRange value",
+    csv.includes('"$1000-$1500"')
+  );
+  assert(
+    "CSV includes IntendedUse value",
+    csv.includes('"Gaming"')
+  );
   // Test that name is included in the CSV content
   assert(
     "CSV includes customer name",
     csv.includes('"Alice"')
   );
-
   const quoteTest = buildCSVContent([
     {
       ID: 2,
@@ -187,24 +201,36 @@ useEffect(() => {
     "Quotes are escaped properly",
     quoteTest.includes('"Bob ""The Builder"""')
   );
-
+  // Test that null budget_range and intended_use render as empty string (not "null")
+  const nullFieldTest = buildCSVContent([
+    {
+      ID: 3,
+      Customer: 'Carol',
+      Status: 'Pending',
+      Dates: '2024-01-03',
+      Notes: '',
+      Source: 'Configuration_Form',
+      budget_range: null,
+      intended_use: undefined,
+    }
+  ]);
+  assert(
+    "Null BudgetRange renders as empty string in CSV",
+    nullFieldTest.includes('BudgetRange') && !nullFieldTest.includes('"null"')
+  );
   const emptyTest = buildCSVContent([]);
   // Test that an empty array of rows returns an empty string for CSV content
   assert(
     "Empty rows returns empty string",
     emptyTest === ''
   );
-
   console.log("----- CSV TESTS COMPLETE -----");
-
 }, []);
-
-
   return (
      <>
     <section className="mt-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl text-main-text font-bold">
           Orders (Configuration Form)
         </h2>
         <button
@@ -214,14 +240,12 @@ useEffect(() => {
           Download CSV
         </button>
       </div>
-
       <OrdersPanel rows={configFormRows}
        onFilteredChange={setFilteredConfigRows} />
     </section>
-
     <section className="mt-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl text-main-text font-bold">
           Orders (Service Requests)
         </h2>
         <button
@@ -231,7 +255,6 @@ useEffect(() => {
           Download CSV
         </button>
       </div>
-
       <OrdersPanel rows={serviceRequestRows} 
        onFilteredChange={setFilteredServiceRows} />
     </section>

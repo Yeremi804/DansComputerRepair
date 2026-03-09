@@ -4,7 +4,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f8fafc; /* Light slate background, consistent with other pages */
+  /*Chaing this to have it optically change background color to dark mode*/
+  background-color: var(--current-bg); /* Light slate background, consistent with other pages */
   min-height: 100vh;
 }
 
@@ -16,7 +17,8 @@
   width: 100%;
   max-width: 960px;
   text-align: left;
-  color: #1e293b; /* Dark slate, consistent with other page headings */
+  /*Chaing this to have it optically change text color to dark mode*/
+  color:var(--current-text); /* Dark slate, consistent with other page headings */
 }
 
 /* --- Form card: elevated white card matching settings/admin card style --- */

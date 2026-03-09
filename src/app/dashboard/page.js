@@ -86,8 +86,8 @@ export default async function DashboardPage() {
     <div className="flex min-h-screen">
       <Sidebar />
 
-      <main className="flex-1 p-8 bg-white">
-        <h1 className="mb-4 text-3xl font-bold">Dashboard</h1>
+      <main className="flex-1 p-8 bg-main-bg ">
+        <h1 className="mb-4 text-3xl text-main-text font-bold">Dashboard</h1>
 
         <section className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
           <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg">

@@ -1,16 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/client";
 import Services from "./home-services-title.js";
 
 
 export default function Home() {
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
-
+  const [aboutContent, setAboutContent] = useState(null); // For making site_content more dynamic (about us section)
+  const [footerContent, setFooterContent] = useState(null); // For making site_content more dynamic (footer section)
   const [localReviews, setLocalReviews] = useState([]);
   const [yelpReviews, setYelpReviews] = useState([]);
     
@@ -20,6 +17,56 @@ export default function Home() {
   const reviews = showYelp ? yelpReviews : localReviews;
 
   useEffect(() => setIndex(0), [showYelp, localReviews.length]);
+
+  useEffect(() => {
+    async function fetchSiteContent() {
+      // Check preview flag in URL
+      const preview =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("preview") === "1";
+  
+      // Check logged-in session
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData?.session;
+  
+      // Determine if user is admin
+      let isAdmin = false;
+  
+      if (session) {
+        const { data: adminRow, error: adminError } = await supabase
+          .from("admins")
+          .select("user_id")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+  
+        if (!adminError && adminRow) {
+          isAdmin = true;
+        }
+      }
+  
+      // Decide which column to load
+      const column = preview && isAdmin ? "draft" : "published";
+  
+      // Fetch BOTH home_about and footer in one query
+      const { data, error } = await supabase
+        .from("site_content")
+        .select(`key, ${column}`)
+        .in("key", ["home_about", "footer"]);
+  
+      if (error) {
+        console.error("site_content error:", error);
+        return;
+      }
+  
+      // Map results
+      const map = new Map((data || []).map((row) => [row.key, row[column]]));
+  
+      setAboutContent(map.get("home_about") ?? null);
+      setFooterContent(map.get("footer") ?? null);
+    }
+  
+    fetchSiteContent();
+  }, []);
 
   useEffect(() => {
     async function fetchLocalReviews() {
@@ -106,18 +153,20 @@ return (
       {/* Services Section */}
       <Services />
 
-      {/* --- About Us Section --- */}
-      <section className="text-center pt-10 pb-6 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">About Us</h2>
-          <p className="text-lg text-gray-700 leading-relaxed">
-            At Dan's Computer Repair, we provide fast, reliable, and affordable solutions for all your tech needs right here in the Sacramento area. From fixing slow computers to custom PC builds and hardware upgrades, we are proud to serve our local community with honest service you can trust.
-          </p>
-        </div>
-      </section>
+    {/* --- About Us Section --- */}
+<section className="text-center pt-10 pb-6 px-6">
+  <div className="max-w-3xl mx-auto">
+    <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">
+      {aboutContent?.title ?? "About Us"}
+    </h2>
+    <p className="text-lg text-gray-700 leading-relaxed">
+      {aboutContent?.body ?? "Loading..."}
+    </p>
+  </div>
+</section>
 
       {/* --- Service Information Sections --- */}
-      <section className="bg-white py-16">
+      <section className="bg-main-bg py-16">
         <div className="max-w-6xl mx-auto px-4 space-y-8">
           
           {/* General Services Section */}
@@ -263,7 +312,7 @@ return (
       </section>
 
         {/* --- Yelp Reviews Section --- */}
-        <section className="bg-white text-black py-16">
+        <section className="bg-main-bg text-main-text py-16">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <div className="flex items-center justify-center gap-4 mb-10">
               <h2 className="text-2xl font-semibold mb-10">
