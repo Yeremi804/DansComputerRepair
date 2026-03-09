@@ -305,11 +305,9 @@ export default function Header() {
 
   //Changing the bg-white to custom global and layout color to switch dark mode incase color variable wants to be
   return (
-    <header className="w-full border-b border-gray-200 bg-white">
+    <header className="w-full border-b border-gray-200 bg-main-bg text-main-text transition-colors duration-300">
       {/* Notification sound */}
       <audio ref={audioRef} src="/notify.mp3" preload="auto"/>
-
-    <header className="w-full border-b border-gray-200 bg-main-bg text-main-text transition-colors duration-300">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
         {/* Brand */}
         <div
