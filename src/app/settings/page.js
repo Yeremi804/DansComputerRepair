@@ -8,6 +8,7 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
+  Mail,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import "./SettingsPage.css";
@@ -34,6 +35,7 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [emailLoading, setEmailLoading] = useState(false);
 
   // visibility toggles for inputs
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -43,6 +45,9 @@ export default function SettingsPage() {
   // modal + MFA state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState(null);
@@ -104,12 +109,13 @@ export default function SettingsPage() {
   // Modal focus / escape handling
   // -----------------------------
   useEffect(() => {
-    if (!isModalOpen && !isNameModalOpen) return;
+    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsModalOpen(false);
         setIsNameModalOpen(false);
+        setIsEmailModalOpen(false);
       }
     };
 
@@ -119,7 +125,7 @@ export default function SettingsPage() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isModalOpen, isNameModalOpen]);
+  }, [isModalOpen, isNameModalOpen, isEmailModalOpen]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -262,6 +268,22 @@ export default function SettingsPage() {
     setMfaFactorId(null);
   };
 
+  const clearEmailForm = () => {
+    setNewEmail("");
+    setConfirmEmail("");
+  };
+
+  const isValidEmailFormat = (value) => {
+    const email = String(value || "").trim();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const showEmailFormatHelp = () => {
+    window.alert(
+      "Please enter a valid email address.\n\nA good email address should contain:\n- A username before @\n- Exactly one @ symbol\n- A domain name after @\n- A dot (.) in the domain, for example: name@example.com"
+    );
+  };
+
   // -----------------------------
   // Handlers: submit / verify MFA
   // -----------------------------
@@ -360,6 +382,73 @@ export default function SettingsPage() {
       pushToast("error", getFriendlyError(err));
     } finally {
       setMfaLoading(false);
+    }
+  };
+
+  const handleUpdateEmail = async (e) => {
+    e.preventDefault();
+    setToast(null);
+
+    const nextEmail = newEmail.trim();
+    const confirm = confirmEmail.trim();
+
+    if (!nextEmail) {
+      pushToast("error", "Enter a new email address.");
+      return;
+    }
+
+    if (!confirm) {
+      pushToast("error", "Please confirm the new email address.");
+      return;
+    }
+
+    if (nextEmail.toLowerCase() !== confirm.toLowerCase()) {
+      pushToast("error", "New email and confirm email do not match.");
+      return;
+    }
+
+    if (!isValidEmailFormat(nextEmail)) {
+      pushToast("error", "Invalid email format.");
+      showEmailFormatHelp();
+      return;
+    }
+
+    setEmailLoading(true);
+
+    try {
+      let res;
+      const updates = { email: nextEmail };
+      const emailRedirectTo =
+        process.env.NEXT_PUBLIC_SITE_URL
+          ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+          : `${window.location.origin}/auth/callback`;
+
+      if (supabase?.auth?.updateUser) {
+        res = await supabase.auth.updateUser(updates, { emailRedirectTo });
+      } else if (supabase?.auth?.update) {
+        res = await supabase.auth.update(updates);
+      } else {
+        throw new Error("Supabase auth client does not expose updateUser/update.");
+      }
+
+      const error = res?.error ?? null;
+      if (error) throw error;
+
+      await insertAudit({
+        action: "EMAIL_UPDATED",
+        entity_type: "users",
+        entity_id: null,
+        metadata: { email_updated: true },
+      });
+
+      clearEmailForm();
+      setIsEmailModalOpen(false);
+      pushToast("success", "Email updated successfully.");
+    } catch (err) {
+      console.error("Email update error:", err);
+      pushToast("error", getFriendlyError(err));
+    } finally {
+      setEmailLoading(false);
     }
   };
 
@@ -551,7 +640,7 @@ export default function SettingsPage() {
     <div className="flex min-h-screen bg-main-bg">
       <Sidebar />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 settings-main">
         <div className="settings-panel">
           <h2>Profile Name</h2>
           <p>Modify your profile name.</p>
@@ -574,6 +663,18 @@ export default function SettingsPage() {
             onClick={() => setIsModalOpen(true)}
           >
             Change Password
+          </button>
+        </div>
+
+        <div className="settings-panel">
+          <h2>Email</h2>
+          <p>Update your account email address.</p>
+          <button
+            className="open-modal-btn"
+            type="button"
+            onClick={() => setIsEmailModalOpen(true)}
+          >
+            Update Email
           </button>
         </div>
 
@@ -880,6 +981,70 @@ export default function SettingsPage() {
                     disabled={nameLoading}
                   >
                     {nameLoading ? "Saving..." : "Save Name"}
+                  </motion.button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isEmailModalOpen && (
+          <div className="modal-backdrop" onClick={() => setIsEmailModalOpen(false)}>
+            <div className="modal" onClick={(event) => event.stopPropagation()}>
+              <div className="settings-card">
+                <div className="settings-card__header">
+                  <div className="settings-card__icon">
+                    <Mail size={26} />
+                  </div>
+                  <h2>Update Email</h2>
+                  <p>Enter and confirm your new email address.</p>
+                </div>
+
+                <form onSubmit={handleUpdateEmail} className="password-form">
+                  <div className="input-group">
+                    <label htmlFor="new-email">New Email Address</label>
+                    <div className="input-row">
+                      <span className="input-icon">
+                        <Mail size={18} />
+                      </span>
+                      <input
+                        id="new-email"
+                        type="email"
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                        placeholder="name@example.com"
+                        autoComplete="email"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="confirm-email">Confirm Email Address</label>
+                    <div className="input-row">
+                      <span className="input-icon">
+                        <Mail size={18} />
+                      </span>
+                      <input
+                        id="confirm-email"
+                        type="email"
+                        value={confirmEmail}
+                        onChange={(e) => setConfirmEmail(e.target.value)}
+                        placeholder="name@example.com"
+                        autoComplete="email"
+                      />
+                    </div>
+                    <span className="helper-text">
+                      Format example: name@example.com
+                    </span>
+                  </div>
+
+                  <motion.button
+                    type="submit"
+                    className="save-btn"
+                    whileHover={{ scale: 1.02 }}
+                    disabled={emailLoading}
+                  >
+                    {emailLoading ? "Saving..." : "Update Email"}
                   </motion.button>
                 </form>
               </div>
