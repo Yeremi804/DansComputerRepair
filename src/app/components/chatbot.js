@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { askGemini } from "../actions";
 
+const UNKNOWN_RESPONSE =
+  "I’m not sure based on that. Please submit a service request with your device details and issue summary so the team can follow up with the right next steps.";
+
 const CHAT_SHORTCUTS = [
   {
     patterns: [
@@ -12,17 +15,38 @@ const CHAT_SHORTCUTS = [
       "request form",
       "book repair",
       "repair request",
+      "schedule repair",
+      "submit request",
+      "need repair",
+      "fix my computer",
+      "fix my laptop",
+      "repair my computer",
+      "repair my laptop",
+      "diagnostic",
+      "diagnostics",
+      "drop off",
+      "drop-off",
+      "appointment",
+      "get estimate",
     ],
     text: "Yes. You can submit a request here:",
     links: [{ label: "Service Request Form", href: "/service-request" }],
   },
   {
-    patterns: ["faq", "questions", "common questions"],
+    patterns: ["faq", "questions", "common questions", "help page", "support questions"],
     text: "You can view frequently asked questions here:",
     links: [{ label: "FAQ", href: "/faq" }],
   },
   {
-    patterns: ["computer build", "build pc", "custom pc", "pc build"],
+    patterns: [
+      "computer build",
+      "build pc",
+      "custom pc",
+      "pc build",
+      "gaming pc",
+      "new computer build",
+      "custom computer",
+    ],
     text: "You can start a custom computer build request here:",
     links: [
       {
@@ -32,9 +56,14 @@ const CHAT_SHORTCUTS = [
     ],
   },
   {
-    patterns: ["review", "leave feedback", "rating"],
+    patterns: ["review", "leave feedback", "rating", "testimonial", "feedback"],
     text: "You can leave a review here:",
     links: [{ label: "Review Form", href: "/review-form" }],
+  },
+  {
+    patterns: ["contact", "contact form", "send message", "message dan", "reach out"],
+    text: "You can send a message here:",
+    links: [{ label: "Contact Form", href: "/contact-form" }],
   },
   {
     patterns: ["home", "homepage", "main page"],
@@ -84,7 +113,17 @@ export default function Chatbot() {
       }
 
       const aiResponse = await askGemini(trimmedInput);
-      setMessages((prev) => [...prev, { role: "model", text: aiResponse }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "model",
+          text: aiResponse,
+          links:
+            aiResponse === UNKNOWN_RESPONSE
+              ? [{ label: "Service Request Form", href: "/service-request" }]
+              : undefined,
+        },
+      ]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -103,12 +142,12 @@ export default function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-[1000]">
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-xl shadow-blue-500/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="fixed bottom-6 right-6 z-[1000] h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-xl shadow-blue-500/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           aria-label="Open chatbot"
         >
           <span className="text-2xl leading-none">✦</span>
