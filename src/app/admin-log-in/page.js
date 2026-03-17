@@ -1,22 +1,30 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react"; // React hooks for managing state and side effects
 import { Eye, EyeOff } from "lucide-react"; // 2 icons for password state
-import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-
+import { supabase } from "@/lib/supabase/client"; // supabase client for authentication and database interactions
+import { useRouter } from "next/navigation"; // Next.js hook for programmatic navigation
 
 export default function AdminLoginPage() {
-  const [showPassword, setShowPassword] = useState(false);  // hide password by default
+  const [showPassword, setShowPassword] = useState(false); // hide password by default
   const [email, setEmail] = useState(""); // used by supabase
   const [password, setPassword] = useState(""); // used by supabase
-  const [loading, setLoading] = useState(false);  // used by supabase
-  const [error, setError] = useState("");  // used by supabase
+  const [loading, setLoading] = useState(false); // used by supabase
+  const [error, setError] = useState(""); // used by supabase
+
   // Captcha states that enable captcah to pop up, store the svg, store the user input, store the error message, and store the verification status
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaSvg, setCaptchaSvg] = useState("");
   const [captchaInput, setCaptchaInput] = useState("");
   const [captchaError, setCaptchaError] = useState("");
   const [captchaVerified, setCaptchaVerified] = useState(false);
+
+  // MFA with TOTP (Time-based One Time Password)
+  const [mfaOpen, setMfaOpen] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaError, setMfaError] = useState("");
+  const [mfaFactorId, setMfaFactorId] = useState(null);
+
+  const router = useRouter();
 
   //load captcha on component mount
   const loadCaptcha = async () => {
@@ -52,17 +60,9 @@ export default function AdminLoginPage() {
     }
   };
 
-
-  // MFA with TOTP (Time-based One Time Password)
-  const [mfaOpen, setMfaOpen] = useState(false);
-  const [mfaCode, setMfaCode] = useState("");
-  const [mfaError, setMfaError] = useState("");
-  const [mfaFactorId, setMfaFactorId] = useState(null);
-  const router = useRouter();
-
-
   async function handleSubmit(e) {
     e.preventDefault();
+
     // First, check if captcha is verified before proceeding with login also testing if you can access the cookie value for verification. This is important since if we can find exploit to bypasss the captcha, then we can bypass the MFA as well since MFA is only triggered after successful captcha verification.
     if (!captchaVerified) {
       setError("Please complete the captcha verification.");
@@ -76,13 +76,15 @@ export default function AdminLoginPage() {
 
     try {
       // The regular login
-      const { error: authError } = await supabase.auth.signInWithPassword({ email: emailTrimmed, password, });
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: emailTrimmed,
+        password,
+      });
+
       if (authError) {
         setError(authError.message);
         return;
       }
-
-
 
       // Save cookies for the middleware
       const { data: sess } = await supabase.auth.getSession();
@@ -95,8 +97,17 @@ export default function AdminLoginPage() {
         }),
       });
 
-      const {data: { user }, error: userError} = await supabase.auth.getUser(); // get the current user, if there is an error or no user, it means the login failed somehow, so we can just return a error response
-      if(user) {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser(); // get the current user, if there is an error or no user, it means the login failed somehow, so we can just return a error response
+
+      if (userError || !user) {
+        setError(userError?.message || "Unable to retrieve user after login.");
+        return;
+      }
+
+      if (user) { // included this part to ensure that it capture the cookeis or data to update and addinto the metric unit table.
         await supabase
           .from("profiles")
           .update({ Last_sign_in: new Date().toISOString() })
@@ -105,7 +116,9 @@ export default function AdminLoginPage() {
       }
 
       // Checks the AAL
-      const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const { data: aalData, error: aalError } =
+        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
       if (aalError) {
         setError(aalError.message);
         return;
@@ -118,7 +131,9 @@ export default function AdminLoginPage() {
       }
 
       // If not AAl2 verified, then check TOTP factors
-      const { data: factors, error: listErr } = await supabase.auth.mfa.listFactors();
+      const { data: factors, error: listErr } =
+        await supabase.auth.mfa.listFactors();
+
       if (listErr) {
         setError(listErr.message);
         return;
@@ -126,11 +141,14 @@ export default function AdminLoginPage() {
 
       // Checks if the user has a MFA setup.
       const TOTP = factors.totp || [];
-      const verifiedTOTP = TOTP.find(f => f.status === "verified");
+      const verifiedTOTP = TOTP.find((f) => f.status === "verified");
+
       // If no MFA, then it prompts this error message.
       if (!verifiedTOTP) {
         // Either send them to sign up page for MFA, or prompt them on the spot.
-        setError("User currently does not have a MFA setup. Redirecting user to setup MFA...")
+        setError(
+          "User currently does not have a MFA setup. Redirecting user to setup MFA..."
+        );
 
         setTimeout(() => {
           router.replace("/init-mfa");
@@ -140,7 +158,10 @@ export default function AdminLoginPage() {
       }
 
       // Create a challenge and open MFA popup. I believe this part is related to using existing factors.
-      const { error: chalErr } = await supabase.auth.mfa.challenge({ factorId: verifiedTOTP.id, });
+      const { error: chalErr } = await supabase.auth.mfa.challenge({
+        factorId: verifiedTOTP.id,
+      });
+
       if (chalErr) {
         setError(chalErr.message);
         return;
@@ -162,29 +183,36 @@ export default function AdminLoginPage() {
   async function submitMFA(e) {
     e.preventDefault();
     setMfaError("");
+
     if (!mfaFactorId) {
       setMfaError("No TOTP factor.");
       return;
     }
 
     // Verify the 6-digit MFA code
-    const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({ factorId: mfaFactorId, code: mfaCode.trim(), });
+    const { error: verifyErr } = await supabase.auth.mfa.challengeAndVerify({
+      factorId: mfaFactorId,
+      code: mfaCode.trim(),
+    });
+
     if (verifyErr) {
       setMfaError(verifyErr.message || "Invalid code");
       return;
     }
 
+    //Included this part to ensure that it capture the cookeis or data to update and addinto the metric unit table.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    //Included this part to ensure that it capture the cookeis or data to update and addinto the metric unit table. 
-    const { data: {user}} = await supabase.auth.getUser();
-    if(user) {
+    if (user) {
       await supabase
         .from("profiles")
         .update({ last_sign_in: new Date().toISOString() })
         .eq("id", user.id)
         .select();
 
-        console.log("Last sign in time updated successfully for user:", user.id);
+      console.log("Last sign in time updated successfully for user:", user.id);
     }
 
     // User login with MFA was successful
@@ -245,7 +273,7 @@ export default function AdminLoginPage() {
 
             {error && <div className="text-red-600 text-sm">{error}</div>}
 
-            { /*This is what the user clicks first */}
+            {/*This is what the user clicks first */}
             {!captchaVerified && (
               <div
                 // When the user clicks this box, it sets showCaptcha to true, which triggers the drawer to open with the captcha inside.
@@ -255,7 +283,9 @@ export default function AdminLoginPage() {
                 <div className="w-6 h-6 border-2 rounded-sm border-neutral-400 flex items-center justify-center">
                   {showCaptcha && <div className="w-3 h-3 bg-black rounded-sm" />}
                 </div>
-                <span className="text-sm text-black font-medium">I am not a robot      🤖</span>
+                <span className="text-sm text-black font-medium">
+                  I am not a robot 🤖
+                </span>
               </div>
             )}
 
@@ -272,13 +302,17 @@ export default function AdminLoginPage() {
                 <input
                   type="text"
                   // If there is a captcha error, show that as the placeholder. Otherwise, show the default "Type the characters above"
-                  placeholder={captchaError ? captchaError : "Type the characters above"}
-                  className="w-full border text-black border-black rounded-sm px-3 py-2 text-"
+                  placeholder={
+                    captchaError
+                      ? captchaError
+                      : "Type the characters above"
+                  }
+                  className="w-full border text-black border-black rounded-sm px-3 py-2"
                   value={captchaInput}
                   onChange={(e) => setCaptchaInput(e.target.value)}
                 />
 
-                {/* The Black "Check" Button with your Loading Spinner 
+                {/* The Black "Check" Button with your Loading Spinner
                     Hasnt happen yet or occur so far*/}
                 <button
                   type="button"
@@ -305,10 +339,11 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading || !captchaVerified}
-              className={`w-full font-medium py-2 rounded-sm mt-2 cursor-pointer transition-colors ${captchaVerified
-                ? "bg-[#8fbd7e] hover:bg-[#6dab5c] text-white"
-                : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-                }`}
+              className={`w-full font-medium py-2 rounded-sm mt-2 cursor-pointer transition-colors ${
+                captchaVerified
+                  ? "bg-[#8fbd7e] hover:bg-[#6dab5c] text-white"
+                  : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
+              }`}
             >
               {loading ? "Loading..." : "Sign In"}
             </button>
@@ -319,6 +354,7 @@ export default function AdminLoginPage() {
             <span className="text-sm text-neutral-600">Or</span>
             <button
               type="button"
+              onClick={() => router.push("/create-admin-account")}
               className="bg-[#7e9dbd] hover:bg-[#5d7b99] text-white font-medium px-4 py-2 rounded-sm cursor-pointer"
             >
               Sign up
@@ -362,13 +398,17 @@ export default function AdminLoginPage() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="px-3 py-2 bg-black text-white rounded-sm cursor-pointer">
+                <button
+                  type="submit"
+                  className="px-3 py-2 bg-black text-white rounded-sm cursor-pointer"
+                >
                   Verify
                 </button>
               </div>
             </form>
           </div>
-        </div>)}
+        </div>
+      )}
     </main>
   );
 }
