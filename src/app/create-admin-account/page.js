@@ -52,11 +52,19 @@ export default function CreateAdminAccountPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main
+      className="min-h-screen transition-colors duration-300"
+      style={{ backgroundColor: 'var(--current-bg)' }}
+    >
       <section className="mx-auto max-w-3xl p-6">
-        <h1 className="text-3xl font-semibold mb-6">Create Admin account</h1>
+        <h1
+          className="text-3xl font-semibold mb-6"
+          style={{ color: 'var(--current-text)' }}
+        >
+          Create Admin account
+        </h1>
 
-        {/* ✅ Success Banner (Tailwind fade-in) */}
+        {/* Success Banner */}
         {serverSuccess && (
           <div
             role="status"
@@ -67,7 +75,7 @@ export default function CreateAdminAccountPage() {
           </div>
         )}
 
-        {/* 🔴 Error Banner (Tailwind shake) */}
+        {/* Error Banner */}
         {serverError && (
           <div
             role="alert"
@@ -78,61 +86,194 @@ export default function CreateAdminAccountPage() {
           </div>
         )}
 
-        <div className="border border-neutral-300 rounded-md bg-white">
+        {/* Form card: modern shadow, white background (matches service-request / config form) */}
+        <div
+          className="rounded-lg bg-white"
+          style={{
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 6px -1px rgba(11, 63, 115, 0.12), 0 2px 4px -1px rgba(11, 63, 115, 0.08)',
+          }}
+        >
           <form className="p-6 md:p-8" onSubmit={onSubmit} noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* First name */}
               <div>
-                <label className="block text-sm mb-1">First name</label>
+                <label
+                  className="block text-sm font-medium mb-1.5"
+                  style={{ color: '#475569' }}
+                >
+                  First name
+                </label>
                 <input
                   type="text"
                   name="firstName"
                   placeholder="First name"
-                  className="w-full border border-black rounded-sm px-3 py-2"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: '#1e293b',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
+              {/* Last name */}
               <div>
-                <label className="block text-sm mb-1">Last name</label>
+                <label
+                  className="block text-sm font-medium mb-1.5"
+                  style={{ color: '#475569' }}
+                >
+                  Last name
+                </label>
                 <input
                   type="text"
                   name="lastName"
                   placeholder="Last name"
-                  className="w-full border border-black rounded-sm px-3 py-2"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: '#1e293b',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
+              {/* Email address */}
               <div className="md:col-span-2">
-                <label className="block text-sm mb-1">Email address</label>
+                <label
+                  className="block text-sm font-medium mb-1.5"
+                  style={{ color: '#475569' }}
+                >
+                  Email address
+                </label>
                 <input
                   type="email"
                   name="email"
                   placeholder="Email address"
                   required
-                  className="w-full border border-black rounded-sm px-3 py-2"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: '#1e293b',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
+              {/* Phone number */}
               <div>
-                <label className="block text-sm mb-1">Phone number</label>
+                <label
+                  className="block text-sm font-medium mb-1.5"
+                  style={{ color: '#475569' }}
+                >
+                  Phone number
+                </label>
                 <input
                   type="tel"
                   name="phone"
                   placeholder="Phone number"
-                  className="w-full border border-black rounded-sm px-3 py-2"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: '#1e293b',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
+              {/* Password */}
               <div>
-                <label className="block text-sm mb-1">Password</label>
+                <label
+                  className="block text-sm font-medium mb-1.5"
+                  style={{ color: '#475569' }}
+                >
+                  Password
+                </label>
                 <input
                   type="password"
                   name="password"
                   placeholder="Minimum 10 characters"
                   required
-                  onBlur={(e) => setPasswordError(validatePassword(e.target.value) || '')}
-                  className={`w-full rounded-sm px-3 py-2 border ${
-                    passwordError ? 'border-red-500 focus:outline-red-600' : 'border-black'
-                  }`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: `1px solid ${passwordError ? '#ef4444' : '#cbd5e1'}`,
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: '#1e293b',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = passwordError ? '#ef4444' : '#3b82f6';
+                    e.target.style.boxShadow = passwordError
+                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
+                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                  }}
+                  onBlur={(e) => {
+                    setPasswordError(validatePassword(e.target.value) || '');
+                    e.target.style.borderColor = passwordError ? '#ef4444' : '#cbd5e1';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   aria-invalid={!!passwordError}
                   aria-describedby={passwordError ? 'password-error' : undefined}
                 />
@@ -143,35 +284,91 @@ export default function CreateAdminAccountPage() {
                 )}
               </div>
 
+              {/* Confirm password */}
               <div>
-                <label className="block text-sm mb-1">Confirm password</label>
+                <label
+                  className="block text-sm font-medium mb-1.5"
+                  style={{ color: '#475569' }}
+                >
+                  Confirm password
+                </label>
                 <input
                   type="password"
                   name="confirmPassword"
                   placeholder="Minimum 10 characters"
                   required
-                  className="w-full border border-black rounded-sm px-3 py-2"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: '#1e293b',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
+
             </div>
 
+            {/* Sign up button */}
             <div className="mt-8">
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full bg-green-600 text-white py-2 rounded-sm hover:bg-green-700 disabled:opacity-60"
+                style={{
+                  width: '100%',
+                  backgroundColor: '#16a34a',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  fontSize: '0.9375rem',
+                  fontWeight: '600',
+                  cursor: isPending ? 'not-allowed' : 'pointer',
+                  opacity: isPending ? 0.6 : 1,
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) => { if (!isPending) e.target.style.backgroundColor = '#15803d'; }}
+                onMouseLeave={(e) => { if (!isPending) e.target.style.backgroundColor = '#16a34a'; }}
               >
                 {isPending ? 'Creating account…' : 'Sign up'}
               </button>
             </div>
           </form>
 
-          <div className="border-t border-neutral-300 p-6 md:p-8">
+          {/* Divider + Sign in */}
+          <div
+            className="p-6 md:p-8"
+            style={{ borderTop: '1px solid #e2e8f0' }}
+          >
             <div className="flex justify-center items-center gap-2">
-              <span className="text-sm text-neutral-600">Or</span>
+              <span className="text-sm" style={{ color: '#64748b' }}>Or</span>
               <a
                 href="/admin-log-in"
-                className="bg-slate-600 text-white px-4 py-2 rounded-sm hover:bg-slate-700"
+                style={{
+                  backgroundColor: '#475569',
+                  color: '#ffffff',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  textDecoration: 'none',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = '#334155'; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = '#475569'; }}
               >
                 Sign in
               </a>
