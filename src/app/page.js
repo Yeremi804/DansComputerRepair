@@ -154,12 +154,12 @@ return (
       <Services />
 
     {/* --- About Us Section --- */}
-<section className="text-center pt-10 pb-6 px-6">
+<section className="text-center text-main-text bg-main-bg pt-10 pb-6 px-6">
   <div className="max-w-3xl mx-auto">
-    <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">
+    <h2 className="text-4xl md:text-4xl font-bold text-main-text mb-4">
       {aboutContent?.title ?? "About Us"}
     </h2>
-    <p className="text-lg text-gray-700 leading-relaxed">
+    <p className="text-lg text-main-text leading-relaxed">
       {aboutContent?.body ?? "Loading..."}
     </p>
   </div>
