@@ -105,6 +105,25 @@ export default function SettingsPage() {
     }
   };
 
+  // Logout helper
+  const handleLogoutAfterMfaUnenroll = async () => {
+    // clear server-side session/cookies
+    await fetch("/api/logout", { method: "POST" });
+
+    // sign out client-side
+    await supabase.auth.signOut();
+
+    // close popups (modals) and change states
+    setCurrentPassword("");
+    setUnenrollMfaCode("");
+    setUnenrollMfaFactorId(null);
+    setUnenrollMfaRequired(false);
+    setIsMfaUnenrollOpen(false);
+
+    // send user back to the login page
+    window.location.href = "/admin-log-in";
+  };
+
   // -----------------------------
   // Modal focus / escape handling
   // -----------------------------
@@ -498,31 +517,37 @@ export default function SettingsPage() {
 
       if (listErr) throw listErr;
 
-      const verifiedTotp = (factors?.totp || []).find(
-        (factor) => factor.status === "verified"
-      );
+      const verifiedFactors = [
+        ...(factors?.totp || []),
+        ...(factors?.phone || []),
+      ].filter((factor) => factor.status === "verified");
 
-      if (!verifiedTotp) {
-        throw new Error("No verified MFA factor found.");
+      if (verifiedFactors.length === 0) {
+        throw new Error("No verified MFA factors found.");
       }
 
-      // Unenroll the factor
-      const { error: unenrollErr } =
-        await supabase.auth.mfa.unenroll({
-          factorId: verifiedTotp.id,
+      // Unenroll all verified factors
+      for (const factor of verifiedFactors) {
+        const { error: unenrollErr } = await supabase.auth.mfa.unenroll({
+          factorId: factor.id,
         });
 
-      if (unenrollErr) throw unenrollErr;
+        if (unenrollErr) throw unenrollErr;
+      }
 
       // audit
       await insertAudit({
         action: "MFA_UNENROLLED",
-        metadata: { factor_id: verifiedTotp.id },
+        metadata: {
+          factor_ids: verifiedFactors.map((factor) => factor.id),
+          factor_count: verifiedFactors.length,
+        },
       });
 
       pushToast("success", "MFA successfully unenrolled.");
-      setCurrentPassword("");
-      setIsMfaUnenrollOpen(false);
+      
+      // Logout user after the removal of MFA factors
+      await handleLogoutAfterMfaUnenroll();
 
     } catch (err) {
       console.error("MFA unenroll error:", err);
@@ -553,21 +578,41 @@ export default function SettingsPage() {
 
       if (verifyErr) throw verifyErr;
 
-      // Now we are AAL2 — safe to unenroll
-      const { error: unenrollErr } = await supabase.auth.mfa.unenroll({
-        factorId: unenrollMfaFactorId,
-      });
+      // Now we are AAL2 — safe to unenroll all verified factors
+      const { data: factors, error: listErr } =
+        await supabase.auth.mfa.listFactors();
 
-      if (unenrollErr) throw unenrollErr;
+      if (listErr) throw listErr;
+
+      const verifiedFactors = [
+        ...(factors?.totp || []),
+        ...(factors?.phone || []),
+      ].filter((factor) => factor.status === "verified");
+
+      if (verifiedFactors.length === 0) {
+        throw new Error("No verified MFA factors found.");
+      }
+
+      for (const factor of verifiedFactors) {
+        const { error: unenrollErr } = await supabase.auth.mfa.unenroll({
+          factorId: factor.id,
+        });
+
+        if (unenrollErr) throw unenrollErr;
+      }
 
       await insertAudit({
         action: "MFA_UNENROLLED",
-        metadata: { factor_id: unenrollMfaFactorId },
+        metadata: {
+          factor_ids: verifiedFactors.map((factor) => factor.id),
+          factor_count: verifiedFactors.length,
+        },
       });
 
       pushToast("success", "MFA successfully unenrolled.");
-      setCurrentPassword("");
-      setIsMfaUnenrollOpen(false);
+      
+      // Logout user after the removal of MFA factors
+      await handleLogoutAfterMfaUnenroll();
 
     } catch (err) {
       console.error("MFA verify+unenroll error:", err);
