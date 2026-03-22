@@ -9,12 +9,109 @@ function validatePassword(pw) {
   return null;
 }
 
+// US phone number validation
+// Based on Paul Schreiber's approach (Stack Overflow, 36 upvotes):
+//   Step 1 — FORMAT: strict regex enforcing paired parentheses, no mixed/consecutive separators
+//   Step 2 — DIGITS: strip formatting, apply NANP rules (area code & exchange start with 2-9)
+//
+// Accepted formats: 5552345678 | 555-234-5678 | (555) 234-5678 | (555)234-5678
+//                   555.234.5678 | 555 234 5678 | 1-555-234-5678 | +1 555-234-5678
+function validatePhone(phone) {
+  if (!phone || phone.trim() === '') return 'Phone number is required.';
+
+  const raw = phone.trim();
+  const errMsg = 'Please enter a valid US phone number (e.g. (555) 234-5678 or 555-234-5678).';
+
+  // Step 1: FORMAT — parentheses must be paired; separators must be consistent
+  // Bare 10 digits OR optional +1/1 prefix followed by (NXX) or NXX then sep NXX sep XXXX
+  const formatRegex = /^(\+?1[\s\-\.]?)?((\(\d{3}\)[\s\-\.]?|\d{3}[\s\-\.])\d{3}[\s\-\.]\d{4})$|^(\+?1[\s\-\.]?)?\d{10}$/;
+  if (!formatRegex.test(raw)) {
+    return errMsg;
+  }
+
+  // Step 2: DIGITS — strip all non-digit chars, remove leading country code 1 if 11 digits
+  let digits = raw.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
+
+  if (digits.length !== 10) return errMsg;
+
+  // NANP rule: area code and exchange must start with 2-9
+  // (ref: /^[2-9]\d{2}[2-9]\d{2}\d{4}$/ — Paul Schreiber, Stack Overflow)
+  if (!/^[2-9]\d{2}[2-9]\d{2}\d{4}$/.test(digits)) {
+    return errMsg;
+  }
+
+  return null;
+}
+
+// Shared input style
+const baseInputStyle = {
+  width: '100%',
+  padding: '10px 12px',
+  border: '1px solid #cbd5e1',
+  borderRadius: '6px',
+  fontSize: '14px',
+  color: '#1e293b',
+  backgroundColor: '#ffffff',
+  outline: 'none',
+  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+  boxSizing: 'border-box',
+};
+
+const errorInputStyle = {
+  ...baseInputStyle,
+  border: '1px solid #ef4444',
+};
+
+function InputField({ label, name, type = 'text', placeholder, required, error, onBlurValidate, ...rest }) {
+  const [touched, setTouched] = useState(false);
+
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+        {label} {required && <span style={{ color: '#ef4444' }}>*</span>}
+      </label>
+      <input
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        required={required}
+        style={error && touched ? errorInputStyle : baseInputStyle}
+        onFocus={(e) => {
+          e.target.style.borderColor = error && touched ? '#ef4444' : '#3b82f6';
+          e.target.style.boxShadow = error && touched
+            ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
+            : '0 0 0 3px rgba(59, 130, 246, 0.15)';
+        }}
+        onBlur={(e) => {
+          setTouched(true);
+          if (onBlurValidate) onBlurValidate(e.target.value);
+          e.target.style.borderColor = '#cbd5e1';
+          e.target.style.boxShadow = 'none';
+        }}
+        aria-invalid={!!(error && touched)}
+        aria-describedby={error && touched ? `${name}-error` : undefined}
+        {...rest}
+      />
+      {error && touched && (
+        <p id={`${name}-error`} className="mt-1 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function CreateAdminAccountPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState('');
   const [serverSuccess, setServerSuccess] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [errors, setErrors] = useState({});
   const [isPending, startTransition] = useTransition();
+
+  function setFieldError(field, msg) {
+    setErrors((prev) => ({ ...prev, [field]: msg || '' }));
+  }
 
   function onSubmit(e) {
     e.preventDefault();
@@ -24,13 +121,39 @@ export default function CreateAdminAccountPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const pwErr = validatePassword(formData.get('password'));
-    setPasswordError(pwErr || '');
-    if (pwErr) return;
+    const firstName = formData.get('firstName')?.trim();
+    const lastName = formData.get('lastName')?.trim();
+    const email = formData.get('email')?.trim();
+    const phone = formData.get('phone')?.trim();
+    const password = formData.get('password')?.trim();
+    const confirmPassword = formData.get('confirmPassword')?.trim();
+
+    // Validate all fields
+    const newErrors = {};
+    if (!firstName) newErrors.firstName = 'First name is required.';
+    if (!lastName) newErrors.lastName = 'Last name is required.';
+    if (!email) newErrors.email = 'Email address is required.';
+    newErrors.phone = validatePhone(phone) || '';
+    newErrors.password = validatePassword(password) || '';
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password.';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match.';
+    }
+
+    // Force all fields as touched by setting errors
+    setErrors(newErrors);
+
+    const hasErrors = Object.values(newErrors).some((v) => v !== '');
+    if (hasErrors) return;
 
     startTransition(async () => {
       const res = await signUp(formData);
       if (!res?.ok) {
+        // Log detailed dev message to console, show user-friendly message in UI
+        if (res?.devMessage) {
+          console.error('[SignUp Error]', res.devMessage);
+        }
         setServerError('');
         requestAnimationFrame(() => {
           setServerError(res?.error || 'Something went wrong.');
@@ -47,6 +170,7 @@ export default function CreateAdminAccountPage() {
         setTimeout(() => router.push('/init-mfa'), 700);
       } else {
         form.reset();
+        setErrors({});
       }
     });
   }
@@ -86,7 +210,7 @@ export default function CreateAdminAccountPage() {
           </div>
         )}
 
-        {/* Form card: modern shadow, white background (matches service-request / config form) */}
+        {/* Form card */}
         <div
           className="rounded-lg bg-white"
           style={{
@@ -99,225 +223,176 @@ export default function CreateAdminAccountPage() {
 
               {/* First name */}
               <div>
-                <label
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#475569' }}
-                >
-                  First name
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                  First name <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="text"
                   name="firstName"
                   placeholder="First name"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: '#1e293b',
-                    backgroundColor: '#ffffff',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    boxSizing: 'border-box',
-                  }}
+                  required
+                  style={errors.firstName ? errorInputStyle : baseInputStyle}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                    e.target.style.borderColor = errors.firstName ? '#ef4444' : '#3b82f6';
+                    e.target.style.boxShadow = errors.firstName
+                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
+                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
                   }}
                   onBlur={(e) => {
+                    setFieldError('firstName', e.target.value.trim() ? '' : 'First name is required.');
                     e.target.style.borderColor = '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
+                {errors.firstName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                )}
               </div>
 
               {/* Last name */}
               <div>
-                <label
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#475569' }}
-                >
-                  Last name
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                  Last name <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="text"
                   name="lastName"
                   placeholder="Last name"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: '#1e293b',
-                    backgroundColor: '#ffffff',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    boxSizing: 'border-box',
-                  }}
+                  required
+                  style={errors.lastName ? errorInputStyle : baseInputStyle}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                    e.target.style.borderColor = errors.lastName ? '#ef4444' : '#3b82f6';
+                    e.target.style.boxShadow = errors.lastName
+                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
+                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
                   }}
                   onBlur={(e) => {
+                    setFieldError('lastName', e.target.value.trim() ? '' : 'Last name is required.');
                     e.target.style.borderColor = '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
+                {errors.lastName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                )}
               </div>
 
               {/* Email address */}
               <div className="md:col-span-2">
-                <label
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#475569' }}
-                >
-                  Email address
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                  Email address <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="email"
                   name="email"
                   placeholder="Email address"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: '#1e293b',
-                    backgroundColor: '#ffffff',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    boxSizing: 'border-box',
-                  }}
+                  style={errors.email ? errorInputStyle : baseInputStyle}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                    e.target.style.borderColor = errors.email ? '#ef4444' : '#3b82f6';
+                    e.target.style.boxShadow = errors.email
+                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
+                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
                   }}
                   onBlur={(e) => {
+                    setFieldError('email', e.target.value.trim() ? '' : 'Email address is required.');
                     e.target.style.borderColor = '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
               </div>
 
               {/* Phone number */}
               <div>
-                <label
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#475569' }}
-                >
-                  Phone number
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                  Phone number <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="Phone number"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: '#1e293b',
-                    backgroundColor: '#ffffff',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    boxSizing: 'border-box',
-                  }}
+                  placeholder="e.g. 555-123-4567"
+                  required
+                  style={errors.phone ? errorInputStyle : baseInputStyle}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                    e.target.style.borderColor = errors.phone ? '#ef4444' : '#3b82f6';
+                    e.target.style.boxShadow = errors.phone
+                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
+                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
                   }}
                   onBlur={(e) => {
+                    setFieldError('phone', validatePhone(e.target.value) || '');
                     e.target.style.borderColor = '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
+                  aria-invalid={!!errors.phone}
+                  aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />
+                {errors.phone && (
+                  <p id="phone-error" className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                )}
               </div>
 
               {/* Password */}
               <div>
-                <label
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#475569' }}
-                >
-                  Password
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                  Password <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="password"
                   name="password"
                   placeholder="Minimum 10 characters"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: `1px solid ${passwordError ? '#ef4444' : '#cbd5e1'}`,
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: '#1e293b',
-                    backgroundColor: '#ffffff',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    boxSizing: 'border-box',
-                  }}
+                  style={errors.password ? errorInputStyle : baseInputStyle}
                   onFocus={(e) => {
-                    e.target.style.borderColor = passwordError ? '#ef4444' : '#3b82f6';
-                    e.target.style.boxShadow = passwordError
+                    e.target.style.borderColor = errors.password ? '#ef4444' : '#3b82f6';
+                    e.target.style.boxShadow = errors.password
                       ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
                       : '0 0 0 3px rgba(59, 130, 246, 0.15)';
                   }}
                   onBlur={(e) => {
-                    setPasswordError(validatePassword(e.target.value) || '');
-                    e.target.style.borderColor = passwordError ? '#ef4444' : '#cbd5e1';
+                    setFieldError('password', validatePassword(e.target.value) || '');
+                    e.target.style.borderColor = '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
-                  aria-invalid={!!passwordError}
-                  aria-describedby={passwordError ? 'password-error' : undefined}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
                 />
-                {passwordError && (
-                  <p id="password-error" className="mt-1 text-sm text-red-600">
-                    {passwordError}
-                  </p>
+                {errors.password && (
+                  <p id="password-error" className="mt-1 text-sm text-red-600">{errors.password}</p>
                 )}
               </div>
 
               {/* Confirm password */}
               <div>
-                <label
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#475569' }}
-                >
-                  Confirm password
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                  Confirm password <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="password"
                   name="confirmPassword"
                   placeholder="Minimum 10 characters"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: '#1e293b',
-                    backgroundColor: '#ffffff',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    boxSizing: 'border-box',
-                  }}
+                  style={errors.confirmPassword ? errorInputStyle : baseInputStyle}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                    e.target.style.borderColor = errors.confirmPassword ? '#ef4444' : '#3b82f6';
+                    e.target.style.boxShadow = errors.confirmPassword
+                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
+                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
                   }}
                   onBlur={(e) => {
+                    setFieldError('confirmPassword', e.target.value.trim() ? '' : 'Please confirm your password.');
                     e.target.style.borderColor = '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
+                  aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
                 />
+                {errors.confirmPassword && (
+                  <p id="confirm-password-error" className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                )}
               </div>
 
             </div>
