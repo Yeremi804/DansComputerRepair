@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { askGemini } from "../actions";
 
-const UNKNOWN_RESPONSE =
+export const UNKNOWN_RESPONSE =
   "I’m not sure based on that. Please submit a service request with your device details and issue summary so the team can follow up with the right next steps.";
 
 const CHAT_SHORTCUTS = [
@@ -71,7 +72,7 @@ const CHAT_SHORTCUTS = [
   },
 ];
 
-function getShortcutResponse(userText) {
+export function getShortcutResponse(userText) {
   const normalized = userText.toLowerCase();
 
   return (
