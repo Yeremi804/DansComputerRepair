@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { askGemini } from "../actions";
 
 const UNKNOWN_RESPONSE =
   "I’m not sure based on that. Please submit a service request with your device details and issue summary so the team can follow up with the right next steps.";
