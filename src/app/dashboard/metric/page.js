@@ -17,7 +17,7 @@ export default function MetricsPage() {
                 const { data, error: fetchError } = await supabase
                     .from("profiles")  
                     .select("email, role ,last_sign_in, Last_Sign_Out")
-                    .order("last_sign_in", { ascending: false })
+                    .order("Last_Sign_Out", { ascending: false })
                     .limit(20);
                 // If there is an error fetching the metrics, set the error state
                 if (fetchError) {
@@ -39,7 +39,7 @@ export default function MetricsPage() {
     }, []);
 
     // If the metrics are still loading, show a loading message. If there was an error fetching the metrics, show the error message. Otherwise, show the metrics table.
-    if (loading) return <div className="p-4">Loading...</div>;
+    if (loading) return <div className="bg-main-bg text-main-text p-4">Loading...</div>;
     if (error) return <div className="p-4 text-red-600">{error}</div>;
 
     return (

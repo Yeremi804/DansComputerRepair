@@ -2,176 +2,315 @@
 import React, { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// main component for contact form page
 export default function ContactFormPage() {
 
-    // initialize supabase client with environment variables
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      );
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
 
-    // success and error messages for form submission
-    const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errors, setErrors] = useState({});
 
-    // handle form input changes, update formData state
-    const handleChange = (e) => {
+  const isValidName = (name) => /^[A-Za-z\s'-]+$/.test(name);
+
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+
+  const isValidPhone = (phone) => {
+    const cleaned = phone.replace(/\D/g, "");
+    return cleaned.length === 10;
+  };
+
+  const isValidMessage = (text) =>
+    /^[A-Za-z0-9\s.,!?'"()\-]*$/.test(text);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+
+    // NAME restriction
+    if (name === "name") {
+      if (!/^[A-Za-z\s'-]*$/.test(value)) return;
+    }
+
+    // PHONE restriction
+    if (name === "phone") {
+      if (!/^[0-9()\-\s]*$/.test(value)) return;
+    }
+
+    // MESSAGE restriction
+    if (name === "message") {
+      if (!/^[A-Za-z0-9\s.,!?'"()\-]*$/.test(value)) return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
     }));
-    };
-    // handle form submission, insert data into supabase, show success or error message
-    const handleSubmit = async (e) => {
 
+    // clear error for that field
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (!isValidName(formData.name)) {
+      newErrors.name = "Invalid name format";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!isValidEmail(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    if (formData.phone && !isValidPhone(formData.phone)) {
+      newErrors.phone = "Invalid phone number";
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required";
+    } else if (!isValidMessage(formData.message)) {
+      newErrors.message = "Invalid characters in message";
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // insert form data into supabase table "contact_messages"
-    const { data, error } = await supabase.from("contact_messages").insert([
-      {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.message,
-      },
-    ]);
-    // if there's an error, log it and show error message, otherwise show success message and reset form
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
+
+    const { data, error } = await supabase
+      .from("contact_messages")
+      .insert([formData]);
+
     if (error) {
       console.error(error);
       setErrorMessage("There was an error submitting your message. Please try again.");
     } else {
-      console.log("Inserted:", data);
       setSuccessMessage("Thank you for reaching out! We will check your message soon.");
-        setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-      });
+      setFormData({ name: "", email: "", phone: "", message: "" });
     }
-    // clear success and error messages after 10 seconds
+
     setTimeout(() => {
       setSuccessMessage("");
       setErrorMessage("");
     }, 10000);
+  };
 
-    };
+  /* ---------- SHARED STYLES (same as config form) ---------- */
 
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: "1.5rem",
+  };
 
-  // form data state
-  const [formData, setFormData] = useState({
-      name: "",
-      email: "",
-      phone: "",
-      message: "",
-    });
-  
-     //
+  const fieldInputStyle = {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "10px 12px",
+    border: "1px solid #cbd5e1",
+    borderRadius: "6px",
+    fontSize: "14px",
+    color: "#1e293b",
+    backgroundColor: "#ffffff",
+    outline: "none",
+  };
+
+  const labelStyle = {
+    display: "block",
+    fontSize: "0.875rem",
+    fontWeight: "500",
+    color: "#475569",
+    marginBottom: "6px",
+  };
+
+  const sectionHeadingStyle = {
+    fontWeight: "600",
+    color: "#334155",
+    paddingBottom: "8px",
+    borderBottom: "1px solid #e2e8f0",
+    marginBottom: "20px",
+  };
+
+  /* ---------- UI ---------- */
+
   return (
+    <main style={{ minHeight: "100vh", backgroundColor: "var(--current-bg)", padding: "32px 16px" }}>
+      <form onSubmit={handleSubmit} style={{ margin: "0 auto", maxWidth: "960px" }}>
 
-    <main className="min-h-screen bg-white text-black">
-
-      <section className="mx-auto max-w-3xl p-6">
-
-        <h1 className="text-2xl font-semibold mb-6">
-          Leave us a message! We would love to hear from you.
+        {/* Title */}
+        <h1 style={{
+          fontSize: "1.875rem",
+          fontWeight: "600",
+          marginBottom: "24px",
+          color: "var(--current-text)",
+        }}>
+          Contact Us
         </h1>
 
-        <div className="border border-neutral-400 bg-white">
-          {/* show success message if form submission is successful */ }
+        {/* Card */}
+        <div style={{
+          border: "1px solid #e2e8f0",
+          borderRadius: "8px",
+          padding: "32px",
+          backgroundColor: "#ffffff",
+          boxShadow: "0 4px 6px -1px rgba(11,63,115,0.12), 0 2px 4px -1px rgba(11,63,115,0.08)",
+        }}>
+
+          {/* Status messages */}
           {successMessage && (
-            <div className="bg-green-100 text-green-800 p-4 border-b border-green-200">
+            <p style={{ marginBottom: "16px", fontSize: "0.875rem", color: "#065f46" }}>
               {successMessage}
-            </div>
+            </p>
           )}
-          {/* show error message if form submission fails */ }
           {errorMessage && (
-            <div className="bg-red-100 text-red-800 p-4 border-b border-red-200">
+            <p style={{ marginBottom: "16px", fontSize: "0.875rem", color: "#9b1c1c" }}>
               {errorMessage}
-            </div>
+            </p>
           )}
 
-          {/* contact form */ }
-          <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-4">
-            {/* form field for name*/ }
+          {/* Section */}
+          <h2 style={{ ...sectionHeadingStyle, fontSize: "1rem" }}>
+            Contact Information
+          </h2>
+
+          {/* Inputs */}
+          <div style={gridStyle}>
             <div>
-              <label className="block text-med mb-1">Name</label>
+              <label htmlFor="name" style={labelStyle}>
+                Name
+              </label>
               <input
-                type="text"
+                id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Full Name"
-                className="w-full border border-black px-3 py-2"
-                required
+                style={{ ...fieldInputStyle,
+                        borderColor: errors.name ? "#dc2626" : "#cbd5e1" }}
               />
+              {errors.name && (
+                <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
+                  {errors.name}
+                </p>
+              )}
             </div>
 
-            {/* form field for email*/ }
             <div>
-              <label className="block text-med mb-1">
+              <label htmlFor="email" style={labelStyle}>
                 Email Address
               </label>
               <input
-                type="text"
+                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email Address"
-                className="w-full border border-black px-3 py-2"
-                required
+                style={{ ...fieldInputStyle,
+                        borderColor: errors.email ? "#dc2626" : "#cbd5e1" }}
               />
+              {errors.email && (
+                <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
+                  {errors.email}
+                </p>
+              )}
             </div>
 
-            {/* form field for phone number (optional) */ }
             <div>
-              <label className="block text-med mb-1">Phone Number (optional)</label>
+              <label htmlFor="phone" style={labelStyle}>
+                Phone Number (optional)
+              </label>
               <input
-                type="text"
+                id="phone"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className="w-full border border-black px-3 py-2"
+                style={{ ...fieldInputStyle,
+                        borderColor: errors.phone ? "#dc2626" : "#cbd5e1" }}
               />
+              {errors.phone && (
+                <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
+                  {errors.phone}
+                </p>
+              )}
             </div>
+          </div>
 
-        
-            {/* form field for message */ }
-            <div>
-              <label htmlFor="message" className="block text-med mb-1">Message</label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full border border-black py-8 px-3"
-                required
-              />
-            </div>
+          {/* Message */}
+          <div style={{ marginTop: "20px" }}>
+            <label htmlFor="message" style={labelStyle}>
+              Message
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              rows={6}
+              placeholder="Your message..."
+              style={{
+                ...fieldInputStyle,
+                resize: "vertical",
+                minHeight: "120px",
+                borderColor: errors.message ? "#dc2626" : "#cbd5e1"
+              }}
+              maxLength={500}
+            />
+            {errors.message && (
+              <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
+                {errors.message}
+              </p>
+            )}
+          </div>
 
-            <div className="mb-4">
-              
+          {/* Submit */}
+          <div style={{ marginTop: "24px", display: "flex", justifyContent: "center" }}>
+            <button
+              type="submit"
+              style={{
+                backgroundColor: "#16a34a",
+                color: "#ffffff",
+                border: "none",
+                padding: "12px 80px",
+                borderRadius: "6px",
+                fontSize: "0.9375rem",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Submit
+            </button>
+          </div>
 
-              
-            </div>
-            {/* submit button */ }
-            <div className="border-t border-neutral-300 p-6 md:p-8">
-              <div className="flex justify-center items-center gap-2">
-                <button
-                  type="submit"
-                  className="w-3/4 bg-[#8fbd7e] text-black px-4 py-2 font-bold hover:bg-[#6dab5c]"
-                >
-                  Submit
-                </button>
-              </div>
-
-            </div>
-          </form>
         </div>
-      </section>
+      </form>
     </main>
   );
 }
