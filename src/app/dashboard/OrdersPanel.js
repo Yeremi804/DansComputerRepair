@@ -366,6 +366,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                 <DetailRow label="Phone" value={row.phone_number} />
                 <DetailRow label="Email" value={row.email} />
                 <DetailRow label="Device Type" value={row.device_type} />
+                <DetailRow label="Service Type" value={row.service_type || 'No specification.'} />
               </DetailCard>
 
               {/* Card 2: Problem Description */}

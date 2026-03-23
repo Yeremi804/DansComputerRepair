@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client"; // For using the existing client
-
+import Sidebar from "../../components/Sidebar"; // Admin sidebar component
 // This page allows admins to edit the "About Us" section of the homepage and the footer content
 export default function HomeContentPage() {
   const router = useRouter();
@@ -197,11 +197,11 @@ export default function HomeContentPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10">
+    <main className="min-h-screen bg-main-bg text-main-text px-4 py-10">
       <div className="mx-auto max-w-5xl">
         {/* Page header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-semibold text-slate-900">Home Content</h1>
+          <h1 className="text-3xl font-semibold text-main-text">Home Content</h1>
           <p className="mt-1 text-sm text-slate-600">
             Edit drafts, preview changes, and publish updates to the live site.
           </p>

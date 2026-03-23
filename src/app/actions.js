@@ -2,22 +2,58 @@
 
 const RESPONSE_RULES = [
   {
-    patterns: ["service request", "service form", "book repair", "repair request"],
+    patterns: [
+      "service request",
+      "service form",
+      "book repair",
+      "repair request",
+      "schedule repair",
+      "submit request",
+      "need repair",
+      "fix my computer",
+      "fix my laptop",
+      "repair my computer",
+      "repair my laptop",
+      "diagnostic",
+      "diagnostics",
+      "drop off",
+      "drop off repair",
+      "drop-off",
+      "appointment",
+      "get estimate",
+      "broken screen",
+      "screen repair",
+      "won t turn on",
+      "wont turn on",
+      "data recovery",
+    ],
     response:
       "You can submit a repair request on the Service Request page with your device details and issue summary.",
   },
   {
-    patterns: ["faq", "common questions", "questions"],
+    patterns: ["faq", "common questions", "questions", "help page", "support questions"],
     response: "You can find answers to common questions on the FAQ page.",
   },
   {
-    patterns: ["computer build", "custom pc", "build pc", "pc build"],
+    patterns: [
+      "computer build",
+      "custom pc",
+      "build pc",
+      "pc build",
+      "gaming pc",
+      "new computer build",
+      "custom computer",
+    ],
     response:
       "You can start a custom computer build request from the Computer Building Form page.",
   },
   {
-    patterns: ["review", "feedback", "rating"],
+    patterns: ["review", "feedback", "rating", "testimonial", "leave feedback"],
     response: "You can leave feedback on the Review Form page.",
+  },
+  {
+    patterns: ["contact", "contact form", "send message", "message dan", "reach out"],
+    response: "You can use the Contact Form page to send a message.",
   },
   {
     patterns: ["price", "cost", "estimate", "quote", "how much"],
@@ -59,5 +95,5 @@ export async function askGemini(userMessage) {
     return matchedRule.response;
   }
 
-  return "I can help with service requests, common repair questions, pricing estimates, and turnaround times. Try adding a few details about your device issue.";
+  return "I’m not sure based on that. Please submit a service request with your device details and issue summary so the team can follow up with the right next steps.";
 }
