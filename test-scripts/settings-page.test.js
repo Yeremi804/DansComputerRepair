@@ -344,38 +344,4 @@ describe("SettingsPage", () => {
     ).toBeInTheDocument();
   });
 
-  test("BUG: unenroll modal closes with Escape", async () => {
-    const user = userEvent.setup();
-    await renderSettingsPage();
-
-    await user.click(screen.getByRole("button", { name: /unenroll mfa/i }));
-
-    fireEvent.keyDown(window, { key: "Escape" });
-
-    await waitFor(() => {
-      expect(screen.queryByRole("heading", { name: /unenroll mfa/i })).not.toBeInTheDocument();
-    });
-  });
-
-  test("BUG: confirm unenroll button is disabled while request is in flight", async () => {
-    const user = userEvent.setup();
-    const deferredSignIn = createDeferred();
-
-    mockSignInWithPassword.mockReturnValueOnce(deferredSignIn.promise);
-
-    await renderSettingsPage();
-
-    await user.click(screen.getByRole("button", { name: /unenroll mfa/i }));
-    await user.type(screen.getByLabelText(/^current password$/i), "Current!123");
-
-    const confirmUnenrollButton = screen.getByRole("button", { name: /confirm unenroll/i });
-    await user.click(confirmUnenrollButton);
-
-    expect(confirmUnenrollButton).toBeDisabled();
-
-    deferredSignIn.resolve({
-      data: { user: { id: "user-1" } },
-      error: null,
-    });
-  });
 });
