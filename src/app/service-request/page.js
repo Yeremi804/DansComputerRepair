@@ -11,6 +11,8 @@ export default function ServiceRequest() {
     email: '',
     deviceSelect: '',
     deviceText: '',
+    serviceSelect: '',
+    serviceText: '',
     started: '',
     idea: '',
     questions: '',
@@ -34,12 +36,19 @@ export default function ServiceRequest() {
       return;
     }
 
+    if (!form.serviceSelect && !form.serviceText) {
+      setStatus("error");
+      alert("Please select a service or type your service in the 'Or specify' field.");
+      return;
+    }
+
     try {
       const submissionData = {
         customer_name: form.name,
         phone_number: form.phone,
         email: form.email,
         device_type: form.deviceSelect || form.deviceText,
+        service_type: form.serviceSelect || form.serviceText,
         problem_start_date: form.started,
         problem_cause_idea: form.idea,
         additional_questions: form.questions,
@@ -50,7 +59,7 @@ export default function ServiceRequest() {
       if (error) throw error;
 
       setStatus('submitted');
-      setForm({ name: '', phone: '', email: '', deviceSelect: '', deviceText: '', started: '', idea: '', questions: '', smsConsent: false });
+      setForm({ name: '', phone: '', email: '', deviceSelect: '', deviceText: '', serviceSelect: '', serviceText: '', started: '', idea: '', questions: '', smsConsent: false });
 
     } catch (err) {
       setStatus('error');
@@ -175,6 +184,48 @@ export default function ServiceRequest() {
                   value={form.deviceText}
                   onChange={update}
                   disabled={!!form.deviceSelect}
+                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: '1.75rem',
+              }}
+            >
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-700 mb-2">
+                  Service
+                </label>
+                <select
+                  name="serviceSelect"
+                  value={form.serviceSelect}
+                  onChange={update}
+                  disabled={!!form.serviceText}
+                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+                >
+                  <option value="">Select a service</option>
+                  <option>Computer diagnostics</option>
+                  <option>Laptop &amp; desktop repair</option>
+                  <option>Virus and malware removal</option>
+                  <option>Data recovery</option>
+                  <option>System upgrades</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-700 mb-2">
+                  Or Specify
+                </label>
+                <input
+                  name="serviceText"
+                  placeholder="Type your service here"
+                  value={form.serviceText}
+                  onChange={update}
+                  disabled={!!form.serviceSelect}
                   className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
                 />
               </div>
