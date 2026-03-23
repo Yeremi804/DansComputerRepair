@@ -366,6 +366,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                 <DetailRow label="Phone" value={row.phone_number} />
                 <DetailRow label="Email" value={row.email} />
                 <DetailRow label="Device Type" value={row.device_type} />
+                <DetailRow label="Service Type" value={row.service_type || 'No specification.'} />
               </DetailCard>
 
               {/* Card 2: Problem Description */}
@@ -457,25 +458,24 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
       </div>
 
       {/* Table wrapper with scroll */}
-      <div className="max-h-96 overflow-y-auto rounded border border-gray-200 bg-white">
-        <table className="w-full border-collapse text-left text-sm">
+      <div className="max-h-96 overflow-x-auto overflow-y-auto rounded border border-gray-200 bg-white">
+        <table className="min-w-[1100px] w-full table-fixed border-collapse text-left text-sm">
           <thead className="sticky top-0 bg-gray-50 text-gray-700">
             <tr className="border-b-2 border-gray-200">
-              <th></th>
-              <th className="px-3 py-2 font-semibold">ID</th>
-              <th className="px-3 py-2 font-semibold">Customer</th>
-              <th className="px-3 py-2 font-semibold">Status</th>
-              <th className="px-3 py-2 font-semibold">Date</th>
+              <th className="w-10"></th>
+              <th className="w-20 px-3 py-2 font-semibold">ID</th>
+              <th className="w-52 px-3 py-2 font-semibold">Customer</th>
+              <th className="w-44 px-3 py-2 font-semibold">Status</th>
+              <th className="w-40 px-3 py-2 font-semibold">Date</th>
               <th className="px-3 py-2 font-semibold">Notes</th>
-              <th className="px-3 py-2 font-semibold">Source</th>
+              <th className="w-52 px-3 py-2 font-semibold">Source</th>
             </tr>
           </thead>
           <tbody className="text-gray-900">
             {filteredRows.map((row, index) => (
               <React.Fragment key={`${row.Source}-${row.ID ?? index}`}>
-                <tr
-                  className="odd:bg-white even:bg-gray-50">
-                  <td className="px-1 py-3 align-top">
+                <tr className="odd:bg-white even:bg-gray-50">
+                  <td className="w-10 px-1 py-3 align-top">
                     <button
                       className="text-lg cursor-pointer hover:opacity-70"
                       onClick={() => setExpandedRow(expandedRow === row.ID ? null : row.ID)}
@@ -483,20 +483,20 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                       {expandedRow === row.ID ? '▼' : '▶'}
                     </button>
                   </td>
-                  <td className="px-3 py-3 align-top">{row.ID}</td>
-                  <td className="px-3 py-3 align-top">{row.Customer}</td>
-                  <td className="px-3 py-3 align-top">
-                      <StatusBadge
-                        status={row.Status}
+                  <td className="w-20 px-3 py-3 align-top">{row.ID}</td>
+                  <td className="w-52 px-3 py-3 align-top">{row.Customer}</td>
+                  <td className="w-44 px-3 py-3 align-top">
+                    <StatusBadge
+                      status={row.Status}
                       row={row}
                       router={router}
                     />
                   </td>
-                  <td className="px-3 py-3 align-top">
+                  <td className="w-40 px-3 py-3 align-top whitespace-nowrap">
                     {normalizeValue(row, 'Dates')}
                   </td>
                   <td className="px-3 py-3 align-top">{row.Notes}</td>
-                  <td className="px-3 py-3 align-top">{row.Source}</td>
+                  <td className="w-52 px-3 py-3 align-top">{row.Source}</td>
                 </tr>
                 {expandedRow === row.ID && renderDetails(row)}
               </React.Fragment>

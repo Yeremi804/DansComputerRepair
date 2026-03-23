@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 
 const MapComponent = dynamic(() => import("./MapComponent"), {
@@ -99,12 +100,36 @@ export function Footer() {
         <div>
           <h3 className="font-semibold mb-3">About Us</h3>
           <ul className="space-y-1 text-sm">
-            <li>Computer diagnostics</li>
-            <li>Laptop &amp; desktop repair</li>
-            <li>Virus and malware removal</li>
-            <li>Data recovery</li>
-            <li>Custom PC builds</li>
-            <li>System upgrades</li>
+            <li>
+              <Link href="/service-request" className="hover:underline">
+                Computer diagnostics
+              </Link>
+            </li>
+            <li>
+              <Link href="/service-request" className="hover:underline">
+                Laptop &amp; desktop repair
+              </Link>
+            </li>
+            <li>
+              <Link href="/service-request" className="hover:underline">
+                Virus and malware removal
+              </Link>
+            </li>
+            <li>
+              <Link href="/service-request" className="hover:underline">
+                Data recovery
+              </Link>
+            </li>
+            <li>
+              <Link href="/create-computer-configuration-form" className="hover:underline">
+                Custom PC builds
+              </Link>
+            </li>
+            <li>
+              <Link href="/service-request" className="hover:underline">
+                System upgrades
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -141,11 +166,16 @@ export function Footer() {
         <div>
           <h3 className="font-semibold mb-3">Customer Support</h3>
           <ul className="space-y-1 text-sm">
-            <li>Request a repair</li>
-            <li>Track your service</li>
-            <li>Warranty information</li>
-            <li>Troubleshooting tips</li>
-            <li>Contact technician</li>
+            <li>
+              <Link href="/service-request" className="hover:underline">
+                Request a repair
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact-form" className="hover:underline">
+                Contact technician
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
