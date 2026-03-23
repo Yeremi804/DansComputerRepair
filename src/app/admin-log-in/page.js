@@ -17,6 +17,12 @@ export default function AdminLoginPage() {
   const [captchaInput, setCaptchaInput] = useState("");
   const [captchaError, setCaptchaError] = useState("");
   const [captchaVerified, setCaptchaVerified] = useState(false);
+  // Forgot Password States
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [forgotPasswordError, setForgotPasswordError] = useState("");
+  const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
 
   // MFA with TOTP (Time-based One Time Password)
   const [mfaOpen, setMfaOpen] = useState(false);
@@ -69,6 +75,49 @@ export default function AdminLoginPage() {
       loadCaptcha(); // Load a new captcha on failure
     }
   };
+
+
+  // MFA with TOTP (Time-based One Time Password)
+  const [mfaOpen, setMfaOpen] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaError, setMfaError] = useState("");
+  const [mfaFactorId, setMfaFactorId] = useState(null);
+  const router = useRouter();
+
+  async function handleForgotPassword(e) {
+    e.preventDefault();
+    setForgotPasswordError("");
+    setForgotPasswordMessage("");
+    setForgotPasswordLoading(true);
+
+    const emailToReset = forgotPasswordEmail.trim();
+
+    if (!emailToReset) {
+      setForgotPasswordError("Please enter your email address.");
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(emailToReset, {
+        redirectTo: `${window.location.origin}/update-password`,
+      });
+
+      if (error) {
+        setForgotPasswordError(error.message);
+        return;
+      }
+
+      setForgotPasswordMessage(
+        "Password reset email sent. Please check your inbox."
+      );
+    } catch (err) {
+      console.error(err);
+      setForgotPasswordError("Unable to send reset email. Please try again.");
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -348,9 +397,18 @@ export default function AdminLoginPage() {
                 <input type="checkbox" className="accent-black" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                 Remember me
               </label>
-              <a href="#" className="text-blue-600 hover:underline">
+              <button
+                type="button"
+                onClick={() => {
+                  setForgotPasswordOpen(true);
+                  setForgotPasswordEmail(email);
+                  setForgotPasswordError("");
+                  setForgotPasswordMessage("");
+                }}
+                className="text-blue-600 hover:underline cursor-pointer"
+              >
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             {/* Sign in button. */}
@@ -380,6 +438,63 @@ export default function AdminLoginPage() {
           </div>
         </div>
       </section>
+
+      {/* Forgot Password Popup */}
+      {forgotPasswordOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="w-full max-w-md bg-white rounded-md p-6 space-y-4 shadow-xl">
+            <h2 className="text-2xl font-semibold text-[#273043]">
+              Reset Password
+            </h2>
+            <p className="text-sm text-black">
+              Enter your email address and we will send you a password reset link.
+            </p>
+
+            <form onSubmit={handleForgotPassword} className="space-y-3">
+              <input
+                type="email"
+                className="w-full border border-black rounded-sm px-3 py-2"
+                placeholder="Enter email address"
+                value={forgotPasswordEmail}
+                onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                autoFocus
+                required
+              />
+
+              {forgotPasswordError && (
+                <div className="text-red-600 text-sm">{forgotPasswordError}</div>
+              )}
+
+              {forgotPasswordMessage && (
+                <div className="text-green-700 text-sm">
+                  {forgotPasswordMessage}
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  className="px-4 py-2 border border-neutral-400 rounded-sm cursor-pointer"
+                  onClick={() => {
+                    setForgotPasswordOpen(false);
+                    setForgotPasswordError("");
+                    setForgotPasswordMessage("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={forgotPasswordLoading}
+                  className="px-4 py-2 bg-black text-white rounded-sm cursor-pointer"
+                >
+                  {forgotPasswordLoading ? "Sending..." : "Send Link"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* MFA Popup */}
       {mfaOpen && (
