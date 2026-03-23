@@ -27,6 +27,10 @@ export default function Header() {
   const [notifOpen, setNotifOpen] = useState(false);
   const MotionButton = motion.button;
 
+  // State to track current theme
+  const [isDark, setIsDark] = useState(false);
+
+
   // Notifications state
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -69,12 +73,16 @@ export default function Header() {
     //Optional: Save preference so it doesn't reset on refresh
     const isDark = document.documentElement.classList.contains("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
+    setIsDark(isDark);
   };
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
+      setIsDark(true);
+    } else {
+      setIsDark(false);
     }
   }, []);
 
@@ -334,12 +342,48 @@ export default function Header() {
           </div>
         </div>
 
-        <button 
+        <MotionButton 
+          type="button"
           onClick={toggleTheme}
-          className="ml-4 rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200"
+          whileHover={hover}
+          whileTap={tap}
+          className={`ml-4 rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200`}
         >
-          🌓 Toggle Theme
-        </button>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={isDark ? 'light' : 'dark'}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-2"
+            >
+              {isDark ? (
+                <>
+                  <motion.span
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    🌞
+                  </motion.span>
+                  Light Mode
+                </>
+              ) : (
+                <>
+                  <motion.span
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    🌚
+                  </motion.span>
+                  Dark Mode
+                </>
+              )}
+            </motion.span>
+          </AnimatePresence>
+        </MotionButton>
 
         {/* Desktop Nav */}
         <nav className="hidden md:block">

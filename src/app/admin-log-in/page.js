@@ -8,9 +8,9 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false); // hide password by default
   const [email, setEmail] = useState(""); // used by supabase
   const [password, setPassword] = useState(""); // used by supabase
-  const [loading, setLoading] = useState(false); // used by supabase
-  const [error, setError] = useState(""); // used by supabase
-
+  const [loading, setLoading] = useState(false);  // used by supabase
+  const [error, setError] = useState("");  // used by supabase
+  const [rememberMe, setRememberMe] = useState(false);
   // Captcha states that enable captcah to pop up, store the svg, store the user input, store the error message, and store the verification status
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaSvg, setCaptchaSvg] = useState("");
@@ -36,6 +36,16 @@ export default function AdminLoginPage() {
   //activate the function ahead of time so that the captcha can load while the user is filling out their email and password. This way, when they click the "I'm not a robot" box, the captcha will already be there without any delay.
   useEffect(() => {
     loadCaptcha();
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    const rememberedPassword = localStorage.getItem('rememberedPassword');
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+    if (rememberedPassword) {
+      setPassword(rememberedPassword);
+      setRememberMe(true);
+    }
   }, []);
 
   //Function to verify the captcha input against the cookie value
@@ -85,6 +95,17 @@ export default function AdminLoginPage() {
         setError(authError.message);
         return;
       }
+
+      // Remember email/password if checked
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', emailTrimmed);
+        localStorage.setItem('rememberedPassword', password);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('rememberedPassword');
+      }
+
+
 
       // Save cookies for the middleware
       const { data: sess } = await supabase.auth.getSession();
@@ -238,7 +259,7 @@ export default function AdminLoginPage() {
                 type="email"
                 name="email"
                 placeholder="Enter email address "
-                className="w-full border border-black rounded-sm px-3 py-2"
+                className="w-full border border-black rounded-sm px-3 py-2 text-black"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -248,7 +269,7 @@ export default function AdminLoginPage() {
             {/* Password + Eye toggle */}
             <div>
               <label className="block text-black text-sm mb-1">Password</label>
-              <div className="relative">
+              <div className="relative text-black">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -295,7 +316,7 @@ export default function AdminLoginPage() {
               <div className="border border-neutral-300 p-4 mb-4 space-y-4 bg-white animate-in slide-in-from-top-1">
                 {/* The SVG Image open from the string of line to have it shown on clients*/}
                 <div
-                  className="bg-neutral-100 p-2 rounded-sm flex justify-center"
+                  className="bg-neutral-100 p-2 rounded-sm flex justify-center pointer-events-none"
                   dangerouslySetInnerHTML={{ __html: captchaSvg }}
                 />
 
@@ -303,12 +324,8 @@ export default function AdminLoginPage() {
                 <input
                   type="text"
                   // If there is a captcha error, show that as the placeholder. Otherwise, show the default "Type the characters above"
-                  placeholder={
-                    captchaError
-                      ? captchaError
-                      : "Type the characters above"
-                  }
-                  className="w-full border text-black border-black rounded-sm px-3 py-2"
+                  placeholder={captchaError ? captchaError : "Type the characters above"}
+                  className="w-full border text-black border-black rounded-sm px-3 py-2 pointer-events-auto"
                   value={captchaInput}
                   onChange={(e) => setCaptchaInput(e.target.value)}
                 />
@@ -318,7 +335,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={fetchCaptcha}
-                  className="w-full bg-black text-white py-2 rounded-sm text-sm font-medium"
+                  className="w-full bg-black text-white py-2 rounded-sm text-sm font-medium pointer-events-auto"
                 >
                   {captchaVerified ? "Verifying..." : "Check"}
                 </button>
@@ -328,7 +345,7 @@ export default function AdminLoginPage() {
             {/* Remember me + Forgot password */}
             <div className="flex items-center justify-between text-sm mb-8">
               <label className="flex items-center text-black gap-2">
-                <input type="checkbox" className="accent-black" />
+                <input type="checkbox" className="accent-black" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                 Remember me
               </label>
               <a href="#" className="text-blue-600 hover:underline">
@@ -368,7 +385,7 @@ export default function AdminLoginPage() {
       {mfaOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="w-full max-w-sm bg-white rounded-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold">Two-factor Verification</h2>
+            <h2 className="text-lg text-black text-main-text">Two-factor Verification</h2>
             <p className="text-sm text-black">
               Enter the 6-digit code from your authenticator app.
             </p>
@@ -378,7 +395,7 @@ export default function AdminLoginPage() {
                 inputMode="numeric"
                 pattern="[0-9]{6}"
                 maxLength={6}
-                className="w-full border border-black rounded-sm px-3 py-2"
+                className="w-full border border-black rounded-sm px-3 py-2 text-black"
                 placeholder="123456"
                 value={mfaCode}
                 onChange={(e) => setMfaCode(e.target.value)}
