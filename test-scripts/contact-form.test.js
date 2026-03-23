@@ -141,7 +141,7 @@ test("clears form fields after successful submission", async () => {
     target: { value: "john@test.com" },
   });
 
-  fireEvent.change(screen.getAllByRole("textbox")[3], {
+  fireEvent.change(screen.getByLabelText("Message"), {
     target: { value: "Test message" },
   });
 
