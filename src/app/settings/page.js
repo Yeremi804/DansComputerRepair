@@ -13,6 +13,8 @@ import {
 import Sidebar from "../components/Sidebar";
 import "./SettingsPage.css";
 
+import { showPasswordChangeSuccess, showPasswordChangeError } from "../../lib/toastNotifs";
+
 /**
  * SettingsPage
  *
