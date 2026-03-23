@@ -24,13 +24,7 @@ export default function AdminLoginPage() {
   const [forgotPasswordError, setForgotPasswordError] = useState("");
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
 
-  // MFA with TOTP (Time-based One Time Password)
-  const [mfaOpen, setMfaOpen] = useState(false);
-  const [mfaCode, setMfaCode] = useState("");
-  const [mfaError, setMfaError] = useState("");
-  const [mfaFactorId, setMfaFactorId] = useState(null);
-
-  const router = useRouter();
+ 
 
   //load captcha on component mount
   const loadCaptcha = async () => {
