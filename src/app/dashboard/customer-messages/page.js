@@ -24,7 +24,7 @@ export default async function CustomerMessagesPage() {
   return (
     <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 p-8">
+        <main className="flex-1 bg-main-bg text-main-text p-8">
             <h1 className="mb-4 text-3xl font-bold">Customer Messages</h1>
             <CustomerMessagesPanel />
         

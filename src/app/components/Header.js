@@ -27,6 +27,10 @@ export default function Header() {
   const [notifOpen, setNotifOpen] = useState(false);
   const MotionButton = motion.button;
 
+  // State to track current theme
+  const [isDark, setIsDark] = useState(false);
+
+
   // Notifications state
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -69,12 +73,16 @@ export default function Header() {
     //Optional: Save preference so it doesn't reset on refresh
     const isDark = document.documentElement.classList.contains("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
+    setIsDark(isDark);
   };
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
+      setIsDark(true);
+    } else {
+      setIsDark(false);
     }
   }, []);
 
@@ -334,12 +342,48 @@ export default function Header() {
           </div>
         </div>
 
-        <button 
+        <MotionButton 
+          type="button"
           onClick={toggleTheme}
-          className="ml-4 rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200"
+          whileHover={hover}
+          whileTap={tap}
+          className={`ml-4 rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200`}
         >
-          🌓 Toggle Theme
-        </button>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={isDark ? 'light' : 'dark'}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-2"
+            >
+              {isDark ? (
+                <>
+                  <motion.span
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    🌞
+                  </motion.span>
+                  Light Mode
+                </>
+              ) : (
+                <>
+                  <motion.span
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    🌚
+                  </motion.span>
+                  Dark Mode
+                </>
+              )}
+            </motion.span>
+          </AnimatePresence>
+        </MotionButton>
 
         {/* Desktop Nav */}
         <nav className="hidden md:block">
@@ -370,110 +414,124 @@ export default function Header() {
                 >
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
+                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
                   )}
                 </button>
 
                 <AnimatePresence>
                   {notifOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: -6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      className="absolute right-0 mt-2 w-80 rounded-lg border border-gray-200 bg-white shadow-lg z-50"
+                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                      transition={{ duration: 0.16, ease: "easeOut" }}
+                      className="absolute right-0 mt-3 w-[360px] overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl z-50"
                     >
                       {/* Header */}
-                      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
-                        <div className="font-semibold text-gray-900">
-                          Notifications
+                      <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-4 py-3">
+                        <div>
+                          <div className="font-semibold text-gray-900">
+                            Notifications
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {unreadCount > 0
+                              ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
+                              : "All caught up"}
+                          </div>
                         </div>
+
                         <button
                           // "Mark All as Read" button
                           type="button"
                           onClick={markAllAsRead}
-                          className="text-sm rounded px-2 py-1 text-gray-700 hover:bg-gray-100"
+                          className="rounded-md px-2.5 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
                         >
                           Mark All as Read
                         </button>
                       </div>
 
                       {/* Scrollable Content */}
-                      <div className="max-h-80 overflow-auto">
+                      <div className="max-h-96 overflow-auto px-2 py-2">
                         {notifications.length === 0 ? (
-                          <div className="px-3 py-3 text-sm text-gray-600">
+                          <div className="px-3 py-6 text-center text-sm text-gray-500">
                             No notifications yet.
                           </div>
                         ) : (
                           <>
                             {/* New Notifications (Unread) */}
-                            <div className="px-3 pt-3 pb-2 text-xs font-semibold text-gray-500 uppercase">
+                            <div className="px-2 pt-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
                               New Notifications
                             </div>
 
                             {notifications.filter((n) => !n.read_at).length === 0 ? (
-                              <div className="px-3 pb-3 text-sm text-gray-600">
+                              <div className="px-3 pb-4 text-sm text-gray-500">
                                 No new notifications.
                               </div>
                             ) : (
-                              notifications
-                                .filter((n) => !n.read_at)
-                                .map((n) => (
-                                  <button
-                                    key={n.id}
-                                    type="button"
-                                    onClick={() => markNotificationRead(n.id)}
-                                    className="w-full text-left px-3 py-3 border-b border-gray-50 hover:bg-gray-50"
-                                  >
-                                    <div className="flex items-start justify-between gap-2">
-                                      <div>
+                              <div className="space-y-1.5 pb-3">
+                                {notifications
+                                  .filter((n) => !n.read_at)
+                                  .map((n) => (
+                                    <button
+                                      key={n.id}
+                                      type="button"
+                                      onClick={() => markNotificationRead(n.id)}
+                                      className="w-full rounded-xl bg-red-50/40 px-4 py-3 text-left transition hover:bg-red-50"
+                                    >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="min-w-0">
                                         <div className="text-sm font-medium text-gray-900">
                                           {n.title}
                                         </div>
                                         {n.body && (
-                                          <div className="text-sm text-gray-700 mt-0.5">
+                                          <div className="mt-1 text-[13px] leading-5 text-gray-600">
                                             {n.body}
                                           </div>
                                         )}
-                                        <div className="text-xs text-gray-500 mt-1">
+                                        <div className="mt-2 text-[11px] text-gray-400">
                                           {new Date(n.created_at).toLocaleString()}
                                         </div>
                                       </div>
-                                      <span className="mt-1 h-2 w-2 rounded-full bg-red-500 flex-shrink-0" />
+
+                                      <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-red-500" />
                                     </div>
                                   </button>
-                                ))
+                                ))}
+                              </div>
                             )}
 
                             {/* Past Notifications (Read) */}
-                            <div className="px-3 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase border-t border-gray-100">
+                            <div className="border-t border-gray-100 px-2 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
                               Past Notifications
                             </div>
 
                             {notifications.filter((n) => n.read_at).length === 0 ? (
-                              <div className="px-3 pb-3 text-sm text-gray-600">
+                              <div className="px-3 pb-3 text-sm text-gray-500">
                                 No past notifications.
                               </div>
                             ) : (
-                              notifications
-                                .filter((n) => n.read_at)
-                                .map((n) => (
-                                  <div
-                                    key={n.id}
-                                    className="px-3 py-3 border-b border-gray-50"
-                                  >
-                                    <div className="text-sm font-medium text-gray-900">
-                                      {n.title}
-                                    </div>
-                                    {n.body && (
-                                      <div className="text-sm text-gray-700 mt-0.5">
-                                        {n.body}
+                              <div className="space-y-1.5 pb-2">
+                                {notifications
+                                  .filter((n) => n.read_at)
+                                  .map((n) => (
+                                    <div
+                                      key={n.id}
+                                      className="rounded-xl px-4 py-3 transition hover:bg-gray-50"
+                                    >
+                                      <div className="text-sm font-medium text-gray-900">
+                                        {n.title}
                                       </div>
-                                    )}
-                                    <div className="text-xs text-gray-500 mt-1">
-                                      {new Date(n.created_at).toLocaleString()}
+                                      {n.body && (
+                                        <div className="mt-1 text-[13px] leading-5 text-gray-600">
+                                          {n.body}
+                                        </div>
+                                      )}
+                                      <div className="mt-2 text-[11px] text-gray-400">
+                                        {new Date(n.created_at).toLocaleString()}
+                                      </div>
                                     </div>
-                                  </div>
-                                ))
+                                  ))}
+                                </div>
                             )}
                           </>
                         )}
@@ -658,54 +716,117 @@ export default function Header() {
       <AnimatePresence>
         {notifOpen && !open && !checking && userPresent && isAdmin && isAdminPage && (
           <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="md:hidden border-t border-gray-200 bg-white"
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            className="md:hidden px-4 pt-3"
           >
-            <div className="mx-auto max-w-6xl px-4 py-3">
-              <div className="flex items-center justify-between">
-                <div className="font-semibold text-gray-900">Notifications</div>
+            <div className="overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-slate-200 bg-[#E2E8F0] px-4 py-3">
+                <div>
+                  <div className="font-semibold text-slate-900">Notifications</div>
+                  <div className="text-xs text-slate-600">
+                    {unreadCount > 0
+                      ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
+                      : "All caught up"}
+                  </div>
+                </div>
+
                 <button
                   type="button"
                   onClick={markAllAsRead}
-                  className="text-sm rounded px-2 py-1 text-gray-700 hover:bg-gray-100"
+                  className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
                 >
                   Mark All as Read
                 </button>
               </div>
 
-              <div className="mt-2 max-h-80 overflow-auto rounded border border-gray-100">
+              {/* Content */}
+              <div className="max-h-96 overflow-auto px-2 py-2">
                 {notifications.length === 0 ? (
-                  <div className="px-3 py-3 text-sm text-gray-600">
+                  <div className="px-3 py-6 text-center text-sm text-slate-500">
                     No notifications yet.
                   </div>
                 ) : (
-                  notifications.map((n) => (
-                    <button
-                      key={n.id}
-                      type="button"
-                      onClick={() => {
-                        if (!n.read_at) markNotificationRead(n.id);
-                      }}
-                      className="w-full text-left px-3 py-3 border-b border-gray-50 hover:bg-gray-50"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{n.title}</div>
-                          {n.body && (
-                            <div className="text-sm text-gray-700 mt-0.5">{n.body}</div>
-                          )}
-                          <div className="text-xs text-gray-500 mt-1">
-                            {new Date(n.created_at).toLocaleString()}
-                          </div>
-                        </div>
-                        {!n.read_at && (
-                          <span className="mt-1 h-2 w-2 rounded-full bg-red-500 flex-shrink-0" />
-                        )}
+                  <>
+                    {/* New Notifications */}
+                    <div className="px-2 pt-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                      New Notifications
+                    </div>
+
+                    {notifications.filter((n) => !n.read_at).length === 0 ? (
+                      <div className="px-3 pb-4 text-sm text-slate-500">
+                        No new notifications.
                       </div>
-                    </button>
-                  ))
+                    ) : (
+                      <div className="space-y-1.5 pb-3">
+                        {notifications
+                          .filter((n) => !n.read_at)
+                          .map((n) => (
+                            <button
+                              key={n.id}
+                              type="button"
+                              onClick={() => markNotificationRead(n.id)}
+                              className="w-full rounded-xl bg-red-50 px-4 py-3 text-left transition hover:bg-red-100"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <div className="text-sm font-medium text-slate-900">
+                                    {n.title}
+                                  </div>
+                                  {n.body && (
+                                    <div className="mt-1 text-[13px] leading-5 text-slate-600">
+                                      {n.body}
+                                    </div>
+                                  )}
+                                  <div className="mt-2 text-[11px] text-slate-400">
+                                    {new Date(n.created_at).toLocaleString()}
+                                  </div>
+                                </div>
+
+                                <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-red-500" />
+                              </div>
+                            </button>
+                          ))}
+                      </div>
+                    )}
+
+                    {/* Past Notifications */}
+                    <div className="border-t border-slate-200 px-2 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                      Past Notifications
+                    </div>
+
+                    {notifications.filter((n) => n.read_at).length === 0 ? (
+                      <div className="px-3 pb-3 text-sm text-slate-500">
+                        No past notifications.
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5 pb-2">
+                        {notifications
+                          .filter((n) => n.read_at)
+                          .map((n) => (
+                            <div
+                              key={n.id}
+                              className="rounded-xl px-4 py-3 transition hover:bg-slate-200/60"
+                            >
+                              <div className="text-sm font-medium text-slate-900">
+                                {n.title}
+                              </div>
+                              {n.body && (
+                                <div className="mt-1 text-[13px] leading-5 text-slate-600">
+                                  {n.body}
+                                </div>
+                              )}
+                              <div className="mt-2 text-[11px] text-slate-400">
+                                {new Date(n.created_at).toLocaleString()}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
