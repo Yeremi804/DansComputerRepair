@@ -38,6 +38,9 @@ describe("ServiceRequestPage", () => {
       screen.getByPlaceholderText("Type your device here")
     ).toBeInTheDocument();
     expect(
+      screen.getByPlaceholderText("Type your service here")
+    ).toBeInTheDocument();
+    expect(
       screen.getByPlaceholderText(
         "e.g. After a software update, dropped the device..."
       )
@@ -83,6 +86,10 @@ describe("ServiceRequestPage", () => {
       target: { value: "Gaming PC" },
     });
 
+    fireEvent.change(screen.getByPlaceholderText("Type your service here"), {
+      target: { value: "Diagnostics" },
+    });
+
     fireEvent.change(
       screen.getByPlaceholderText(
         "Additional info, special requests, or questions"
@@ -124,6 +131,10 @@ describe("ServiceRequestPage", () => {
       target: { value: "Laptop" },
     });
 
+    fireEvent.change(screen.getByPlaceholderText("Type your service here"), {
+      target: { value: "Repair" },
+    });
+
     fireEvent.click(screen.getByRole("button", { name: /submit request/i }));
 
     await waitFor(() => {
@@ -146,6 +157,10 @@ describe("ServiceRequestPage", () => {
       target: { value: "1234567890" },
     });
 
+    fireEvent.change(screen.getByPlaceholderText("Type your service here"), {
+      target: { value: "Repair" },
+    });
+
     fireEvent.click(screen.getByRole("button", { name: /submit request/i }));
 
     await waitFor(() => {
@@ -166,6 +181,7 @@ describe("ServiceRequestPage", () => {
     await user.type(screen.getByPlaceholderText("Email Address"), "jane@test.com");
     await user.type(screen.getByPlaceholderText("Phone Number"), "5551112222");
     await user.type(screen.getByPlaceholderText("Type your device here"), "Laptop");
+    await user.type(screen.getByPlaceholderText("Type your service here"), "Repair");
     await user.type(
       screen.getByPlaceholderText(
         "Additional info, special requests, or questions"
@@ -182,6 +198,7 @@ describe("ServiceRequestPage", () => {
           phone_number: "5551112222",
           email: "jane@test.com",
           device_type: "Laptop",
+          service_type: "Repair",
           additional_questions: "Laptop battery issue",
           sms_consent: false,
         }),
@@ -198,11 +215,13 @@ describe("ServiceRequestPage", () => {
     const emailInput = screen.getByPlaceholderText("Email Address");
     const phoneInput = screen.getByPlaceholderText("Phone Number");
     const deviceInput = screen.getByPlaceholderText("Type your device here");
+    const serviceInput = screen.getByPlaceholderText("Type your service here");
 
     fireEvent.change(nameInput, { target: { value: "John Doe" } });
     fireEvent.change(emailInput, { target: { value: "john@test.com" } });
     fireEvent.change(phoneInput, { target: { value: "1234567890" } });
     fireEvent.change(deviceInput, { target: { value: "Desktop" } });
+    fireEvent.change(serviceInput, { target: { value: "Repair" } });
 
     fireEvent.click(screen.getByRole("button", { name: /submit request/i }));
 
@@ -211,6 +230,7 @@ describe("ServiceRequestPage", () => {
       expect(emailInput.value).toBe("");
       expect(phoneInput.value).toBe("");
       expect(deviceInput.value).toBe("");
+      expect(serviceInput.value).toBe("");
     });
   });
 });
