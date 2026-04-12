@@ -90,24 +90,24 @@ export default function InitMFAPage() {
                             {/* The left column. This Holds the Form info. */}
                             <form onSubmit= {handleSubmit} className="space-y-10 flex flex-col justify-center h-full">
                                 <div>
-                                    <label className="block text-sm mb-1">Email address</label>
+                                    <label className="form-label">Email address</label>
                                     <input
                                     type="email"
                                     name="email"
-                                    placeholder="Enter email address "
-                                    className="w-full border border-black rounded-sm px-3 py-2"
+                                    placeholder="Enter email address"
+                                    className="form-input"
                                     value = {email}
                                     onChange= {(e) => setEmail(e.target.value)}
                                     required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm mb-1">Password</label>
+                                    <label className="form-label">Password</label>
                                         <div className="relative w-full">
                                             <input
                                             type={showPassword ? "text" : "password"}
                                             name="password"
-                                            className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                                            className="form-input pr-10"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
@@ -128,7 +128,7 @@ export default function InitMFAPage() {
                                 </div>
                                 <button
                                 type="submit"
-                                className="w-full bg-[#8fbd7e] hover:bg-[#6dab5c] text-white font-medium py-2 rounded-sm mt-2 cursor-pointer"
+                                className="btn-primary btn-full mt-2"
                                 >
                                 Initialize a MFA Factor
                                 </button>
@@ -139,7 +139,7 @@ export default function InitMFAPage() {
                                 <div className="flex flex-col items-center break-all">
                                     <QRCodeSVG value={qrURI} size={190}></QRCodeSVG>
                                     <form onSubmit={verifyTOTP} className="flex items-center gap-2 w-full justify-center py-3">
-                                        <input className="border rounded px-2 py-1 text-center"
+                                        <input className="form-input text-center"
                                             inputMode="numeric"
                                             pattern="[0-9]{6}"
                                             maxLength={6}
@@ -148,7 +148,7 @@ export default function InitMFAPage() {
                                             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                                             required></input>
                                     </form>
-                                    <button type="submit" onClick={verifyTOTP} className="w-full px-3 py-1 border rounded bg-black text-white hover:opacity-80 cursor-pointer">Verify</button>
+                                    <button type="submit" onClick={verifyTOTP} className="btn-primary btn-full">Verify</button>
                                     {/* If successful, will show green text here */}
                                     {success && (<div className="text-green-600 text-sm text-center font-medium mt-2">MFA setup was successful. Redirecting…</div>)}
 

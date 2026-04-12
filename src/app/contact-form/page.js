@@ -130,34 +130,6 @@ export default function ContactFormPage() {
     gap: "1.5rem",
   };
 
-  const fieldInputStyle = {
-    width: "100%",
-    boxSizing: "border-box",
-    padding: "10px 12px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "6px",
-    fontSize: "14px",
-    color: "#1e293b",
-    backgroundColor: "#ffffff",
-    outline: "none",
-  };
-
-  const labelStyle = {
-    display: "block",
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    color: "#475569",
-    marginBottom: "6px",
-  };
-
-  const sectionHeadingStyle = {
-    fontWeight: "600",
-    color: "#334155",
-    paddingBottom: "8px",
-    borderBottom: "1px solid #e2e8f0",
-    marginBottom: "20px",
-  };
-
   /* ---------- UI ---------- */
 
   return (
@@ -176,11 +148,11 @@ export default function ContactFormPage() {
 
         {/* Card */}
         <div style={{
-          border: "1px solid #e2e8f0",
-          borderRadius: "8px",
-          padding: "32px",
-          backgroundColor: "#ffffff",
-          boxShadow: "0 4px 6px -1px rgba(11,63,115,0.12), 0 2px 4px -1px rgba(11,63,115,0.08)",
+          border: "1px solid var(--form-card-border)",
+          borderRadius: "var(--form-card-radius)",
+          padding: "var(--form-card-padding)",
+          backgroundColor: "var(--form-card-bg)",
+          boxShadow: "var(--form-card-shadow)",
         }}>
 
           {/* Status messages */}
@@ -196,14 +168,21 @@ export default function ContactFormPage() {
           )}
 
           {/* Section */}
-          <h2 style={{ ...sectionHeadingStyle, fontSize: "1rem" }}>
+          <h2 style={{
+            fontWeight: "600",
+            fontSize: "1rem",
+            color: "var(--section-heading-color)",
+            paddingBottom: "8px",
+            borderBottom: "1px solid var(--section-heading-border)",
+            marginBottom: "20px",
+          }}>
             Contact Information
           </h2>
 
           {/* Inputs */}
           <div style={gridStyle}>
             <div>
-              <label htmlFor="name" style={labelStyle}>
+              <label htmlFor="name" className="form-label">
                 Name
               </label>
               <input
@@ -212,8 +191,7 @@ export default function ContactFormPage() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Full Name"
-                style={{ ...fieldInputStyle,
-                        borderColor: errors.name ? "#dc2626" : "#cbd5e1" }}
+                className={`form-input${errors.name ? " input-error" : ""}`}
               />
               {errors.name && (
                 <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
@@ -223,7 +201,7 @@ export default function ContactFormPage() {
             </div>
 
             <div>
-              <label htmlFor="email" style={labelStyle}>
+              <label htmlFor="email" className="form-label">
                 Email Address
               </label>
               <input
@@ -232,8 +210,7 @@ export default function ContactFormPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email Address"
-                style={{ ...fieldInputStyle,
-                        borderColor: errors.email ? "#dc2626" : "#cbd5e1" }}
+                className={`form-input${errors.email ? " input-error" : ""}`}
               />
               {errors.email && (
                 <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
@@ -243,7 +220,7 @@ export default function ContactFormPage() {
             </div>
 
             <div>
-              <label htmlFor="phone" style={labelStyle}>
+              <label htmlFor="phone" className="form-label">
                 Phone Number (optional)
               </label>
               <input
@@ -252,8 +229,7 @@ export default function ContactFormPage() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                style={{ ...fieldInputStyle,
-                        borderColor: errors.phone ? "#dc2626" : "#cbd5e1" }}
+                className={`form-input${errors.phone ? " input-error" : ""}`}
               />
               {errors.phone && (
                 <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
@@ -265,7 +241,7 @@ export default function ContactFormPage() {
 
           {/* Message */}
           <div style={{ marginTop: "20px" }}>
-            <label htmlFor="message" style={labelStyle}>
+            <label htmlFor="message" className="form-label">
               Message
             </label>
             <textarea
@@ -275,12 +251,8 @@ export default function ContactFormPage() {
               onChange={handleChange}
               rows={6}
               placeholder="Your message..."
-              style={{
-                ...fieldInputStyle,
-                resize: "vertical",
-                minHeight: "120px",
-                borderColor: errors.message ? "#dc2626" : "#cbd5e1"
-              }}
+              className={`form-input${errors.message ? " input-error" : ""}`}
+              style={{ resize: "vertical", minHeight: "120px" }}
               maxLength={500}
             />
             {errors.message && (
@@ -294,16 +266,7 @@ export default function ContactFormPage() {
           <div style={{ marginTop: "24px", display: "flex", justifyContent: "center" }}>
             <button
               type="submit"
-              style={{
-                backgroundColor: "#16a34a",
-                color: "#ffffff",
-                border: "none",
-                padding: "12px 80px",
-                borderRadius: "6px",
-                fontSize: "0.9375rem",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
+              className="btn-primary btn-wide"
             >
               Submit
             </button>

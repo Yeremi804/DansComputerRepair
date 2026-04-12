@@ -44,31 +44,16 @@ function validatePhone(phone) {
   return null;
 }
 
-// Shared input style
-const baseInputStyle = {
-  width: '100%',
-  padding: '10px 12px',
-  border: '1px solid #cbd5e1',
-  borderRadius: '6px',
-  fontSize: '14px',
-  color: '#1e293b',
-  backgroundColor: '#ffffff',
-  outline: 'none',
-  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-  boxSizing: 'border-box',
-};
-
-const errorInputStyle = {
-  ...baseInputStyle,
-  border: '1px solid #ef4444',
-};
+// Shared input style — kept for onFocus/onBlur dynamic border manipulation
+const baseInputStyle = {};
+const errorInputStyle = {};
 
 function InputField({ label, name, type = 'text', placeholder, required, error, onBlurValidate, ...rest }) {
   const [touched, setTouched] = useState(false);
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+      <label className="form-label">
         {label} {required && <span style={{ color: '#ef4444' }}>*</span>}
       </label>
       <input
@@ -76,18 +61,10 @@ function InputField({ label, name, type = 'text', placeholder, required, error, 
         name={name}
         placeholder={placeholder}
         required={required}
-        style={error && touched ? errorInputStyle : baseInputStyle}
-        onFocus={(e) => {
-          e.target.style.borderColor = error && touched ? '#ef4444' : '#3b82f6';
-          e.target.style.boxShadow = error && touched
-            ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
-            : '0 0 0 3px rgba(59, 130, 246, 0.15)';
-        }}
+        className={`form-input${error && touched ? ' input-error' : ''}`}
         onBlur={(e) => {
           setTouched(true);
           if (onBlurValidate) onBlurValidate(e.target.value);
-          e.target.style.borderColor = '#cbd5e1';
-          e.target.style.boxShadow = 'none';
         }}
         aria-invalid={!!(error && touched)}
         aria-describedby={error && touched ? `${name}-error` : undefined}
@@ -212,10 +189,11 @@ export default function CreateAdminAccountPage() {
 
         {/* Form card */}
         <div
-          className="rounded-lg bg-white"
           style={{
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 6px -1px rgba(11, 63, 115, 0.12), 0 2px 4px -1px rgba(11, 63, 115, 0.08)',
+            border: '1px solid var(--form-card-border)',
+            borderRadius: 'var(--form-card-radius)',
+            backgroundColor: 'var(--form-card-bg)',
+            boxShadow: 'var(--form-card-shadow)',
           }}
         >
           <form className="p-6 md:p-8" onSubmit={onSubmit} noValidate>
@@ -223,7 +201,7 @@ export default function CreateAdminAccountPage() {
 
               {/* First name */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="form-label">
                   First name <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -231,18 +209,8 @@ export default function CreateAdminAccountPage() {
                   name="firstName"
                   placeholder="First name"
                   required
-                  style={errors.firstName ? errorInputStyle : baseInputStyle}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.firstName ? '#ef4444' : '#3b82f6';
-                    e.target.style.boxShadow = errors.firstName
-                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
-                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    setFieldError('firstName', e.target.value.trim() ? '' : 'First name is required.');
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className={`form-input${errors.firstName ? ' input-error' : ''}`}
+                  onBlur={(e) => setFieldError('firstName', e.target.value.trim() ? '' : 'First name is required.')}
                 />
                 {errors.firstName && (
                   <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
@@ -251,7 +219,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Last name */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="form-label">
                   Last name <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -259,18 +227,8 @@ export default function CreateAdminAccountPage() {
                   name="lastName"
                   placeholder="Last name"
                   required
-                  style={errors.lastName ? errorInputStyle : baseInputStyle}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.lastName ? '#ef4444' : '#3b82f6';
-                    e.target.style.boxShadow = errors.lastName
-                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
-                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    setFieldError('lastName', e.target.value.trim() ? '' : 'Last name is required.');
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className={`form-input${errors.lastName ? ' input-error' : ''}`}
+                  onBlur={(e) => setFieldError('lastName', e.target.value.trim() ? '' : 'Last name is required.')}
                 />
                 {errors.lastName && (
                   <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
@@ -279,7 +237,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Email address */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="form-label">
                   Email address <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -287,18 +245,8 @@ export default function CreateAdminAccountPage() {
                   name="email"
                   placeholder="Email address"
                   required
-                  style={errors.email ? errorInputStyle : baseInputStyle}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.email ? '#ef4444' : '#3b82f6';
-                    e.target.style.boxShadow = errors.email
-                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
-                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    setFieldError('email', e.target.value.trim() ? '' : 'Email address is required.');
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className={`form-input${errors.email ? ' input-error' : ''}`}
+                  onBlur={(e) => setFieldError('email', e.target.value.trim() ? '' : 'Email address is required.')}
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -307,7 +255,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Phone number */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="form-label">
                   Phone number <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -315,18 +263,8 @@ export default function CreateAdminAccountPage() {
                   name="phone"
                   placeholder="e.g. 555-123-4567"
                   required
-                  style={errors.phone ? errorInputStyle : baseInputStyle}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.phone ? '#ef4444' : '#3b82f6';
-                    e.target.style.boxShadow = errors.phone
-                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
-                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    setFieldError('phone', validatePhone(e.target.value) || '');
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className={`form-input${errors.phone ? ' input-error' : ''}`}
+                  onBlur={(e) => setFieldError('phone', validatePhone(e.target.value) || '')}
                   aria-invalid={!!errors.phone}
                   aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />
@@ -337,7 +275,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="form-label">
                   Password <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -345,18 +283,8 @@ export default function CreateAdminAccountPage() {
                   name="password"
                   placeholder="Minimum 10 characters"
                   required
-                  style={errors.password ? errorInputStyle : baseInputStyle}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.password ? '#ef4444' : '#3b82f6';
-                    e.target.style.boxShadow = errors.password
-                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
-                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    setFieldError('password', validatePassword(e.target.value) || '');
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className={`form-input${errors.password ? ' input-error' : ''}`}
+                  onBlur={(e) => setFieldError('password', validatePassword(e.target.value) || '')}
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? 'password-error' : undefined}
                 />
@@ -367,7 +295,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Confirm password */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="form-label">
                   Confirm password <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -375,18 +303,8 @@ export default function CreateAdminAccountPage() {
                   name="confirmPassword"
                   placeholder="Minimum 10 characters"
                   required
-                  style={errors.confirmPassword ? errorInputStyle : baseInputStyle}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.confirmPassword ? '#ef4444' : '#3b82f6';
-                    e.target.style.boxShadow = errors.confirmPassword
-                      ? '0 0 0 3px rgba(239, 68, 68, 0.15)'
-                      : '0 0 0 3px rgba(59, 130, 246, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    setFieldError('confirmPassword', e.target.value.trim() ? '' : 'Please confirm your password.');
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className={`form-input${errors.confirmPassword ? ' input-error' : ''}`}
+                  onBlur={(e) => setFieldError('confirmPassword', e.target.value.trim() ? '' : 'Please confirm your password.')}
                   aria-invalid={!!errors.confirmPassword}
                   aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
                 />
@@ -398,25 +316,11 @@ export default function CreateAdminAccountPage() {
             </div>
 
             {/* Sign up button */}
-            <div className="mt-8">
+            <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
               <button
                 type="submit"
                 disabled={isPending}
-                style={{
-                  width: '100%',
-                  backgroundColor: '#16a34a',
-                  color: '#ffffff',
-                  border: 'none',
-                  padding: '12px',
-                  borderRadius: '6px',
-                  fontSize: '0.9375rem',
-                  fontWeight: '600',
-                  cursor: isPending ? 'not-allowed' : 'pointer',
-                  opacity: isPending ? 0.6 : 1,
-                  transition: 'background-color 0.15s ease',
-                }}
-                onMouseEnter={(e) => { if (!isPending) e.target.style.backgroundColor = '#15803d'; }}
-                onMouseLeave={(e) => { if (!isPending) e.target.style.backgroundColor = '#16a34a'; }}
+                className={`btn-primary btn-wide${isPending ? ' opacity-60 cursor-not-allowed' : ''}`}
               >
                 {isPending ? 'Creating account…' : 'Sign up'}
               </button>
@@ -424,26 +328,12 @@ export default function CreateAdminAccountPage() {
           </form>
 
           {/* Divider + Sign in */}
-          <div
-            className="p-6 md:p-8"
-            style={{ borderTop: '1px solid #e2e8f0' }}
-          >
+          <div className="p-6 md:p-8 border-t border-neutral-200">
             <div className="flex justify-center items-center gap-2">
-              <span className="text-sm" style={{ color: '#64748b' }}>Or</span>
+              <span className="text-sm text-neutral-500">Or</span>
               <a
                 href="/admin-log-in"
-                style={{
-                  backgroundColor: '#475569',
-                  color: '#ffffff',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  transition: 'background-color 0.15s ease',
-                }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = '#334155'; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = '#475569'; }}
+                className="btn-outline"
               >
                 Sign in
               </a>

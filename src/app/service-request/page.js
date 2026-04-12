@@ -131,24 +131,22 @@ export default function ServiceRequest() {
 
 	        <div className="mb-6">
 	          <label className="flex items-start gap-3">
-	            <input
-	              type="checkbox"
-	              name="smsConsent"
-	              checked={form.smsConsent}
-	              onChange={update}
-	              className="mt-1 h-4 w-4"
-	            />
-	            <span className="text-sm text-gray-700">
-	              I agree to receive SMS notifications about my repair status.
-	            </span>
+		            <input
+		              type="checkbox"
+		              name="smsConsent"
+		              checked={form.smsConsent}
+		              onChange={update}
+		              className="checkbox-accent mt-1"
+		            />
+            <span className="form-label" style={{ marginBottom: 0 }}>
+              I agree to receive SMS notifications about my repair status.
+            </span>
 	          </label>
 	        </div>
 
           {/* Device Section */}
           <div className="space-y-8">
-            <h2 className="text-2xl font-semibold text-slate-800 tracking-tight">
-              Device Information
-            </h2>
+            <div className={styles.sectionHeader}>2. Device Information</div>
 
             <div
               style={{
@@ -158,7 +156,7 @@ export default function ServiceRequest() {
               }}
             >
               <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
+                <label className="form-label">
                   Device
                 </label>
                 <select
@@ -166,7 +164,7 @@ export default function ServiceRequest() {
                   value={form.deviceSelect}
                   onChange={update}
                   disabled={!!form.deviceText}
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+                  className="form-input"
                 >
                   <option value="">Select a device</option>
                   <option>Desktop</option>
@@ -177,7 +175,7 @@ export default function ServiceRequest() {
               </div>
 
               <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
+                <label className="form-label">
                   Or Specify
                 </label>
                 <input
@@ -186,7 +184,7 @@ export default function ServiceRequest() {
                   value={form.deviceText}
                   onChange={update}
                   disabled={!!form.deviceSelect}
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+                  className="form-input"
                 />
               </div>
             </div>
@@ -199,7 +197,7 @@ export default function ServiceRequest() {
               }}
             >
               <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
+                <label className="form-label">
                   Service
                 </label>
                 <select
@@ -207,7 +205,7 @@ export default function ServiceRequest() {
                   value={form.serviceSelect}
                   onChange={update}
                   disabled={!!form.serviceText}
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+                  className="form-input"
                 >
                   <option value="">Select a service</option>
                   <option>Computer diagnostics</option>
@@ -219,7 +217,7 @@ export default function ServiceRequest() {
               </div>
 
               <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
+                <label className="form-label">
                   Or Specify
                 </label>
                 <input
@@ -228,7 +226,7 @@ export default function ServiceRequest() {
                   value={form.serviceText}
                   onChange={update}
                   disabled={!!form.serviceSelect}
-                  className="rounded-lg px-4 py-3 border border-gray-300 bg-gray-50 focus:outline-none focus:border-black"
+                  className="form-input"
                 />
               </div>
             </div>
@@ -288,9 +286,9 @@ export default function ServiceRequest() {
             <button
               type="submit"
               disabled={status === 'sending'}
-              className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg"
+              className="btn-primary btn-wide"
             >
-              {status === 'sending' ? 'Submitting...' : 'Submit Request'}
+              {status === 'sending' ? 'Submitting...' : 'Submit'}
             </button>
           </div>
 

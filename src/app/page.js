@@ -245,7 +245,7 @@ return (
                 </p>
                 <a
                   href="/service-request"
-                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 text-pink-700 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                  className="btn-pink"
                 >
                   Start a Service Request
                 </a>
@@ -300,7 +300,7 @@ return (
                 </p>
                 <a
                   href="/create-computer-configuration-form"
-                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 text-pink-700 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                  className="btn-pink"
                 >
                   Go to Computer Configuration
                 </a>
@@ -323,7 +323,7 @@ return (
                 onClick={() => setShowYelp(!showYelp)}
                 setindex={0}
             
-                  className="mb-8 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-800 transition"
+                  className="mb-8 px-4 py-2 btn-grey"
               >
                 {showYelp ? "Show Local Reviews" : "Show Yelp Reviews"}
               </button>

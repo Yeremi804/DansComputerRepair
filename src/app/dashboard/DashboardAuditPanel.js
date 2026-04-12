@@ -3,95 +3,67 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 
-/**
- * DashboardAuditPanel
- *
- * Client-side component that queries the `audit_logs` table and renders
- * a small table of recent entries
-*/
-
 export default function DashboardAuditPanel() {
-  // logs: array of audit log objects
   const [logs, setLogs] = useState([]);
-  // loading & error UI state
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState("");
 
-  // Fetch the most recent 50 audit log rows on mount
   useEffect(() => {
     const fetchLogs = async () => {
-      setLoading(true);
-      setErrorMsg("");
+      try {
+        setLoading(true);
+        const { data, error: fetchError } = await supabase
+          .from("audit_logs")
+          .select("id, created_at, actor_email, action, entity_type, entity_id")
+          .order("created_at", { ascending: false })
+          .limit(50);
 
-      // Query: id, created_at, actor_email, action, entity_type, entity_id
-      // Order by created_at descending to show newest first.
-      const { data, error } = await supabase
-        .from("audit_logs")
-        .select("id, created_at, actor_email, action, entity_type, entity_id")
-        .order("created_at", { ascending: false })
-        .limit(50);
+        if (fetchError) {
+          setError(fetchError.message);
+          return;
+        }
 
-      if (error) {
-        // Log error in console and show a helpful message in the UI
-        console.error("Audit logs fetch error:", error);
-        setErrorMsg(error.message ?? "Failed to load audit logs.");
-        setLogs([]);
-      } else {
-        // Normalize missing data to empty array
-        setLogs(data ?? []);
+        setLogs(data || []);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch audit logs");
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchLogs();
   }, []);
 
+  if (loading) return <div className="bg-main-bg text-main-text p-4">Loading...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
+
   return (
-    <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] rounded-xl shadow-sm">
-      {/* Simple, clear loading / empty / error states */}
-      {loading && <p>Loading audit logs...</p>}
-      {!loading && errorMsg && <p className="text-red-700">{errorMsg}</p>}
-      {!loading && !errorMsg && logs.length === 0 && <p>No audit logs found.</p>}
-
-      {/* Data table */}
-      {!loading && !errorMsg && logs.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#cbd5e1]">
-                <th className="py-2 pr-4">Time</th>
-                <th className="py-2 pr-4">Actor</th>
-                <th className="py-2 pr-4">Action</th>
-                <th className="py-2 pr-4">Entity</th>
-                <th className="py-2 pr-4">Entity ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map((log) => (
-                <tr key={log.id} className="border-b border-[#cbd5e1]">
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {/* Convert server timestamp to local string for readability */}
-                    {new Date(log.created_at).toLocaleString()}
-                  </td>
-
-                  {/* Actor email (falls back to an em dash if missing) */}
-                  <td className="py-2 pr-4">{log.actor_email ?? "—"}</td>
-
-                  {/* Action string (e.g. PART_CREATED, PART_UPDATED, PART_DELETED) */}
-                  <td className="py-2 pr-4">{log.action}</td>
-
-                  {/* Entity type (table name or logical entity name) */}
-                  <td className="py-2 pr-4">{log.entity_type}</td>
-
-                  {/* Optional: entity_id (could be blank for some audit rows) */}
-                  <td className="py-2 pr-4">{log.entity_id ?? "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="overflow-x-auto">
+      <div className="border border-neutral-300 rounded-md overflow-hidden bg-white">
+        <div className="grid grid-cols-5 bg-neutral-100 border-b border-neutral-300">
+          <div className="p-4 font-semibold text-sm">Time</div>
+          <div className="p-4 font-semibold text-sm">Actor</div>
+          <div className="p-4 font-semibold text-sm">Action</div>
+          <div className="p-4 font-semibold text-sm">Entity</div>
+          <div className="p-4 font-semibold text-sm">Entity ID</div>
         </div>
-      )}
+        <div>
+          {logs.length === 0 ? (
+            <div className="p-4 text-sm text-neutral-500">No audit logs found.</div>
+          ) : (
+            logs.map((log) => (
+              <div key={log.id} className="grid grid-cols-5 border-b border-neutral-300 hover:bg-neutral-50">
+                <div className="p-4 text-sm">{new Date(log.created_at).toLocaleString()}</div>
+                <div className="p-4 text-sm">{log.actor_email ?? "—"}</div>
+                <div className="p-4 text-sm">{log.action}</div>
+                <div className="p-4 text-sm">{log.entity_type}</div>
+                <div className="p-4 text-sm">{log.entity_id ?? "—"}</div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }

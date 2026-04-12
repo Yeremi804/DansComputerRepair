@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Dan's Computer Repair",
   description: "Tech services provided to you by Dan",
+  icons: {
+    icon: "/favicon.ico",   
+  },
 };
 
 export default function RootLayout({ children }) {

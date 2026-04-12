@@ -38,13 +38,14 @@ export default function AdminLoginPage() {
     loadCaptcha();
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     const rememberedPassword = localStorage.getItem('rememberedPassword');
-    if (rememberedEmail) {
+    // Only pre-fill fields if Remember Me was explicitly checked before
+    const wasRemembered = localStorage.getItem('rememberMeChecked') === 'true';
+    if (wasRemembered && rememberedEmail) {
       setEmail(rememberedEmail);
       setRememberMe(true);
     }
-    if (rememberedPassword) {
+    if (wasRemembered && rememberedPassword) {
       setPassword(rememberedPassword);
-      setRememberMe(true);
     }
   }, []);
 
@@ -143,9 +144,11 @@ export default function AdminLoginPage() {
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', emailTrimmed);
         localStorage.setItem('rememberedPassword', password);
+        localStorage.setItem('rememberMeChecked', 'true');
       } else {
         localStorage.removeItem('rememberedEmail');
         localStorage.removeItem('rememberedPassword');
+        localStorage.removeItem('rememberMeChecked');
       }
 
 
@@ -297,12 +300,12 @@ export default function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-4">
             {/* Email Only */}
             <div>
-              <label className="text-black text-sm mb-1">Email address</label>
+              <label className="form-label">Email address</label>
               <input
                 type="email"
                 name="email"
-                placeholder="Enter email address "
-                className="w-full border border-black rounded-sm px-3 py-2 text-black"
+                placeholder="Enter email address"
+                className="form-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -311,12 +314,12 @@ export default function AdminLoginPage() {
 
             {/* Password + Eye toggle */}
             <div>
-              <label className="block text-black text-sm mb-1">Password</label>
-              <div className="relative text-black">
+              <label className="form-label">Password</label>
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                  className="form-input pr-10"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -325,7 +328,7 @@ export default function AdminLoginPage() {
                   type="button"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-neutral-500 hover:text-black cursor-pointer"
+                  className="absolute right-3 top-2.5 text-neutral-500 hover:text-neutral-700 cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff size={18} strokeWidth={1.5} />
@@ -343,12 +346,12 @@ export default function AdminLoginPage() {
               <div
                 // When the user clicks this box, it sets showCaptcha to true, which triggers the drawer to open with the captcha inside.
                 onClick={() => setShowCaptcha(true)}
-                className="border border-neutral-300 p-4 rounded-sm flex items-center gap-3 bg-neutral-50 cursor-pointer mb-2"
+                className="border border-neutral-300 p-4 rounded-md flex items-center gap-3 bg-neutral-50 cursor-pointer mb-2"
               >
                 <div className="w-6 h-6 border-2 rounded-sm border-neutral-400 flex items-center justify-center">
-                  {showCaptcha && <div className="w-3 h-3 bg-black rounded-sm" />}
+                  {showCaptcha && <div className="w-3 h-3 bg-green-600 rounded-sm" />}
                 </div>
-                <span className="text-sm text-black font-medium">
+                <span className="text-sm text-neutral-700 font-medium">
                   I am not a robot 🤖
                 </span>
               </div>
@@ -356,10 +359,10 @@ export default function AdminLoginPage() {
 
             {/*This pops open when showCaptcha is true */}
             {showCaptcha && !captchaVerified && (
-              <div className="border border-neutral-300 p-4 mb-4 space-y-4 bg-white animate-in slide-in-from-top-1">
+              <div className="border border-neutral-300 p-4 mb-4 space-y-3 bg-white rounded-md animate-in slide-in-from-top-1">
                 {/* The SVG Image open from the string of line to have it shown on clients*/}
                 <div
-                  className="bg-neutral-100 p-2 rounded-sm flex justify-center pointer-events-none"
+                  className="bg-neutral-100 p-2 rounded-md flex justify-center pointer-events-none"
                   dangerouslySetInnerHTML={{ __html: captchaSvg }}
                 />
 
@@ -368,27 +371,28 @@ export default function AdminLoginPage() {
                   type="text"
                   // If there is a captcha error, show that as the placeholder. Otherwise, show the default "Type the characters above"
                   placeholder={captchaError ? captchaError : "Type the characters above"}
-                  className="w-full border text-black border-black rounded-sm px-3 py-2 pointer-events-auto"
+                  className="form-input pointer-events-auto"
                   value={captchaInput}
                   onChange={(e) => setCaptchaInput(e.target.value)}
                 />
 
-                {/* The Black "Check" Button with your Loading Spinner
-                    Hasnt happen yet or occur so far*/}
-                <button
-                  type="button"
-                  onClick={fetchCaptcha}
-                  className="w-full bg-black text-white py-2 rounded-sm text-sm font-medium pointer-events-auto"
-                >
-                  {captchaVerified ? "Verifying..." : "Check"}
-                </button>
+                {/* The "Check" Button */}
+                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={fetchCaptcha}
+                    className="btn-primary btn-wide pointer-events-auto"
+                  >
+                    {captchaVerified ? "Verifying..." : "Check"}
+                  </button>
+                </div>
               </div>
             )}
 
             {/* Remember me + Forgot password */}
             <div className="flex items-center justify-between text-sm mb-8">
-              <label className="flex items-center text-black gap-2">
-                <input type="checkbox" className="accent-black" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+              <label className="flex items-center text-neutral-700 gap-2 cursor-pointer">
+                <input type="checkbox" className="checkbox-accent" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                 Remember me
               </label>
               <button
@@ -405,18 +409,16 @@ export default function AdminLoginPage() {
               </button>
             </div>
 
-            {/* Sign in button. */}
-            <button
-              type="submit"
-              disabled={loading || !captchaVerified}
-              className={`w-full font-medium py-2 rounded-sm mt-2 cursor-pointer transition-colors ${
-                captchaVerified
-                  ? "bg-[#8fbd7e] hover:bg-[#6dab5c] text-white"
-                  : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-              }`}
-            >
-              {loading ? "Loading..." : "Sign In"}
-            </button>
+            {/* Sign in button — grey when CAPTCHA not yet verified */}
+            <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
+              <button
+                type="submit"
+                disabled={loading || !captchaVerified}
+                className={`btn-primary btn-wide mt-2${!captchaVerified ? " btn-disabled-grey" : ""}`}
+              >
+                {loading ? "Loading..." : "Sign In"}
+              </button>
+            </div>
           </form>
 
           {/* Divider and Sign up */}
@@ -425,7 +427,7 @@ export default function AdminLoginPage() {
             <button
               type="button"
               onClick={() => router.push("/create-admin-account")}
-              className="bg-[#7e9dbd] hover:bg-[#5d7b99] text-white font-medium px-4 py-2 rounded-sm cursor-pointer"
+              className="btn-outline"
             >
               Sign up
             </button>
@@ -435,19 +437,15 @@ export default function AdminLoginPage() {
 
       {/* Forgot Password Popup */}
       {forgotPasswordOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="w-full max-w-md bg-white rounded-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-2xl font-semibold text-[#273043]">
-              Reset Password
-            </h2>
-            <p className="text-sm text-black">
-              Enter your email address and we will send you a password reset link.
-            </p>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
+          <div className="w-full max-w-md modal-card">
+            <h2>Reset Password</h2>
+            <p>Enter your email address and we will send you a password reset link.</p>
 
             <form onSubmit={handleForgotPassword} className="space-y-3">
               <input
                 type="email"
-                className="w-full border border-black rounded-sm px-3 py-2"
+                className="form-input"
                 placeholder="Enter email address"
                 value={forgotPasswordEmail}
                 onChange={(e) => setForgotPasswordEmail(e.target.value)}
@@ -468,7 +466,7 @@ export default function AdminLoginPage() {
               <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   type="button"
-                  className="px-4 py-2 border border-neutral-400 rounded-sm cursor-pointer"
+                  className="btn-secondary"
                   onClick={() => {
                     setForgotPasswordOpen(false);
                     setForgotPasswordError("");
@@ -480,7 +478,7 @@ export default function AdminLoginPage() {
                 <button
                   type="submit"
                   disabled={forgotPasswordLoading}
-                  className="px-4 py-2 bg-black text-white rounded-sm cursor-pointer"
+                  className="btn-primary"
                 >
                   {forgotPasswordLoading ? "Sending..." : "Send Link"}
                 </button>
@@ -492,19 +490,17 @@ export default function AdminLoginPage() {
 
       {/* MFA Popup */}
       {mfaOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="w-full max-w-sm bg-white rounded-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-lg text-black text-main-text">Two-factor Verification</h2>
-            <p className="text-sm text-black">
-              Enter the 6-digit code from your authenticator app.
-            </p>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
+          <div className="w-full max-w-sm modal-card">
+            <h2>Two-factor Verification</h2>
+            <p>Enter the 6-digit code from your authenticator app.</p>
 
             <form onSubmit={submitMFA} className="space-y-3">
               <input
                 inputMode="numeric"
                 pattern="[0-9]{6}"
                 maxLength={6}
-                className="w-full border border-black rounded-sm px-3 py-2 text-black"
+                className="form-input"
                 placeholder="123456"
                 value={mfaCode}
                 onChange={(e) => setMfaCode(e.target.value)}
@@ -513,10 +509,10 @@ export default function AdminLoginPage() {
               />
               {mfaError && <div className="text-red-600 text-sm">{mfaError}</div>}
 
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   type="button"
-                  className="px-3 py-2 border rounded-sm cursor-pointer"
+                  className="btn-secondary"
                   onClick={async () => {
                     setMfaOpen(false);
                     setMfaCode("");
@@ -527,7 +523,7 @@ export default function AdminLoginPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-2 bg-black text-white rounded-sm cursor-pointer"
+                  className="btn-primary"
                 >
                   Verify
                 </button>

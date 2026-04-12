@@ -320,7 +320,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
         {/* Brand */}
         <div
-          className="flex items-center gap-3 min-w-0 cursor-pointer"
+          className="flex items-center gap-3 flex-shrink-0 cursor-pointer"
           onClick={() => handleNavigation("/")}
           role="button"
           tabIndex={0}
@@ -333,10 +333,10 @@ export default function Header() {
             className="h-12 w-12 md:h-16 md:w-16 rounded-md object-contain flex-shrink-0"
           />
           <div className="leading-tight">
-            <h1 className="font-semibold tracking-tight text-main-text">
+            <h1 className="font-semibold tracking-tight text-main-text whitespace-nowrap">
               Dan&apos;s Computer Repair
             </h1>
-            <p className="text-sm text-main-text">
+            <p className="text-sm text-main-text whitespace-nowrap">
               IT Services and Computer Repair
             </p>
           </div>

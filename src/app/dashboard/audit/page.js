@@ -1,61 +1,75 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 import Sidebar from "../../components/Sidebar";
-import DashboardAuditPanel from "../DashboardAuditPanel.js";
 
-// Page metadata for Next.js (used by app router).
-export const metadata = {
-  title: "Audit Log",
-  description: "Admin audit log",
-};
+export default function AuditLogPage() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-/**
- * AuditLogPage (server component)
- *
- * - This is a simple wrapper page that:
- *   1) validates required Supabase env vars are present (so the client can use them),
- *   2) mounts the client-side DashboardAuditPanel and passes the Supabase info.
- */
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        setLoading(true);
+        const { data, error: fetchError } = await supabase
+          .from("audit_logs")
+          .select("id, created_at, actor_email, action, entity_type, entity_id")
+          .order("created_at", { ascending: false })
+          .limit(50);
 
-export default async function AuditLogPage() {
-  // These env vars are used client-side by the DashboardAuditPanel to initialize
-  // a Supabase client, we validate early so we can show a clear error if missing
-  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        if (fetchError) {
+          setError(fetchError.message);
+          return;
+        }
 
-  if (!SUPABASE_URL || !SUPABASE_ANON) {
-    // Return a helpful message when the environment is not set, mainly for dev purposes
-    return (
-      <div className="p-8">
-        <h1 className="text-xl font-semibold">Audit Log</h1>
-        <p className="mt-4 text-red-700">
-          Missing Supabase environment variables. Set{" "}
-          <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-          <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in <code>.env.local</code>,
-          then restart the dev server.
-        </p>
-      </div>
-    );
-  }
+        setLogs(data || []);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch audit logs");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Render the admin layout (sidebar + main). The DashboardAuditPanel is a
-  // client component (it uses the browser Supabase client and hooks).
+    fetchLogs();
+  }, []);
+
+  if (loading) return <div className="bg-main-bg text-main-text p-4">Loading...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
+
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-main-bg">
       <Sidebar />
-
-      {/* Main content area */}
-      <main className="flex-1 p-8 bg-main-bg">
-        <h1 className="mb-4 text-3xl text-main-text font-bold">Audit Log</h1>
-
-        {/*
-          DashboardAuditPanel is a client component that:
-            - receives the Supabase URL + anon key to initialize a client
-            - fetches recent audit_logs and displays them
-          Passing env vars from the server to the client via props (safe for anon key).
-        */}
-        <DashboardAuditPanel
-          supabaseUrl={SUPABASE_URL}
-          supabaseAnonKey={SUPABASE_ANON}
-        />
+      <main className="flex-1 p-8 md:ml-0">
+        <h1 className="text-3xl font-bold text-main-text mb-6">Audit Log</h1>
+        <div className="overflow-x-auto">
+          <div className="border border-neutral-300 rounded-md overflow-hidden bg-white">
+            <div className="grid grid-cols-5 bg-neutral-100 border-b border-neutral-300">
+              <div className="p-4 font-semibold text-sm">Time</div>
+              <div className="p-4 font-semibold text-sm">Actor</div>
+              <div className="p-4 font-semibold text-sm">Action</div>
+              <div className="p-4 font-semibold text-sm">Entity</div>
+              <div className="p-4 font-semibold text-sm">Entity ID</div>
+            </div>
+            <div>
+              {logs.length === 0 ? (
+                <div className="p-4 text-sm text-neutral-500">No audit logs found.</div>
+              ) : (
+                logs.map((log) => (
+                  <div key={log.id} className="grid grid-cols-5 border-b border-neutral-300 hover:bg-neutral-50">
+                    <div className="p-4 text-sm">{new Date(log.created_at).toLocaleString()}</div>
+                    <div className="p-4 text-sm">{log.actor_email ?? "—"}</div>
+                    <div className="p-4 text-sm">{log.action}</div>
+                    <div className="p-4 text-sm">{log.entity_type}</div>
+                    <div className="p-4 text-sm">{log.entity_id ?? "—"}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

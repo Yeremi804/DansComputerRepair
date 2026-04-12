@@ -186,13 +186,11 @@ export default function UpdatePasswordPage() {
           <div className="p-6 md:p-8">
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div>
-                <label className="block text-black text-sm mb-1">
-                  New Password
-                </label>
+                <label className="form-label">New Password</label>
                 <div className="relative">
                   <input
                     type={showNewPassword ? "text" : "password"}
-                    className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                    className="form-input pr-10"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -200,7 +198,7 @@ export default function UpdatePasswordPage() {
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-2.5 text-neutral-500 hover:text-black cursor-pointer"
+                    className="absolute right-3 top-2.5 text-neutral-500 hover:text-neutral-700 cursor-pointer"
                   >
                     {showNewPassword ? (
                       <EyeOff size={18} strokeWidth={1.5} />
@@ -212,23 +210,19 @@ export default function UpdatePasswordPage() {
               </div>
 
               <div>
-                <label className="block text-black text-sm mb-1">
-                  Confirm New Password
-                </label>
+                <label className="form-label">Confirm New Password</label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
-                    className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                    className="form-input pr-10"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowConfirmPassword(!showConfirmPassword)
-                    }
-                    className="absolute right-3 top-2.5 text-neutral-500 hover:text-black cursor-pointer"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-2.5 text-neutral-500 hover:text-neutral-700 cursor-pointer"
                   >
                     {showConfirmPassword ? (
                       <EyeOff size={18} strokeWidth={1.5} />
@@ -247,11 +241,7 @@ export default function UpdatePasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full font-medium py-2 rounded-sm mt-2 cursor-pointer transition-colors ${
-                  loading
-                    ? "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-                    : "bg-black text-white hover:bg-neutral-800"
-                }`}
+                className={`btn-primary btn-full mt-2${loading ? " btn-disabled-grey" : ""}`}
               >
                 {loading ? "Updating..." : "Update Password"}
               </button>
@@ -260,11 +250,12 @@ export default function UpdatePasswordPage() {
         </div>
       </section>
 
+      {/* Two-factor Verification Popup */}
       {mfaOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="w-full max-w-sm bg-white rounded-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold">Two-factor Verification</h2>
-            <p className="text-sm text-black">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
+          <div className="w-full max-w-sm modal-card">
+            <h2>Two-factor Verification</h2>
+            <p>
               Enter the 6-digit code from your authenticator app to finish
               resetting your password.
             </p>
@@ -274,7 +265,7 @@ export default function UpdatePasswordPage() {
                 inputMode="numeric"
                 pattern="[0-9]{6}"
                 maxLength={6}
-                className="w-full border border-black rounded-sm px-3 py-2"
+                className="form-input"
                 placeholder="123456"
                 value={mfaCode}
                 onChange={(e) => setMfaCode(e.target.value)}
@@ -284,10 +275,10 @@ export default function UpdatePasswordPage() {
 
               {mfaError && <div className="text-red-600 text-sm">{mfaError}</div>}
 
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   type="button"
-                  className="px-3 py-2 border rounded-sm cursor-pointer"
+                  className="btn-secondary"
                   onClick={() => {
                     setMfaOpen(false);
                     setMfaCode("");
@@ -299,7 +290,7 @@ export default function UpdatePasswordPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-2 bg-black text-white rounded-sm cursor-pointer"
+                  className="btn-primary"
                 >
                   Verify
                 </button>

@@ -687,7 +687,8 @@ export default function SettingsPage() {
     <div className="flex min-h-screen bg-main-bg">
       <Sidebar />
 
-      <main className="flex-1 p-8 settings-main">
+      <div className="flex-1 relative">
+      <main className="p-8 settings-main">
         <div className="settings-panel">
           <h2>Profile Name</h2>
           <p>Modify your profile name.</p>
@@ -736,8 +737,9 @@ export default function SettingsPage() {
             Unenroll MFA
           </button>
         </div>
+      </main>
 
-        {isModalOpen && (
+      {isModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
@@ -857,33 +859,31 @@ export default function SettingsPage() {
                       <span className="helper-text">
                         Enter the 6-digit code from your authenticator app, then verify.
                       </span>
-                      <motion.button
+                      <button
                         type="button"
                         className="save-btn"
-                        whileHover={{ scale: 1.02 }}
                         disabled={mfaLoading}
                         onClick={handleVerifyMfaAndUpdate}
                       >
                         {mfaLoading ? "Verifying..." : "Verify MFA and update password"}
-                      </motion.button>
+                      </button>
                     </div>
                   )}
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                     disabled={loading}
                   >
                     {loading ? "Saving..." : "Update password"}
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {isMfaUnenrollOpen && (
+      {isMfaUnenrollOpen && (
           <div
             className="modal-backdrop"
             onClick={() => setIsMfaUnenrollOpen(false)}
@@ -958,32 +958,30 @@ export default function SettingsPage() {
                             />
                           </div>
 
-                          <motion.button
+                          <button
                             type="button"
                             className="save-btn"
-                            whileHover={{ scale: 1.02 }}
                             disabled={unenrollMfaLoading}
                             onClick={handleVerifyMfaAndUnenroll}
                           >
                             {unenrollMfaLoading ? "Verifying..." : "Verify MFA and Unenroll"}
-                          </motion.button>
+                          </button>
                         </div>
                       )}
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                   >
                     Confirm Unenroll
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {isNameModalOpen && (
+      {isNameModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsNameModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
@@ -1021,21 +1019,20 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                     disabled={nameLoading}
                   >
                     {nameLoading ? "Saving..." : "Save Name"}
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {isEmailModalOpen && (
+      {isEmailModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsEmailModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
@@ -1085,26 +1082,25 @@ export default function SettingsPage() {
                     </span>
                   </div>
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                     disabled={emailLoading}
                   >
                     {emailLoading ? "Saving..." : "Update Email"}
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {toast && (
+      {toast && (
           <div className={`toast ${toast.type === "error" ? "toast--error" : "toast--success"}`}>
             {toast.text}
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

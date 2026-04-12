@@ -111,60 +111,8 @@ export default function CreateComputerConfigurationForm() {
     boxSizing: 'border-box',
   };
 
-  /* Shared style for all text inputs — font size matches service-request form (.input: 14px) */
-  const fieldInputStyle = {
-    width: '100%',
-    boxSizing: 'border-box',
-    padding: '10px 12px',
-    border: '1px solid #cbd5e1',   /* Matches sidebar/card border color across the site */
-    borderRadius: '6px',
-    fontSize: '14px',              /* Matches .input font-size in service-request/page.module.css */
-    color: '#1e293b',
-    backgroundColor: '#ffffff',
-    outline: 'none',
-    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-  };
-
-  /* Shared style for all select dropdowns */
-  const fieldSelectStyle = {
-    ...fieldInputStyle,
-    appearance: 'none',
-    WebkitAppearance: 'none',
-    MozAppearance: 'none',
-    /* Custom dropdown arrow SVG */
-    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E\")",
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'right 12px center',
-    backgroundSize: '16px',
-    paddingRight: '36px',
-    color: '#94a3b8', /* Default placeholder color */
-  };
-
-  const placeholderOptionStyle = {
-    color: '#64748b',
-  };
-
-  const dropdownOptionStyle = {
-    color: '#0f172a',
-  };
-
-  /* Label style consistent with service-request form (.label: 0.875rem / 14px) */
-  const labelStyle = {
-    display: 'block',
-    fontSize: '0.875rem',          /* Matches .label font-size in service-request/page.module.css */
-    fontWeight: '500',
-    color: '#475569',              /* Slate-600, matches service-request label color */
-    marginBottom: '6px',
-  };
-
-  /* Section heading style (h2, h3) */
-  const sectionHeadingStyle = {
-    fontWeight: '600',
-    color: '#334155',         /* Slate-700 */
-    paddingBottom: '8px',
-    borderBottom: '1px solid #e2e8f0', /* Subtle divider, matches service-request sectionHeader */
-    marginBottom: '20px',
-  };
+  /* Style objects below are kept for reference but replaced by CSS classes (form-input, form-label, etc.) */
+  /* form-select CSS class handles the dropdown arrow via globals.css */
 
   //change teh background color and text color to match the current theme. use var(--current-bg) and var(--current-text) for the colors, which are set in the global styles based on the theme (light/dark)
   return (
@@ -185,16 +133,23 @@ export default function CreateComputerConfigurationForm() {
 
         {/* Form card: matches .formBox style from service-request form */}
         <div style={{
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          padding: '32px',
-          backgroundColor: '#ffffff',
-          boxShadow: '0 4px 6px -1px rgba(11, 63, 115, 0.12), 0 2px 4px -1px rgba(11, 63, 115, 0.08)',
+          border: '1px solid var(--form-card-border)',
+          borderRadius: 'var(--form-card-radius)',
+          padding: 'var(--form-card-padding)',
+          backgroundColor: 'var(--form-card-bg)',
+          boxShadow: 'var(--form-card-shadow)',
         }}>
 
           {/* Section 1: Customer Information */}
-          {/* Font size matches h3 section headings (1rem) for visual consistency */}
-          <h2 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '4px' }}>
+          <h2 style={{
+            fontWeight: '600',
+            fontSize: '1rem',
+            color: 'var(--section-heading-color)',
+            paddingBottom: '8px',
+            borderBottom: '1px solid var(--section-heading-border)',
+            marginBottom: '20px',
+            marginTop: '4px',
+          }}>
             1. Customer Information
           </h2>
 
@@ -207,44 +162,39 @@ export default function CreateComputerConfigurationForm() {
               'Intended Use',
             ].map((label) => (
               <div key={label}>
-                <label style={labelStyle}>{label}</label>
+                <label className="form-label">{label}</label>
                 <input
                   name={label}
                   placeholder={label}
-                  style={fieldInputStyle}
+                  className="form-input"
                 />
               </div>
             ))}
           </div>
 
           {/* SMS consent checkbox — identical pattern to service-request form */}
-          <label style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginTop: '8px',
-            marginBottom: '20px',
-            cursor: 'pointer',
-          }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', marginBottom: '20px', cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={smsConsent}
               onChange={(e) => setSmsConsent(e.target.checked)}
-              style={{
-                width: '16px',
-                height: '16px',
-                cursor: 'pointer',
-                accentColor: '#16a34a', /* Green accent to match the submit button */
-                flexShrink: 0,
-              }}
+              className="checkbox-accent"
             />
-            <span style={{ fontSize: '0.875rem', color: '#475569', lineHeight: '1.4' }}>
+            <span className="form-label" style={{ marginBottom: 0, lineHeight: '1.4' }}>
               I agree to receive SMS notifications about my computer configuration status.
             </span>
           </label>
 
           {/* Section 2: Core Components */}
-          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
+          <h3 style={{
+            fontWeight: '600',
+            fontSize: '1rem',
+            color: 'var(--section-heading-color)',
+            paddingBottom: '8px',
+            borderBottom: '1px solid var(--section-heading-border)',
+            marginBottom: '20px',
+            marginTop: '28px',
+          }}>
             2. Core Components
           </h3>
 
@@ -259,15 +209,15 @@ export default function CreateComputerConfigurationForm() {
               ['Case', 'Select a Case', casesList],
             ].map(([name, placeholder, list]) => (
               <div key={name}>
-                <label style={labelStyle}>{name}</label>
+                <label className="form-label">{name}</label>
                 <select
                   name={name}
                   onChange={handleSelectChange}
-                  style={fieldSelectStyle}
+                  className="form-input form-select"
                 >
-                  <option value="" style={placeholderOptionStyle}>{placeholder}</option>
+                  <option value="">{placeholder}</option>
                   {list.map((i) => (
-                    <option key={i.id ?? i.name} value={i.value ?? i.name} style={dropdownOptionStyle}>
+                    <option key={i.id ?? i.name} value={i.value ?? i.name}>
                       {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
                     </option>
                   ))}
@@ -277,7 +227,15 @@ export default function CreateComputerConfigurationForm() {
           </div>
 
           {/* Section 3: Additional Options */}
-          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
+          <h3 style={{
+            fontWeight: '600',
+            fontSize: '1rem',
+            color: 'var(--section-heading-color)',
+            paddingBottom: '8px',
+            borderBottom: '1px solid var(--section-heading-border)',
+            marginBottom: '20px',
+            marginTop: '28px',
+          }}>
             3. Additional Options
           </h3>
 
@@ -288,15 +246,15 @@ export default function CreateComputerConfigurationForm() {
               ['Networking', 'Select Networking Option', networkings],
             ].map(([name, placeholder, list]) => (
               <div key={name}>
-                <label style={labelStyle}>{name}</label>
+                <label className="form-label">{name}</label>
                 <select
                   name={name}
                   onChange={handleSelectChange}
-                  style={fieldSelectStyle}
+                  className="form-input form-select"
                 >
-                  <option value="" style={placeholderOptionStyle}>{placeholder}</option>
+                  <option value="">{placeholder}</option>
                   {list.map((i) => (
-                    <option key={i.id ?? i.name} value={i.value ?? i.name} style={dropdownOptionStyle}>
+                    <option key={i.id ?? i.name} value={i.value ?? i.name}>
                       {i.name}{i.price != null ? ` — ${formatPrice(i.price)}` : ''}
                     </option>
                   ))}
@@ -306,7 +264,15 @@ export default function CreateComputerConfigurationForm() {
           </div>
 
           {/* Section 4: Other Requests / Questions */}
-          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
+          <h3 style={{
+            fontWeight: '600',
+            fontSize: '1rem',
+            color: 'var(--section-heading-color)',
+            paddingBottom: '8px',
+            borderBottom: '1px solid var(--section-heading-border)',
+            marginBottom: '20px',
+            marginTop: '28px',
+          }}>
             4. Other Requests / Questions
           </h3>
 
@@ -314,11 +280,8 @@ export default function CreateComputerConfigurationForm() {
             name="otherRequests"
             rows={6}
             placeholder="Additional info, special requests, or questions"
-            style={{
-              ...fieldInputStyle,
-              resize: 'vertical', /* Allow vertical resize only */
-              minHeight: '120px',
-            }}
+            className="form-input"
+            style={{ resize: 'vertical', minHeight: '120px' }}
           />
 
           {/* Submit button row: centered inside the form card */}
@@ -326,17 +289,7 @@ export default function CreateComputerConfigurationForm() {
             <button
               type="submit"
               disabled={status === 'sending'}
-              style={{
-                backgroundColor: status === 'sending' ? '#86efac' : '#16a34a', /* Green-300 when disabled, Green-600 otherwise */
-                color: '#ffffff',
-                border: 'none',
-                padding: '12px 80px', /* Matches .submitBtn padding in service-request/page.module.css */
-                borderRadius: '6px',
-                fontSize: '0.9375rem',
-                fontWeight: '600',
-                cursor: status === 'sending' ? 'not-allowed' : 'pointer',
-                transition: 'background-color 0.15s ease',
-              }}
+              className={`btn-primary btn-wide${status === 'sending' ? ' opacity-50 cursor-not-allowed' : ''}`}
             >
               {status === 'sending' ? 'Submitting...' : 'Submit'}
             </button>

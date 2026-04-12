@@ -6,7 +6,6 @@
 
 /* Main settings area */
 .settings-main {
-  flex: 1;
   padding: 32px;
   background: transparent;
   display: grid;
@@ -15,60 +14,66 @@
   align-content: start;
   justify-content: flex-start;
   gap: 18px;
-  position: relative;
 }
 
 .settings-panel {
   width: 360px;
   max-width: 100%;
   min-height: 260px;
-  background: #e2e8f0;
-  border: 1px solid #cbd5e1;
-  border-radius: 14px;
+  background: var(--form-card-bg);
+  border: 1px solid var(--form-card-border);
+  border-radius: var(--form-card-radius);
   padding: 28px 28px 30px;
-  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.12);
+  box-shadow: var(--form-card-shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   align-self: start;
   text-align: center;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+/* Push button to bottom of card regardless of content height */
+.settings-panel .open-modal-btn {
+  margin-top: auto;
+  padding-top: 14px;
 }
 
 .settings-panel h2 {
   margin: 0 0 8px;
-  font-size: 20px;
-  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--section-heading-color);
+  font-family: inherit;
 }
 
 .settings-panel p {
   margin: 0 0 18px;
-  color: #475569;
-  font-size: 14px;
+  color: var(--label-color);
+  font-size: var(--label-font-size);
   line-height: 1.5;
+  font-family: inherit;
 }
 
 .open-modal-btn {
-  background: #2563eb;
-  color: #ffffff;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   border: none;
-  padding: 10px 18px;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
   cursor: pointer;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 14px;
+  border-radius: var(--btn-radius);
+  font-weight: var(--btn-font-weight);
+  font-size: var(--btn-font-size);
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
   letter-spacing: 0.2px;
-  box-shadow: 0 10px 16px rgba(37, 99, 235, 0.2);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: background-color 0.15s ease;
 }
 
-.settings-panel .open-modal-btn {
-  margin-top: 14px;
-}
+/* open-modal-btn push-to-bottom handled above */
 
 .open-modal-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 20px rgba(37, 99, 235, 0.28);
+  background: var(--btn-primary-hover);
 }
 
 .modal-backdrop {
@@ -90,12 +95,12 @@
 
 .settings-card {
   width: min(540px, 100%);
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
-  border-radius: 18px;
+  background: var(--form-card-bg);
+  border: 1px solid var(--form-card-border);
+  border-radius: var(--form-card-radius);
   padding: 28px 30px 30px;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08),
-              0 6px 18px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--form-card-shadow);
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .settings-card__header {
@@ -108,8 +113,10 @@
 
 .settings-card__header h2 {
   margin: 12px 0 6px;
-  font-size: 22px;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: #0f172a;
+  font-family: inherit;
 }
 
 .settings-card__header p {
@@ -120,15 +127,14 @@
 }
 
 .settings-card__icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #eaf2ff;
-  color: #2563eb;
-  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.15);
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--btn-primary-bg);
 }
 
 /* Password form */
@@ -140,25 +146,25 @@
 
 .input-group label {
   display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 14px;
+  margin-bottom: var(--label-margin-bottom);
+  font-weight: var(--label-font-weight);
+  color: var(--label-color);
+  font-size: var(--label-font-size);
 }
 
 .input-row {
   display: flex;
   align-items: center;
-  border: 1px solid #d7dde6;
-  border-radius: 12px;
-  background: #f8fafc;
+  border: 1px solid var(--input-border);
+  border-radius: var(--input-radius);
+  background: var(--input-bg);
   padding: 0 12px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input-row:focus-within {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: var(--input-border-focus);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .input-icon {
@@ -171,8 +177,8 @@
   border: none;
   background: transparent;
   padding: 12px 10px;
-  font-size: 14px;
-  color: #0f172a;
+  font-size: var(--input-font-size);
+  color: var(--input-text);
   outline: none;
 }
 
@@ -206,16 +212,22 @@
 
 .save-btn {
   margin-top: 8px;
-  background: #2563eb;
-  color: #ffffff;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   border: none;
-  padding: 12px 18px;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
   cursor: pointer;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 14px;
+  border-radius: var(--btn-radius);
+  font-weight: var(--btn-font-weight);
+  font-size: var(--btn-font-size);
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
   letter-spacing: 0.2px;
-  box-shadow: 0 12px 20px rgba(37, 99, 235, 0.2);
+  transition: background-color 0.15s ease;
+  width: 100%;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--btn-primary-hover);
 }
 
 .save-btn:disabled {

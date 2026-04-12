@@ -109,7 +109,7 @@ export default async function DashboardPage() {
         </section>
 
         <section className="mt-8">
-          <DashboardOrdersPanel supabaseUrl={SUPABASE_URL} supabaseAnonKey={SUPABASE_ANON} />
+          <DashboardOrdersPanel />
         </section>
       </main>
     </div>
