@@ -564,9 +564,9 @@ export default function Header() {
                 <AnimatePresence>
                   {profileOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
                       className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl"
                     >
                       <div className="bg-[#E2E8F0] px-4 py-4">

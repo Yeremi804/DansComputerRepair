@@ -142,12 +142,12 @@ export default function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-[1000]">
+    <div className="fixed bottom-6 right-6 z-[1000] pointer-events-none">
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-[1000] h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-xl shadow-blue-500/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="pointer-events-auto fixed bottom-6 right-6 z-[1000] h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-xl shadow-blue-500/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           aria-label="Open chatbot"
         >
           <span className="text-2xl leading-none">✦</span>

@@ -13,11 +13,11 @@ export default function FAQPage() {
         },
         {
             question: "How do I schedule a repair or service?",
-            answer: "You can schedule a repair or service by contacting us through our website, giving us a call, or visiting our shop during business hours."
+            answer: "You can schedule a repair or service by contacting us through our website, giving us a call, or reaching out via Yelp. We will work with you to find a convenient time for your appointment."
         },
         {
             question: "What is your turnaround time for repairs?",
-            answer: "Turnaround time varies depending on the issue and parts availability, but we typically aim to complete repairs within 3-5 business days."
+            answer: "Turnaround time varies depending on the issue and parts availability, but we typically aim to complete repairs within 24 hours."
         },
         {
             question: "Do you offer on-site support?",
