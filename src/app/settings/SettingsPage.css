@@ -101,6 +101,30 @@
   padding: 28px 30px 30px;
   box-shadow: var(--form-card-shadow);
   font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  z-index: 1;
+}
+
+.modal-close-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
 .settings-card__header {

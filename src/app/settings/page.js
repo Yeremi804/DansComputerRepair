@@ -9,6 +9,7 @@ import {
   EyeOff,
   ShieldCheck,
   Mail,
+  X,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import "./SettingsPage.css";
@@ -129,14 +130,19 @@ export default function SettingsPage() {
   // -----------------------------
   // Modal focus / escape handling
   // -----------------------------
+  const closeAllModals = () => {
+    setIsModalOpen(false);
+    setIsNameModalOpen(false);
+    setIsEmailModalOpen(false);
+    setIsMfaUnenrollOpen(false);
+  };
+
   useEffect(() => {
-    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen) return;
+    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen && !isMfaUnenrollOpen) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setIsModalOpen(false);
-        setIsNameModalOpen(false);
-        setIsEmailModalOpen(false);
+        closeAllModals();
       }
     };
 
@@ -146,7 +152,7 @@ export default function SettingsPage() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isModalOpen, isNameModalOpen, isEmailModalOpen]);
+  }, [isModalOpen, isNameModalOpen, isEmailModalOpen, isMfaUnenrollOpen]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -743,6 +749,14 @@ export default function SettingsPage() {
           <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsModalOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <div className="settings-card__icon">
                     <ShieldCheck size={26} />
@@ -893,6 +907,14 @@ export default function SettingsPage() {
               onClick={(event) => event.stopPropagation()}
             >
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsMfaUnenrollOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <div className="settings-card__icon">
                     <ShieldCheck size={26} />
@@ -985,6 +1007,14 @@ export default function SettingsPage() {
           <div className="modal-backdrop" onClick={() => setIsNameModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsNameModalOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <h2>Update Name</h2>
                   <p>Enter your preferred first and last name for the header profile display.</p>
@@ -1036,6 +1066,14 @@ export default function SettingsPage() {
           <div className="modal-backdrop" onClick={() => setIsEmailModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsEmailModalOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <div className="settings-card__icon">
                     <Mail size={26} />
