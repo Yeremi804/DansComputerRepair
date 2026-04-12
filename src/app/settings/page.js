@@ -14,6 +14,7 @@ import Sidebar from "../components/Sidebar";
 import "./SettingsPage.css";
 
 import { showPasswordChangeSuccess, showPasswordChangeError } from "../../lib/toastNotifs";
+import { defaultCaptchaStyle } from "@/lib/captchaStyle";
 
 /**
  * SettingsPage
@@ -43,6 +44,11 @@ export default function SettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Editing Captcha Style
+  const[isCaptchaModalOpen, setIsCaptchaModalOpen] = useState(false);
+  const [captchaStyle, setCaptchaStyle] = useState(defaultCaptchaStyle);
+  const [captchaLoading, setCaptchaLoading] = useState(false);
 
   // modal + MFA state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -107,6 +113,35 @@ export default function SettingsPage() {
     }
   };
 
+  const handleSaveCaptchaStyle = async () => {
+  setCaptchaLoading(true);
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error || !session?.access_token) {
+      throw new Error("Not authenticated");
+    }
+
+    const res = await fetch('/api/captcha-style', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(captchaStyle),
+    });
+
+    if (!res.ok) throw new Error('Failed to save');
+    pushToast("success", "Captcha style updated.");
+    setIsCaptchaModalOpen(false);
+  } catch (err) {
+    pushToast("error", "Failed to update captcha style.");
+    console.error(err);
+  } finally {
+    setCaptchaLoading(false);
+  }
+};
+
+
   // Logout helper
   const handleLogoutAfterMfaUnenroll = async () => {
     // clear server-side session/cookies
@@ -130,13 +165,14 @@ export default function SettingsPage() {
   // Modal focus / escape handling
   // -----------------------------
   useEffect(() => {
-    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen) return;
+    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen && !isCaptchaModalOpen) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsModalOpen(false);
         setIsNameModalOpen(false);
         setIsEmailModalOpen(false);
+        setIsCaptchaModalOpen(false);
       }
     };
 
@@ -146,7 +182,7 @@ export default function SettingsPage() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isModalOpen, isNameModalOpen, isEmailModalOpen]);
+  }, [isModalOpen, isNameModalOpen, isEmailModalOpen, isCaptchaModalOpen]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -168,7 +204,22 @@ export default function SettingsPage() {
       setLastName(String(meta.lastName || "").trim());
     };
 
+   const loadCaptchaStyle = async () => {
+  try {
+    const res = await fetch('/api/captcha-style');
+    if (res.ok) {
+      const style = await res.json();
+      setCaptchaStyle(style);
+    } else {
+      setCaptchaStyle(defaultCaptchaStyle);
+    }
+  } catch {
+    setCaptchaStyle(defaultCaptchaStyle);
+  }
+};
+
     loadProfileName();
+    loadCaptchaStyle();
   }, []);
 
   // -----------------------------
@@ -737,6 +788,18 @@ export default function SettingsPage() {
           </button>
         </div>
 
+        <div className= "settings-panel">
+          <h2>Captcha Style</h2>
+          <p>Customize the appearance of your CAPTCHA challenges.</p>
+          <button
+            className="open-modal-btn"
+            type="button"
+            onClick={() => setIsCaptchaModalOpen(true)}
+          >
+            Edit Captcha Style
+          </button>
+        </div>
+
         {isModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
@@ -982,6 +1045,76 @@ export default function SettingsPage() {
             </div>
           </div>
         )}
+
+        {isCaptchaModalOpen && (
+  <div className="modal-backdrop" onClick={() => setIsCaptchaModalOpen(false)}>
+    <div className="modal" onClick={(event) => event.stopPropagation()}>
+      <div className="settings-card">
+        <div className="settings-card__header">
+          <h2>Customize Captcha Style</h2>
+          <p>Adjust the visual settings for the captcha.</p>
+        </div>
+        <form className="password-form">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="input-group">
+              <label>Width</label>
+              <input type="number" value={captchaStyle.width} onChange={(e) => setCaptchaStyle({...captchaStyle, width: +e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Height</label>
+              <input type="number" value={captchaStyle.height} onChange={(e) => setCaptchaStyle({...captchaStyle, height: +e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Background Color</label>
+              <input type="color" value={captchaStyle.background} onChange={(e) => setCaptchaStyle({...captchaStyle, background: e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Text Color</label>
+              <input type="color" value={captchaStyle.textColor} onChange={(e) => setCaptchaStyle({...captchaStyle, textColor: e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Font Family</label>
+              <input type="text" value={captchaStyle.fontFamily} onChange={(e) => setCaptchaStyle({...captchaStyle, fontFamily: e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Font Size</label>
+              <input type="number" value={captchaStyle.fontSize} onChange={(e) => setCaptchaStyle({...captchaStyle, fontSize: +e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Letter Spacing</label>
+              <input type="number" value={captchaStyle.letterSpacing} onChange={(e) => setCaptchaStyle({...captchaStyle, letterSpacing: +e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Line Color</label>
+              <input type="color" value={captchaStyle.lineColor} onChange={(e) => setCaptchaStyle({...captchaStyle, lineColor: e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Line Width</label>
+              <input type="number" value={captchaStyle.lineWidth} onChange={(e) => setCaptchaStyle({...captchaStyle, lineWidth: +e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Line Opacity</label>
+              <input type="number" step="0.1" value={captchaStyle.lineOpacity} onChange={(e) => setCaptchaStyle({...captchaStyle, lineOpacity: +e.target.value})} />
+            </div>
+            <div className="input-group">
+              <label>Captcha Length</label>
+              <input type="number" min="1" max="10" value={captchaStyle.captchaLength} onChange={(e) => setCaptchaStyle({...captchaStyle, captchaLength: +e.target.value})} />
+            </div>
+          </div>
+          <motion.button
+            type="button"
+            className="save-btn"
+            whileHover={{ scale: 1.02 }}
+            disabled={captchaLoading}
+            onClick={handleSaveCaptchaStyle}
+          >
+            {captchaLoading ? "Saving..." : "Save Changes"}
+          </motion.button>
+        </form>
+      </div>
+    </div>
+  </div>
+)}
 
         {isNameModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsNameModalOpen(false)}>
