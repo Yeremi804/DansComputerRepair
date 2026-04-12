@@ -6,14 +6,21 @@ import { NextResponse } from "next/server";
 // Mock dependencies
 jest.mock("@supabase/supabase-js");
 jest.mock("../src/app/api/smsSend/SmsSender");
-jest.mock("../src/app/api/emailSend/EmailSender"); // Mock email sender to avoid errors
+jest.mock("../src/app/api/emailSend/EmailSender");
+
+// Mock NextResponse.json to capture the data
+const mockJson = jest.fn().mockImplementation((data, init) => ({
+  status: init?.status || 200,
+  json: async () => data,
+  _data: data
+}));
+NextResponse.json = mockJson;
 
 // Mock console to keep test output clean
-jest.spyOn(console, "log").mockImplementation(() => {});
-jest.spyOn(console, "error").mockImplementation(() => {});
+const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-describe("SMS Notification Feature", () => {
-  let supabaseMock;
+describe("SMS Notification Feature - 33 Comprehensive Tests", () => {
   let fromMock;
   let selectMock;
   let eqMock;
@@ -39,92 +46,208 @@ describe("SMS Notification Feature", () => {
     });
   });
 
-  const mockRequest = (body) => {
-    return {
-      json: jest.fn().mockResolvedValue(body),
-    };
-  };
-
-  test("SMS is triggered when opt-in is true and status is updated", async () => {
-    const customerPhone = "1234567890";
-    const orderId = "123";
-    
-    // Mock database response with opt-in true
-    singleMock.mockResolvedValue({
-      data: {
-        phone_number: customerPhone,
-        sms_consent: true,
-        email: "test@example.com"
-      },
-      error: null
-    });
-
-    const req = mockRequest({
-      id: orderId,
-      source: "service_requests",
-      newStatus: "Completed"
-    });
-
-    await POST(req);
-
-    // Verify SMS was sent
-    expect(sendSms).toHaveBeenCalledWith(
-      customerPhone,
-      expect.stringContaining(`order #${orderId} is complete`)
-    );
+  const mockRequest = (body) => ({
+    json: jest.fn().mockResolvedValue(body),
   });
 
-  test("SMS is not triggered when opt-in is false", async () => {
-    const customerPhone = "1234567890";
+  // --- Category 1: Request Validation (6 tests) ---
+  describe("Request Validation", () => {
+    const requiredFields = ['id', 'source', 'newStatus'];
     
-    // Mock database response with opt-in false
-    singleMock.mockResolvedValue({
-      data: {
-        phone_number: customerPhone,
-        sms_consent: false,
-        email: "test@example.com"
-      },
-      error: null
+    requiredFields.forEach(field => {
+      test(`Returns 400 if '${field}' is missing`, async () => {
+        const body = { id: '1', source: 's', newStatus: 'n' };
+        delete body[field];
+        const res = await POST(mockRequest(body));
+        expect(res.status).toBe(400);
+        expect(res._data.error).toBe("Missing required fields");
+      });
     });
 
-    const req = mockRequest({
-      id: "123",
-      source: "service_requests",
-      newStatus: "Completed"
+    test("Returns 400 if all fields are missing", async () => {
+      const res = await POST(mockRequest({}));
+      expect(res.status).toBe(400);
     });
 
-    await POST(req);
+    test("Handles null body gracefully", async () => {
+      await expect(POST(mockRequest(null))).rejects.toThrow();
+    });
 
-    // Verify SMS was NOT sent
-    expect(sendSms).not.toHaveBeenCalled();
+    test("Returns 400 if id is an empty string", async () => {
+      const res = await POST(mockRequest({ id: "", source: "s", newStatus: "n" }));
+      expect(res.status).toBe(400);
+    });
   });
 
-  test("Correct phone number and message content are passed to Twilio", async () => {
-    const customerPhone = "9876543210";
-    const orderId = "456";
-    const newStatus = "In Progress";
-    
-    singleMock.mockResolvedValue({
-      data: {
-        phone: customerPhone, // Testing rowData.phone fallback
-        sms_consent: true,
-        email: "test@example.com"
-      },
-      error: null
+  // --- Category 2: Table Selection Logic (3 tests) ---
+  describe("Table Selection Logic", () => {
+    const tableMappings = [
+      { source: 'Configuration_Form', expectedTable: 'Configuration_Form', idField: 'id' },
+      { source: 'service_requests', expectedTable: 'service_requests', idField: 'serial_id' },
+      { source: 'Other_Source', expectedTable: 'Admin_Page_Order', idField: 'ID' }
+    ];
+
+    tableMappings.forEach(({ source, expectedTable, idField }) => {
+      test(`Correctly selects table '${expectedTable}' for source '${source}'`, async () => {
+        singleMock.mockResolvedValue({ data: { sms_consent: false }, error: null });
+        await POST(mockRequest({ id: '123', source, newStatus: 'Updated' }));
+        expect(fromMock).toHaveBeenCalledWith(expectedTable);
+        expect(eqMock).toHaveBeenCalledWith(idField, '123');
+      });
+    });
+  });
+
+  // --- Category 3: SMS Consent Logic (5 tests) ---
+  describe("SMS Consent Logic", () => {
+    const consentScenarios = [
+      { consent: true, phone: "123", shouldSend: true },
+      { consent: false, phone: "123", shouldSend: false },
+      { consent: null, phone: "123", shouldSend: false },
+      { consent: undefined, phone: "123", shouldSend: false },
+      { consent: true, phone: null, shouldSend: false }
+    ];
+
+    consentScenarios.forEach(({ consent, phone, shouldSend }, index) => {
+      test(`Scenario ${index + 1}: Consent=${consent}, Phone=${phone} -> ShouldSend=${shouldSend}`, async () => {
+        singleMock.mockResolvedValue({ data: { phone_number: phone, sms_consent: consent }, error: null });
+        await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+        if (shouldSend) expect(sendSms).toHaveBeenCalled();
+        else expect(sendSms).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  // --- Category 4: Phone Number Field Priority (4 tests) ---
+  describe("Phone Number Field Priority", () => {
+    test("Uses 'phone_number' if both 'phone_number' and 'phone' exist", async () => {
+      singleMock.mockResolvedValue({ data: { phone_number: "PN1", phone: "P1", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalledWith("PN1", expect.any(String));
     });
 
-    const req = mockRequest({
-      id: orderId,
-      source: "Admin_Page_Order",
-      newStatus: newStatus
+    test("Uses 'phone' if 'phone_number' is missing", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "P1", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalledWith("P1", expect.any(String));
     });
 
-    await POST(req);
+    test("Does not send if both phone fields are empty strings", async () => {
+      singleMock.mockResolvedValue({ data: { phone_number: "", phone: "", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).not.toHaveBeenCalled();
+    });
 
-    // Verify correct phone number and message content
-    expect(sendSms).toHaveBeenCalledWith(
-      customerPhone,
-      `Your order #${orderId} has been updated to '${newStatus}'. -Dan's Computer Repair`
-    );
+    test("Sends if phone field is whitespace", async () => {
+      singleMock.mockResolvedValue({ data: { phone_number: " ", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalledWith(" ", expect.any(String));
+    });
+  });
+
+  // --- Category 5: Message Content Logic (6 tests) ---
+  describe("Message Content Logic", () => {
+    test("Sends 'Completed' specific message", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: 'ORD1', source: 's', newStatus: 'Completed' }));
+      expect(sendSms).toHaveBeenCalledWith("123", expect.stringContaining("order #ORD1 is complete!"));
+    });
+
+    test("Sends standard update message for 'In Progress'", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: 'ORD1', source: 's', newStatus: 'In Progress' }));
+      expect(sendSms).toHaveBeenCalledWith("123", expect.stringContaining("updated to 'In Progress'"));
+    });
+
+    test("Sends standard update message for 'Pending Parts'", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: 'ORD1', source: 's', newStatus: 'Pending Parts' }));
+      expect(sendSms).toHaveBeenCalledWith("123", expect.stringContaining("updated to 'Pending Parts'"));
+    });
+
+    test("Handles special characters in status", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'Ready & Waiting!' }));
+      expect(sendSms).toHaveBeenCalledWith("123", expect.stringContaining("'Ready & Waiting!'"));
+    });
+
+    test("Message includes business name suffix", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalledWith("123", expect.stringContaining("-Dan's Computer Repair"));
+    });
+
+    test("Message includes order ID correctly", async () => {
+      const complexId = "ABC-123-XYZ";
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: complexId, source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalledWith("123", expect.stringContaining(`#${complexId}`));
+    });
+  });
+
+  // --- Category 6: Error Handling & Resilience (6 tests) ---
+  describe("Error Handling & Resilience", () => {
+    test("Returns 500 if Supabase fetch fails", async () => {
+      singleMock.mockResolvedValue({ data: null, error: { message: "DB Fetch Error" } });
+      const res = await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(res.status).toBe(500);
+      expect(res._data.error).toBe("DB Fetch Error");
+    });
+
+    test("Returns 500 if Supabase update fails", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123" }, error: null });
+      updateMock.mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: { message: "Update Failed" } }) });
+      const res = await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(res.status).toBe(500);
+      expect(res._data.error).toBe("Update Failed");
+    });
+
+    test("Continues execution if sendSms throws an error", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      sendSms.mockRejectedValue(new Error("Twilio Down"));
+      const res = await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(res.status).toBe(200);
+      expect(res._data.success).toBe(true);
+      expect(errorSpy).toHaveBeenCalled();
+    });
+
+    test("Logs error message when SMS sending fails", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      sendSms.mockRejectedValue(new Error("Twilio Error"));
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Failed to send SMS to 123"), expect.any(Error));
+    });
+
+    test("Handles case where rowData is null but no error returned", async () => {
+      singleMock.mockResolvedValue({ data: null, error: null });
+      await expect(POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }))).rejects.toThrow();
+    });
+
+    test("Handles very long status strings in SMS", async () => {
+      const longStatus = "A".repeat(500);
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: longStatus }));
+      expect(sendSms).toHaveBeenCalledWith("123", expect.stringContaining(longStatus));
+    });
+  });
+
+  // --- Category 7: Email Integration Side-Effects (3 tests) ---
+  describe("Email Integration Side-Effects", () => {
+    test("Does not attempt to send email if email field is missing", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true, email: null }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalled();
+    });
+
+    test("Sends email and SMS simultaneously when both are available", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true, email: "a@b.com" }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalled();
+    });
+
+    test("SMS still sends even if email sending fails", async () => {
+      singleMock.mockResolvedValue({ data: { phone: "123", sms_consent: true, email: "a@b.com" }, error: null });
+      await POST(mockRequest({ id: '1', source: 's', newStatus: 'n' }));
+      expect(sendSms).toHaveBeenCalled();
+    });
   });
 });

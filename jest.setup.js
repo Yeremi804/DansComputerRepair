@@ -22,7 +22,20 @@ try {
       if (!headers.has("content-type")) {
         headers.set("content-type", "application/json");
       }
-      return new global.Response(body, { ...init, headers });
+      const res = new global.Response(body, { ...init, headers });
+      // Attach the body to the response object for our polyfilled json() method
+      res._body = body;
+      return res;
+    };
+  }
+  
+  // Ensure instance.json() works correctly
+  if (global.Response && global.Response.prototype && !global.Response.prototype.json) {
+    global.Response.prototype.json = async function() {
+      if (this._body) return JSON.parse(this._body);
+      // If undici's Response doesn't expose body easily, we might need to read it
+      const text = await this.text();
+      return JSON.parse(text);
     };
   }
 } catch {
@@ -53,7 +66,10 @@ try {
         this.status = init.status || 200;
         this.headers = new global.Headers(init.headers);
       }
-      async json() { return JSON.parse(this._body); }
+      async json() { 
+        if (!this._body) return null;
+        return JSON.parse(this._body); 
+      }
       async text() { return this._body; }
       static json(data, init = {}) {
         const body = JSON.stringify(data);
