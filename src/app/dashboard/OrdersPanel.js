@@ -97,8 +97,8 @@ function StatusBadge({ status, row, router }) {
   // Restore original color logic (as in your previous version)
   let colorClass = '';
   if (key.includes('pending')) colorClass = 'bg-gray-200 text-gray-900';
-  else if (key.includes('in progress') || key.includes('in-progress') || key.includes('progress')) colorClass = 'bg-green-200 text-green-900';
-  else if (key.includes('complete')) colorClass = 'bg-blue-200 text-blue-900';
+  else if (key.includes('in progress') || key.includes('in-progress') || key.includes('progress')) colorClass = 'bg-blue-200 text-blue-900';
+  else if (key.includes('complete')) colorClass = 'bg-green-200 text-green-900';
   else if (key.includes('cancel')) colorClass = 'bg-red-200 text-red-900';
   else colorClass = 'bg-blue-200 text-blue-900';
 
@@ -266,7 +266,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     if (row.Source === 'Configuration_Form') {
       return (
         <tr>
-          <td colSpan={7} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
+          <td colSpan={6} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
             {/* Top meta bar — order ID + date stamp (Shopify/Stripe header pattern) */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -340,7 +340,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     } else if (row.Source === 'service_requests') {
       return (
         <tr>
-          <td colSpan={7} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
+          <td colSpan={6} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
             {/* Top meta bar */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -404,7 +404,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
             value={searchTerm}
             onChange={event => setSearchTerm(event.target.value)}
             placeholder="Search orders"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full rounded border border-gray-400 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-500"
           />
         </div>
 
@@ -468,7 +468,6 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
               <th className="w-44 px-3 py-2 font-semibold">Status</th>
               <th className="w-40 px-3 py-2 font-semibold">Date</th>
               <th className="px-3 py-2 font-semibold">Notes</th>
-              <th className="w-52 px-3 py-2 font-semibold">Source</th>
             </tr>
           </thead>
           <tbody className="text-gray-900">
@@ -496,7 +495,6 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                     {normalizeValue(row, 'Dates')}
                   </td>
                   <td className="px-3 py-3 align-top">{row.Notes}</td>
-                  <td className="w-52 px-3 py-3 align-top">{row.Source}</td>
                 </tr>
                 {expandedRow === row.ID && renderDetails(row)}
               </React.Fragment>
@@ -504,7 +502,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
             {filteredRows.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className="px-3 py-6 text-center text-sm text-gray-500"
                 >
                   No orders match the search.
