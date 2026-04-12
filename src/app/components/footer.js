@@ -182,7 +182,8 @@ export function Footer() {
 
       {/* Map */}
       <div className="max-w-6xl mx-auto px-6">
-        <div className="mt-4 h-72 md:h-96 w-full rounded overflow-hidden border">
+        <h3 className="font-semibold mb-3">Our Service Area</h3>
+        <div className="h-72 md:h-96 w-full rounded overflow-hidden border">
           <MapComponent />
         </div>
       </div>
