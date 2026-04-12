@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { askGemini } from "../actions";
+import { supabase } from "@/lib/supabase/client";
 
 export const UNKNOWN_RESPONSE =
   "I’m not sure based on that. Please submit a service request with your device details and issue summary so the team can follow up with the right next steps.";
@@ -87,7 +88,33 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [chatbotVisible, setChatbotVisible] = useState(true);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+
   const messageEndRef = useRef(null);
+
+  useEffect(() => {
+    async function loadChatbotVisibility() {
+      const { data, error } = await supabase
+        .from("site_content")
+        .select("published")
+        .eq("key", "chatbot_settings")
+        .maybeSingle();
+    
+        if (error) {
+          console.error("failed to load chatbot settings:", error);
+          setChatbotVisible(true);
+          setSettingsLoading(false);
+          return;
+        }
+
+        setChatbotVisible(data?.published?.enabled ?? true);
+        setSettingsLoading(false);
+      }
+
+      loadChatbotVisibility();
+  }, []);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -140,6 +167,9 @@ export default function Chatbot() {
       handleSend();
     }
   }
+
+  if (settingsLoading) return null;
+  if (!chatbotVisible) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-[1000]">
