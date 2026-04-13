@@ -204,11 +204,12 @@ export default function Chatbot() {
         </button>
       )}
 
-      <div
-        className={`w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border shadow-2xl transition-all duration-200 ${
-          isOpen ? "pointer-events-auto scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
-        } ${isDark ? "border-gray-700 bg-gray-900 shadow-black/40" : "border-slate-200 bg-white shadow-slate-900/20"}`}
-      >
+      {isOpen && (
+        <div
+          className={`pointer-events-auto w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border shadow-2xl transition-all duration-200 ${
+            isDark ? "border-gray-700 bg-gray-900 shadow-black/40" : "border-slate-200 bg-white shadow-slate-900/20"
+          }`}
+        >
         <div className="flex items-center justify-between bg-gradient-to-r from-sky-600 to-blue-700 px-4 py-3 text-white">
           <div>
             <p className="text-sm font-semibold">Dan&apos;s Assistant</p>
@@ -280,7 +281,7 @@ export default function Chatbot() {
             </button>
           </div>
         </div>
-      </div>
+        </div>
       )}
     </div>
   );
