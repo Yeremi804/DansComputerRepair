@@ -142,7 +142,7 @@ export default function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-[1000] pointer-events-none">
+    <div className="pointer-events-none fixed bottom-6 right-6 z-[1000]">
       {!isOpen && (
         <button
           type="button"
@@ -154,10 +154,9 @@ export default function Chatbot() {
         </button>
       )}
 
+      {isOpen && (
       <div
-        className={`w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 transition-all duration-200 ${
-          isOpen ? "pointer-events-auto scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
-        }`}
+        className="pointer-events-auto w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 transition-all duration-200"
       >
         <div className="flex items-center justify-between bg-gradient-to-r from-sky-600 to-blue-700 px-4 py-3 text-white">
           <div>
@@ -229,6 +228,7 @@ export default function Chatbot() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

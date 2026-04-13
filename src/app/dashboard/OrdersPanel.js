@@ -467,8 +467,8 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
               <th className="w-52 px-3 py-2 font-semibold">Customer</th>
               <th className="w-44 px-3 py-2 font-semibold">Status</th>
               <th className="w-40 px-3 py-2 font-semibold">Date</th>
-              <th className="px-3 py-2 font-semibold">Notes</th>
-              <th className="w-52 px-3 py-2 font-semibold">Source</th>
+              <th className="w-[28%] min-w-[220px] px-3 py-2 font-semibold whitespace-nowrap">Notes</th>
+              <th className="w-[18%] min-w-[170px] px-3 py-2 font-semibold whitespace-nowrap">Source</th>
             </tr>
           </thead>
           <tbody className="text-gray-900">
@@ -495,8 +495,16 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                   <td className="w-40 px-3 py-3 align-top whitespace-nowrap">
                     {normalizeValue(row, 'Dates')}
                   </td>
-                  <td className="px-3 py-3 align-top">{row.Notes}</td>
-                  <td className="w-52 px-3 py-3 align-top">{row.Source}</td>
+                  <td className="w-[28%] min-w-[220px] px-3 py-3 align-top">
+                    <div className="max-w-full truncate whitespace-nowrap" title={row.Notes || ''}>
+                      {row.Notes}
+                    </div>
+                  </td>
+                  <td className="w-[18%] min-w-[170px] px-3 py-3 align-top">
+                    <div className="max-w-full truncate whitespace-nowrap" title={row.Source || ''}>
+                      {row.Source}
+                    </div>
+                  </td>
                 </tr>
                 {expandedRow === row.ID && renderDetails(row)}
               </React.Fragment>

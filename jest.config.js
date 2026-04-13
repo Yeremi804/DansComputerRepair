@@ -7,6 +7,7 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testEnvironment: "jest-environment-jsdom",
+  verbose: true,
   
   // Map the @/ alias to src/ — this fixes "Cannot find module '@/lib/supabase/client'"
   moduleNameMapper: {

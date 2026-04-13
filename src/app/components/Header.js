@@ -65,6 +65,9 @@ export default function Header() {
     { label: "Contact", path: "/contact-form" },
   ];
 
+  const desktopNavButtonClass =
+    "whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium text-main-text transition-colors duration-200 hover:bg-slate-100 hover:text-slate-900";
+
   //creating function to switch the theme between light and dark mode
   const toggleTheme = () => {
     //flipes the dark class on the <html> tag
@@ -317,10 +320,10 @@ export default function Header() {
     <header className="w-full border-b border-gray-200 bg-main-bg text-main-text transition-colors duration-300">
       {/* Notification sound */}
       <audio ref={audioRef} src="/notify.mp3" preload="auto"/>
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:gap-6 lg:px-8 lg:py-3">
         {/* Brand */}
         <div
-          className="flex items-center gap-3 min-w-0 cursor-pointer"
+          className="flex min-w-0 shrink-0 cursor-pointer items-center gap-2.5 lg:gap-3"
           onClick={() => handleNavigation("/")}
           role="button"
           tabIndex={0}
@@ -330,13 +333,13 @@ export default function Header() {
             alt="Dan's Computer Repair Logo"
             width="64"
             height="64"
-            className="h-12 w-12 md:h-16 md:w-16 rounded-md object-contain flex-shrink-0"
+            className="h-10 w-10 rounded-md object-contain md:h-12 md:w-12 lg:h-14 lg:w-14"
           />
-          <div className="leading-tight">
-            <h1 className="font-semibold tracking-tight text-main-text">
+          <div className="min-w-0 leading-tight">
+            <h1 className="text-xl font-semibold tracking-tight text-main-text sm:text-2xl lg:text-[1.65rem]">
               Dan&apos;s Computer Repair
             </h1>
-            <p className="text-sm text-main-text">
+            <p className="text-sm text-main-text/80 sm:text-base">
               IT Services and Computer Repair
             </p>
           </div>
@@ -347,7 +350,8 @@ export default function Header() {
           onClick={toggleTheme}
           whileHover={hover}
           whileTap={tap}
-          className={`ml-4 rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200`}
+          className="hidden shrink-0 items-center rounded-md px-2.5 py-1.5 text-sm font-medium text-main-text transition-colors duration-200 hover:bg-slate-100 lg:flex"
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
           <AnimatePresence mode="wait">
             <motion.span
@@ -356,7 +360,7 @@ export default function Header() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5 whitespace-nowrap"
             >
               {isDark ? (
                 <>
@@ -367,7 +371,7 @@ export default function Header() {
                   >
                     🌞
                   </motion.span>
-                  Light Mode
+                  Light
                 </>
               ) : (
                 <>
@@ -378,7 +382,7 @@ export default function Header() {
                   >
                     🌚
                   </motion.span>
-                  Dark Mode
+                  Dark
                 </>
               )}
             </motion.span>
@@ -386,8 +390,8 @@ export default function Header() {
         </MotionButton>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:block">
-          <ul className="flex items-center gap-4">
+        <nav className="hidden min-w-0 flex-1 justify-end lg:flex">
+          <ul className="flex min-w-0 items-center gap-1.5 lg:gap-2">
             {links.map((l) => (
               <li key={l.path}>
                 <MotionButton
@@ -395,7 +399,7 @@ export default function Header() {
                   onClick={() => handleNavigation(l.path)}
                   whileHover={hover}
                   whileTap={tap}
-                  className="rounded px-2 py-1 text-main-text hover:text-gray-900 hover:underline hover:bg-red-100"
+                  className={desktopNavButtonClass}
                 >
                   {l.label}
                 </MotionButton>
@@ -409,7 +413,7 @@ export default function Header() {
                   // Notifications button
                   type="button"
                   onClick={() => setNotifOpen((v) => !v)}
-                  className="relative rounded p-2 text-gray-700 hover:bg-gray-100"
+                  className="relative rounded-md p-2 text-slate-700 transition-colors hover:bg-slate-100"
                   aria-label="Notifications"
                 >
                   <Bell className="h-5 w-5" />
@@ -550,7 +554,7 @@ export default function Header() {
                   onClick={() => setProfileOpen((v) => !v)}
                   whileHover={hover}
                   whileTap={tap}
-                  className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-800 shadow-sm hover:border-slate-400"
+                  className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-800 shadow-sm transition-colors hover:border-slate-400"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E2E8F0] text-xs font-semibold text-slate-800">
                     {initials || "U"}
@@ -615,13 +619,24 @@ export default function Header() {
         </nav>
 
         {/* Mobile Hamburger Button */}
-        <div className="md:hidden flex items-center gap-2">
+        <div className="flex items-center gap-2 lg:hidden">
+          <MotionButton
+            type="button"
+            onClick={toggleTheme}
+            whileHover={hover}
+            whileTap={tap}
+            className="rounded-md px-2 py-2 text-main-text transition-colors duration-200 hover:bg-slate-100"
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? "🌞" : "🌚"}
+          </MotionButton>
+
           {/* Mobile notifications bell (admin pages only) */}
           {!checking && userPresent && isAdmin && isAdminPage && (
             <button
               type="button"
               onClick={() => setNotifOpen((v) => !v)}
-              className="relative rounded p-2 text-gray-700 hover:bg-gray-100"
+              className="relative rounded-md p-2 text-gray-700 hover:bg-gray-100"
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5" />
@@ -634,7 +649,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="rounded px-3 py-2 text-main-text hover:bg-gray-100"
+              className="rounded-md px-3 py-2 text-main-text hover:bg-gray-100"
           >
             {open ? "✕" : "☰"}
           </button>
@@ -648,7 +663,7 @@ export default function Header() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden overflow-hidden border-t border-gray-200 bg-main-bg text-main-text transition-colors duration-300"
+            className="lg:hidden overflow-hidden border-t border-gray-200 bg-main-bg text-main-text transition-colors duration-300"
           >
             <div className="mx-auto max-w-6xl px-4 py-3">
               <ul className="flex flex-col gap-2">
@@ -720,7 +735,7 @@ export default function Header() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="md:hidden px-4 pt-3"
+            className="lg:hidden px-4 pt-3"
           >
             <div className="overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl">
               {/* Header */}
