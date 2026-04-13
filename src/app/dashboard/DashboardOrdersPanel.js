@@ -2,7 +2,6 @@
 import { useEffect, useState, useRef } from "react";
 import { supabase } from '@/lib/supabase/client';
 import OrdersPanel from "./OrdersPanel";
-import { supabase } from "@/lib/supabase/client";
 
 export default function DashboardOrdersPanel() {
   const RUN_TESTS = true; // Set to true to enable testing logs in the console

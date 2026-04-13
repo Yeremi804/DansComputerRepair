@@ -1097,7 +1097,7 @@ export default function SettingsPage() {
                     className="save-btn"
                   >
                     Confirm Unenroll
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
@@ -1167,7 +1167,7 @@ export default function SettingsPage() {
             onClick={handleSaveCaptchaStyle}
           >
             {captchaLoading ? "Saving..." : "Save Changes"}
-          </button>
+          </motion.button>
         </form>
       </div>
     </div>
