@@ -10,11 +10,31 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
   const [filterSource, setFilterSource] = useState('all');
   const [sortOrder, setSortOrder] = useState('date-desc');
   const [loading, setLoading] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   const supabase = useMemo(
     () => createClient(supabaseUrl, supabaseAnonKey),
     [supabaseUrl, supabaseAnonKey]
   );
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -100,56 +120,56 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h1 className="text-3xl font-bold text-main-text">Customer Reviews</h1>
 
-        <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-200">
-          <Filter size={18} className="text-gray-500" />
+        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
+          <Filter size={18} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
           <select
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
-            className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700"
+            className={`bg-transparent border-none focus:ring-0 text-sm font-medium outline-none ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
           >
-            <option value="all">All Sources</option>
-            <option value="local">Local Site</option>
-            <option value="yelp">Yelp.com</option>
+            <option value="all" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>All Sources</option>
+            <option value="local" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Local Site</option>
+            <option value="yelp" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Yelp.com</option>
           </select>
         </div>
 
-        <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-200">
-          <ArrowUpDown size={18} className="text-gray-500" />
+        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
+          <ArrowUpDown size={18} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700"
+            className={`bg-transparent border-none focus:ring-0 text-sm font-medium outline-none ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
           >
-            <option value="date-desc">Newest First</option>
-            <option value="date-asc">Oldest First</option>
-            <option value="rating-desc">Highest Rated</option>
-            <option value="rating-asc">Lowest Rated</option>
+            <option value="date-desc" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Newest First</option>
+            <option value="date-asc" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Oldest First</option>
+            <option value="rating-desc" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Highest Rated</option>
+            <option value="rating-asc" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Lowest Rated</option>
           </select>
         </div>
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading reviews...</p>
+        <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Loading reviews...</p>
       ) : (
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {filteredAndSortedReviews.length === 0 ? (
-            <p className="text-gray-500 col-span-full">No reviews found.</p>
+            <p className={`col-span-full ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No reviews found.</p>
           ) : (
             filteredAndSortedReviews.map((review) => (
               <div
                 key={review.id}
-                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col"
+                className={`p-6 rounded-xl border shadow-sm hover:shadow-md transition-shadow flex flex-col ${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-lg ${isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600'}`}>
                       {review.name ? review.name.charAt(0).toUpperCase() : '?'}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{review.name || 'Anonymous'}</h3>
-                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{review.name || 'Anonymous'}</h3>
+                      <span className={`text-xs flex items-center gap-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                         {dayjs(review.created_at).format('MMM D, YYYY')}
-                        <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                        <span className={`w-1 h-1 rounded-full ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></span>
                         {review.source}
                       </span>
                     </div>
@@ -157,7 +177,11 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
                   <button
                     onClick={() => handleToggleVisibility(review)}
                     className={`transition-colors p-1 ${
-                      review.show_on_site ? 'text-green-600 hover:text-green-700' : 'text-gray-400 hover:text-gray-600'
+                      review.show_on_site
+                        ? 'text-green-600 hover:text-green-700'
+                        : isDark
+                          ? 'text-gray-500 hover:text-gray-300'
+                          : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={review.show_on_site ? 'Hide from site' : 'Show on site'}
                   >
@@ -170,12 +194,12 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
                     <Star
                       key={i}
                       size={16}
-                      className={`${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+                      className={`${i < review.rating ? 'text-yellow-400 fill-yellow-400' : isDark ? 'text-gray-700' : 'text-gray-200'}`}
                     />
                   ))}
                 </div>
 
-                <p className="text-gray-600 text-sm leading-relaxed flex-1">
+                <p className={`text-sm leading-relaxed flex-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                   "{review.review_text || review.comment}"
                 </p>
               </div>

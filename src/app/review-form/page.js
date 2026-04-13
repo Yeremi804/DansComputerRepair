@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 export default function ReviewFormPage() {
@@ -11,6 +11,26 @@ export default function ReviewFormPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState({});
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
@@ -190,11 +210,11 @@ export default function ReviewFormPage() {
     width: "100%",
     boxSizing: "border-box",
     padding: "10px 12px",
-    border: "1px solid #cbd5e1",
+    border: isDark ? "1px solid #475569" : "1px solid #cbd5e1",
     borderRadius: "6px",
     fontSize: "14px",
-    color: "#1e293b",
-    backgroundColor: "#ffffff",
+    color: isDark ? "#e2e8f0" : "#1e293b",
+    backgroundColor: isDark ? "#0f172a" : "#ffffff",
     outline: "none",
   };
 
@@ -202,15 +222,15 @@ export default function ReviewFormPage() {
     display: "block",
     fontSize: "0.875rem",
     fontWeight: "500",
-    color: "#475569",
+    color: isDark ? "#cbd5e1" : "#475569",
     marginBottom: "6px",
   };
 
   const sectionHeadingStyle = {
     fontWeight: "600",
-    color: "#334155",
+    color: isDark ? "#e2e8f0" : "#334155",
     paddingBottom: "8px",
-    borderBottom: "1px solid #e2e8f0",
+    borderBottom: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
     marginBottom: "20px",
   };
 
@@ -232,10 +252,10 @@ export default function ReviewFormPage() {
 
         {/* Card */}
         <div style={{
-          border: "1px solid #e2e8f0",
+          border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
           borderRadius: "8px",
           padding: "32px",
-          backgroundColor: "#ffffff",
+          backgroundColor: isDark ? "#111827" : "#ffffff",
           boxShadow: "0 4px 6px -1px rgba(11,63,115,0.12), 0 2px 4px -1px rgba(11,63,115,0.08)",
         }}>
 
@@ -269,7 +289,7 @@ export default function ReviewFormPage() {
                 onChange={handleChange}
                 style={{
                   ...fieldInputStyle,
-                  borderColor: errors.name ? "#dc2626" : "#cbd5e1",
+                  borderColor: errors.name ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1"),
                 }}
               />
 
@@ -291,7 +311,7 @@ export default function ReviewFormPage() {
                 onChange={handleChange} 
                 style={
                   { ...fieldInputStyle,
-                      borderColor: errors.emailOrPhone ? "#dc2626" : "#cbd5e1" 
+                      borderColor: errors.emailOrPhone ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1") 
             }}
                  />
               {errors.emailOrPhone && (
@@ -311,7 +331,7 @@ export default function ReviewFormPage() {
                 onChange={handleChange} 
                 style={
                   { ...fieldInputStyle,
-                      borderColor: errors.reviewTitle ? "#dc2626" : "#cbd5e1"
+                      borderColor: errors.reviewTitle ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1")
                    }}
                  />
               {errors.reviewTitle && (
@@ -334,7 +354,7 @@ export default function ReviewFormPage() {
                   onClick={() => setFormData(prev => ({ ...prev, rating: String(star) }))}
                   onMouseEnter={() => setHover(star)}
                   onMouseLeave={() => setHover(null)}
-                  style={{ color: star <= (hover || Number(formData.rating)) ? "#facc15" : "#cbd5e1" }}
+                  style={{ color: star <= (hover || Number(formData.rating)) ? "#facc15" : (isDark ? "#475569" : "#cbd5e1") }}
                 >
                   ★
                 </span>
@@ -360,7 +380,7 @@ export default function ReviewFormPage() {
               rows={6}
               style={{ ...fieldInputStyle,
                  minHeight: "120px", resize: "vertical",
-                 borderColor: errors.reviewText ? "#dc2626" : "#cbd5e1"
+                 borderColor: errors.reviewText ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1")
               }}
               placeholder="Write your review here..."
               maxLength={500}
@@ -445,7 +465,7 @@ export default function ReviewFormPage() {
                 cursor: "pointer",
               }}
             >
-              Submit Review
+              {uploading ? "Submitting..." : "Submit Review"}
             </button>
           </div>
 

@@ -11,6 +11,7 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);  // used by supabase
   const [error, setError] = useState("");  // used by supabase
   const [rememberMe, setRememberMe] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   // Captcha states that enable captcah to pop up, store the svg, store the user input, store the error message, and store the verification status
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaSvg, setCaptchaSvg] = useState("");
@@ -46,6 +47,25 @@ export default function AdminLoginPage() {
       setPassword(rememberedPassword);
       setRememberMe(true);
     }
+  }, []);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   //Function to verify the captcha input against the cookie value
@@ -293,16 +313,16 @@ export default function AdminLoginPage() {
         <h1 className="text-3xl font-semibold mb-6">Admin Log in</h1>
 
         {/* Card Area */}
-        <div className="border border-neutral-300 rounded-md bg-white">
+        <div className={`border rounded-md ${isDark ? "border-gray-700 bg-gray-900" : "border-neutral-300 bg-white"}`}>
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-4">
             {/* Email Only */}
             <div>
-              <label className="text-black text-sm mb-1">Email address</label>
+              <label className={`block text-sm mb-1 ${isDark ? "text-gray-300" : "text-slate-800"}`}>Email address</label>
               <input
                 type="email"
                 name="email"
                 placeholder="Enter email address "
-                className="w-full border border-black rounded-sm px-3 py-2 text-black"
+                className={`w-full border rounded-sm px-3 py-2 ${isDark ? "border-gray-600 bg-gray-800 text-white placeholder:text-gray-400" : "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400"}`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -311,12 +331,12 @@ export default function AdminLoginPage() {
 
             {/* Password + Eye toggle */}
             <div>
-              <label className="block text-black text-sm mb-1">Password</label>
-              <div className="relative text-black">
+              <label className={`block text-sm mb-1 ${isDark ? "text-gray-300" : "text-slate-800"}`}>Password</label>
+              <div className={`relative ${isDark ? "text-white" : "text-slate-900"}`}>
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                  className={`w-full border rounded-sm px-3 py-2 pr-10 ${isDark ? "border-gray-600 bg-gray-800 text-white" : "border-slate-300 bg-white text-slate-900"}`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -325,7 +345,7 @@ export default function AdminLoginPage() {
                   type="button"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-neutral-500 hover:text-black cursor-pointer"
+                  className={`absolute right-3 top-2.5 cursor-pointer ${isDark ? "text-gray-400 hover:text-white" : "text-slate-500 hover:text-slate-900"}`}
                 >
                   {showPassword ? (
                     <EyeOff size={18} strokeWidth={1.5} />
@@ -343,12 +363,12 @@ export default function AdminLoginPage() {
               <div
                 // When the user clicks this box, it sets showCaptcha to true, which triggers the drawer to open with the captcha inside.
                 onClick={() => setShowCaptcha(true)}
-                className="border border-neutral-300 p-4 rounded-sm flex items-center gap-3 bg-neutral-50 cursor-pointer mb-2"
+                className={`border p-4 rounded-sm flex items-center gap-3 cursor-pointer mb-2 ${isDark ? "border-gray-700 bg-gray-800" : "border-slate-300 bg-slate-50"}`}
               >
-                <div className="w-6 h-6 border-2 rounded-sm border-neutral-400 flex items-center justify-center">
-                  {showCaptcha && <div className="w-3 h-3 bg-black rounded-sm" />}
+                <div className={`w-6 h-6 border-2 rounded-sm flex items-center justify-center ${isDark ? "border-gray-500" : "border-slate-400"}`}>
+                  {showCaptcha && <div className={`w-3 h-3 rounded-sm ${isDark ? "bg-white" : "bg-black"}`} />}
                 </div>
-                <span className="text-sm text-black font-medium">
+                <span className={`text-sm font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
                   I am not a robot 🤖
                 </span>
               </div>
@@ -356,10 +376,10 @@ export default function AdminLoginPage() {
 
             {/*This pops open when showCaptcha is true */}
             {showCaptcha && !captchaVerified && (
-              <div className="border border-neutral-300 p-4 mb-4 space-y-4 bg-white animate-in slide-in-from-top-1">
+              <div className={`border p-4 mb-4 space-y-4 animate-in slide-in-from-top-1 ${isDark ? "border-gray-700 bg-gray-900" : "border-slate-300 bg-white"}`}>
                 {/* The SVG Image open from the string of line to have it shown on clients*/}
                 <div
-                  className="bg-neutral-100 p-2 rounded-sm flex justify-center pointer-events-none"
+                  className={`p-2 rounded-sm flex justify-center pointer-events-none ${isDark ? "bg-gray-800" : "bg-slate-100"}`}
                   dangerouslySetInnerHTML={{ __html: captchaSvg }}
                 />
 
@@ -368,7 +388,7 @@ export default function AdminLoginPage() {
                   type="text"
                   // If there is a captcha error, show that as the placeholder. Otherwise, show the default "Type the characters above"
                   placeholder={captchaError ? captchaError : "Type the characters above"}
-                  className="w-full border text-black border-black rounded-sm px-3 py-2 pointer-events-auto"
+                  className={`w-full border rounded-sm px-3 py-2 pointer-events-auto ${isDark ? "text-white border-gray-600 bg-gray-800 placeholder:text-red-400" : "text-slate-900 border-slate-300 bg-white placeholder:text-slate-500"}`}
                   value={captchaInput}
                   onChange={(e) => setCaptchaInput(e.target.value)}
                 />
@@ -378,7 +398,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={fetchCaptcha}
-                  className="w-full bg-black text-white py-2 rounded-sm text-sm font-medium pointer-events-auto"
+                  className={`w-full py-2 rounded-sm text-sm font-medium pointer-events-auto ${isDark ? "bg-white text-black hover:bg-gray-200" : "bg-slate-900 text-white hover:bg-slate-800"}`}
                 >
                   {captchaVerified ? "Verifying..." : "Check"}
                 </button>
@@ -387,8 +407,8 @@ export default function AdminLoginPage() {
 
             {/* Remember me + Forgot password */}
             <div className="flex items-center justify-between text-sm mb-8">
-              <label className="flex items-center text-black gap-2">
-                <input type="checkbox" className="accent-black" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+              <label className={`flex items-center gap-2 ${isDark ? "text-gray-300" : "text-slate-800"}`}>
+                <input type="checkbox" className={isDark ? "accent-white" : "accent-slate-900"} checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                 Remember me
               </label>
               <button
@@ -399,7 +419,7 @@ export default function AdminLoginPage() {
                   setForgotPasswordError("");
                   setForgotPasswordMessage("");
                 }}
-                className="text-blue-600 hover:underline cursor-pointer"
+                className={`cursor-pointer ${isDark ? "text-blue-400 hover:underline" : "text-blue-600 hover:underline"}`}
               >
                 Forgot password?
               </button>
@@ -411,8 +431,10 @@ export default function AdminLoginPage() {
               disabled={loading || !captchaVerified}
               className={`w-full font-medium py-2 rounded-sm mt-2 cursor-pointer transition-colors ${
                 captchaVerified
-                  ? "bg-[#8fbd7e] hover:bg-[#6dab5c] text-white"
-                  : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                  : isDark
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-slate-200 text-slate-500 cursor-not-allowed"
               }`}
             >
               {loading ? "Loading..." : "Sign In"}
@@ -420,12 +442,12 @@ export default function AdminLoginPage() {
           </form>
 
           {/* Divider and Sign up */}
-          <div className="border-t border-neutral-300 p-6 flex justify-end items-center gap-2">
-            <span className="text-sm text-neutral-600">Or</span>
+          <div className={`border-t p-6 flex justify-end items-center gap-2 ${isDark ? "border-gray-700" : "border-slate-300"}`}>
+            <span className={`text-sm ${isDark ? "text-gray-400" : "text-slate-600"}`}>Or</span>
             <button
               type="button"
               onClick={() => router.push("/create-admin-account")}
-              className="bg-[#7e9dbd] hover:bg-[#5d7b99] text-white font-medium px-4 py-2 rounded-sm cursor-pointer"
+              className={`font-medium px-4 py-2 rounded-sm cursor-pointer ${isDark ? "bg-slate-600 hover:bg-slate-500 text-white" : "bg-slate-600 hover:bg-slate-700 text-white"}`}
             >
               Sign up
             </button>
@@ -436,18 +458,18 @@ export default function AdminLoginPage() {
       {/* Forgot Password Popup */}
       {forgotPasswordOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="w-full max-w-md bg-white rounded-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-2xl font-semibold text-[#273043]">
+          <div className={`w-full max-w-md rounded-md p-6 space-y-4 shadow-xl ${isDark ? "bg-gray-900" : "bg-white"}`}>
+            <h2 className={`text-2xl font-semibold ${isDark ? "text-white" : "text-[#273043]"}`}>
               Reset Password
             </h2>
-            <p className="text-sm text-black">
+            <p className={`text-sm ${isDark ? "text-gray-300" : "text-slate-800"}`}>
               Enter your email address and we will send you a password reset link.
             </p>
 
             <form onSubmit={handleForgotPassword} className="space-y-3">
               <input
                 type="email"
-                className="w-full border border-black rounded-sm px-3 py-2"
+                className={`w-full border rounded-sm px-3 py-2 ${isDark ? "border-gray-600 bg-gray-800 text-white placeholder:text-gray-400" : "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400"}`}
                 placeholder="Enter email address"
                 value={forgotPasswordEmail}
                 onChange={(e) => setForgotPasswordEmail(e.target.value)}
@@ -468,7 +490,7 @@ export default function AdminLoginPage() {
               <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   type="button"
-                  className="px-4 py-2 border border-neutral-400 rounded-sm cursor-pointer"
+                  className={`px-4 py-2 rounded-sm cursor-pointer border ${isDark ? "border-gray-600 text-white hover:bg-gray-800" : "border-slate-300 text-slate-900 hover:bg-slate-100"}`}
                   onClick={() => {
                     setForgotPasswordOpen(false);
                     setForgotPasswordError("");
@@ -480,7 +502,7 @@ export default function AdminLoginPage() {
                 <button
                   type="submit"
                   disabled={forgotPasswordLoading}
-                  className="px-4 py-2 bg-black text-white rounded-sm cursor-pointer"
+                  className={`${isDark ? "bg-white text-black hover:bg-gray-200" : "bg-slate-900 text-white hover:bg-slate-800"} px-4 py-2 rounded-sm cursor-pointer`}
                 >
                   {forgotPasswordLoading ? "Sending..." : "Send Link"}
                 </button>
@@ -493,9 +515,9 @@ export default function AdminLoginPage() {
       {/* MFA Popup */}
       {mfaOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="w-full max-w-sm bg-white rounded-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-lg text-black text-main-text">Two-factor Verification</h2>
-            <p className="text-sm text-black">
+          <div className={`w-full max-w-sm rounded-md p-6 space-y-4 shadow-xl ${isDark ? "bg-gray-900" : "bg-white"}`}>
+            <h2 className={`text-lg ${isDark ? "text-white" : "text-slate-900"}`}>Two-factor Verification</h2>
+            <p className={`text-sm ${isDark ? "text-gray-300" : "text-slate-800"}`}>
               Enter the 6-digit code from your authenticator app.
             </p>
 
@@ -504,7 +526,7 @@ export default function AdminLoginPage() {
                 inputMode="numeric"
                 pattern="[0-9]{6}"
                 maxLength={6}
-                className="w-full border border-black rounded-sm px-3 py-2 text-black"
+                className={`w-full border rounded-sm px-3 py-2 ${isDark ? "border-gray-600 bg-gray-800 text-white placeholder:text-gray-400" : "border-slate-300 bg-white text-slate-900"}`}
                 placeholder="123456"
                 value={mfaCode}
                 onChange={(e) => setMfaCode(e.target.value)}
@@ -516,7 +538,7 @@ export default function AdminLoginPage() {
               <div className="flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  className="px-3 py-2 border rounded-sm cursor-pointer"
+                  className={`px-3 py-2 rounded-sm cursor-pointer border ${isDark ? "border-gray-600 text-white hover:bg-gray-800" : "border-slate-300 text-slate-900 hover:bg-slate-100"}`}
                   onClick={async () => {
                     setMfaOpen(false);
                     setMfaCode("");
@@ -527,7 +549,7 @@ export default function AdminLoginPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-2 bg-black text-white rounded-sm cursor-pointer"
+                  className={`${isDark ? "bg-white text-black hover:bg-gray-200" : "bg-slate-900 text-white hover:bg-slate-800"} px-3 py-2 rounded-sm cursor-pointer`}
                 >
                   Verify
                 </button>

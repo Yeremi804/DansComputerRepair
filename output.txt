@@ -1,0 +1,24 @@
+
+> danscomputerrepair@0.1.0 test
+> jest create-computer-configuration-form
+
+PASS test-scripts/create-computer-configuration-form.test.js (5.721 s)
+  CreateComputerConfigurationForm
+    √ renders the page title, sections, and key fields (142 ms)
+    √ fetches all option groups on mount (48 ms)
+    √ renders fetched select options with formatted prices (118 ms)
+    √ keeps working when option fetches fail (33 ms)
+    √ submits all entered values and sms consent in payload (3348 ms)
+    √ shows sending state while submit is in progress (153 ms)
+    √ resets fields and sms consent after successful submit (848 ms)
+    √ shows error state when submit fails (87 ms)
+    √ shows error state when submit throws (93 ms)
+    √ updates select inline text color when a real option is chosen (187 ms)
+    √ applies dark mode styles on initial render when html has dark class (32 ms)
+    √ renders light mode styles by default when html does not have dark class (27 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       12 passed, 12 total
+Snapshots:   0 total
+Time:        6.437 s, estimated 7 s
+Ran all test suites matching create-computer-configuration-form.

@@ -91,16 +91,16 @@ const MONTH_OPTIONS = [
 ];
 
 //badge component for status display
-function StatusBadge({ status, row, router }) {
+function StatusBadge({ status, row, router, isDark }) {
   const key = String(status || '').toLowerCase(); //uses tolowercase for easier comparison
 
   // Restore original color logic (as in your previous version)
   let colorClass = '';
-  if (key.includes('pending')) colorClass = 'bg-gray-200 text-gray-900';
-  else if (key.includes('in progress') || key.includes('in-progress') || key.includes('progress')) colorClass = 'bg-green-200 text-green-900';
-  else if (key.includes('complete')) colorClass = 'bg-blue-200 text-blue-900';
-  else if (key.includes('cancel')) colorClass = 'bg-red-200 text-red-900';
-  else colorClass = 'bg-blue-200 text-blue-900';
+  if (key.includes('pending')) colorClass = isDark ? 'bg-gray-700 text-white' : 'bg-gray-400/80 text-gray-900';
+  else if (key.includes('in progress') || key.includes('in-progress') || key.includes('progress')) colorClass = isDark ? 'bg-blue-900/90 text-blue-300' : 'bg-blue-300 text-blue-900';
+  else if (key.includes('complete')) colorClass = isDark ? 'bg-green-900/90 text-green-300' : 'bg-green-300 text-green-900';
+  else if (key.includes('cancel')) colorClass = isDark ? 'bg-red-900/90 text-red-300' : 'bg-red-300 text-red-900';
+  else colorClass = isDark ? 'bg-blue-900/90 text-blue-300' : 'bg-blue-300 text-blue-900';
 
   const handleStatusChange = async (Event) => {
     const newStatus = Event.target.value;
@@ -121,9 +121,10 @@ function StatusBadge({ status, row, router }) {
       <select
         value={status}
         onChange={handleStatusChange}
+        className={`bg-transparent outline-none ${isDark ? 'text-white' : 'text-gray-900'}`}
       >
         {STATUS_UPDATE_OPTIONS.map(option => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
             {option.label}
           </option>
         ))}
@@ -146,11 +147,11 @@ function normalizeValue(row, field) {
 // ─── Detail panel sub-components (modern UI) ──────────────────────────
 
 // Section card wrapper — white card with label, matches Shopify/Stripe sidebar card pattern
-function DetailCard({ title, children }) {
+function DetailCard({ title, children, isDark }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-gray-100 bg-gray-50">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">{title}</p>
+    <div className={`${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border overflow-hidden`}>
+      <div className={`px-4 py-2.5 border-b ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-gray-50'}`}>
+        <p className={`text-xs font-semibold uppercase tracking-widest ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>{title}</p>
       </div>
       <div className="px-4 py-3 flex flex-col gap-2.5">
         {children}
@@ -160,22 +161,22 @@ function DetailCard({ title, children }) {
 }
 
 // Single key-value row inside a card — label on top, value below (Shopify pattern)
-function DetailRow({ label, value }) {
+function DetailRow({ label, value, isDark }) {
   return (
     <div>
-      <p className="text-[11px] text-gray-400 font-medium mb-0.5">{label}</p>
-      <p className="text-sm text-gray-800 font-medium leading-snug">{value || 'N/A'}</p>
+      <p className={`text-[11px] font-medium mb-0.5 ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>{label}</p>
+      <p className={`text-sm font-medium leading-snug ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>{value || 'N/A'}</p>
     </div>
   );
 }
 
 // Spec chip — compact pill for hardware components (used in Config Form)
-function SpecChip({ label, value }) {
+function SpecChip({ label, value, isDark }) {
   if (!value) return null;
   return (
-    <div className="flex items-start gap-2 py-1.5 border-b border-gray-100 last:border-0">
-      <span className="text-xs text-gray-400 w-28 shrink-0 pt-0.5">{label}</span>
-      <span className="text-xs text-gray-800 font-medium leading-snug">{value}</span>
+    <div className={`flex items-start gap-2 py-1.5 border-b last:border-0 ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+      <span className={`text-xs w-28 shrink-0 pt-0.5 ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>{label}</span>
+      <span className={`text-xs font-medium leading-snug ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>{value}</span>
     </div>
   );
 }
@@ -191,6 +192,26 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
   const [sortField, setSortField] = useState('az');
   const [monthFilter, setMonthFilter] = useState('all');
   const [expandedRow, setExpandedRow] = useState(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const filteredRows = useMemo(() => {
     const byStatus =
@@ -266,19 +287,19 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     if (row.Source === 'Configuration_Form') {
       return (
         <tr>
-          <td colSpan={7} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
+          <td colSpan={7} className={`border-t px-4 py-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
             {/* Top meta bar — order ID + date stamp (Shopify/Stripe header pattern) */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+                <span className={`text-xs font-semibold uppercase tracking-widest ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   Order #{row.ID}
                 </span>
-                <span className="text-gray-300">·</span>
-                <span className="text-xs text-gray-400">
+                <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>·</span>
+                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>
                   {formatDateCALong(row.Dates)}
                 </span>
               </div>
-              <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${isDark ? 'bg-indigo-900/40 border border-indigo-700 text-indigo-300' : 'bg-indigo-50 border border-indigo-200 text-indigo-700'}`}>
                 Computer Configuration
               </span>
             </div>
@@ -287,49 +308,51 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 
               {/* Card 1: Customer — Budget Range & Intended Use here */}
-              <DetailCard title="Customer">
-                <DetailRow label="Name" value={row.Customer} />
-                <DetailRow label="Phone" value={row.phone} />
-                <DetailRow label="Email" value={row.email} />
+              <DetailCard title="Customer" isDark={isDark}>
+                <DetailRow label="Name" value={row.Customer} isDark={isDark} />
+                <DetailRow label="Phone" value={row.phone} isDark={isDark} />
+                <DetailRow label="Email" value={row.email} isDark={isDark} />
                 {/* Budget Range and Intended Use */}
-                <div className="mt-1 pt-2 border-t border-gray-100 flex flex-col gap-2">
+                <div className={`mt-1 pt-2 flex flex-col gap-2 ${isDark ? 'border-t border-gray-700' : 'border-t border-gray-100'}`}>
                   <DetailRow
                     label="Budget Range"
                     value={row.budget_range || 'Not specified'}
+                    isDark={isDark}
                   />
                   <DetailRow
                     label="Intended Use"
                     value={row.intended_use || 'Not specified'}
+                    isDark={isDark}
                   />
                 </div>
               </DetailCard>
 
               {/* Card 2: Component Specs — compact chip list pattern */}
-              <DetailCard title="Component Specifications">
-                <SpecChip label="Processor" value={row.cpu} />
-                <SpecChip label="Graphics Card" value={row.gpu} />
-                <SpecChip label="Memory" value={row.memory} />
-                <SpecChip label="Storage" value={row.storage} />
-                <SpecChip label="Motherboard" value={row.motherboard} />
+              <DetailCard title="Component Specifications" isDark={isDark}>
+                <SpecChip label="Processor" value={row.cpu} isDark={isDark} />
+                <SpecChip label="Graphics Card" value={row.gpu} isDark={isDark} />
+                <SpecChip label="Memory" value={row.memory} isDark={isDark} />
+                <SpecChip label="Storage" value={row.storage} isDark={isDark} />
+                <SpecChip label="Motherboard" value={row.motherboard} isDark={isDark} />
               </DetailCard>
 
               {/* Card 3: Build Details */}
-              <DetailCard title="Build Details">
-                <SpecChip label="Case" value={row.case} />
-                <SpecChip label="OS" value={row.operating_system} />
-                <SpecChip label="Power Supply" value={row.psu} />
-                <SpecChip label="Cooling" value={row.cooling} />
-                <SpecChip label="Networking" value={row.networking} />
+              <DetailCard title="Build Details" isDark={isDark}>
+                <SpecChip label="Case" value={row.case} isDark={isDark} />
+                <SpecChip label="OS" value={row.operating_system} isDark={isDark} />
+                <SpecChip label="Power Supply" value={row.psu} isDark={isDark} />
+                <SpecChip label="Cooling" value={row.cooling} isDark={isDark} />
+                <SpecChip label="Networking" value={row.networking} isDark={isDark} />
               </DetailCard>
             </div>
 
             {/* Notes — only shown if present, amber tinted (Shopify "Notes" card pattern) */}
             {(row.other_requests || row.Notes) && (
-              <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500 mb-1">
+              <div className={`mt-3 rounded-lg border px-4 py-3 ${isDark ? 'border-amber-700 bg-amber-900/20' : 'border-amber-200 bg-amber-50'}`}>
+                <p className={`text-[11px] font-semibold uppercase tracking-widest mb-1 ${isDark ? 'text-amber-300' : 'text-amber-500'}`}>
                   Notes / Other Requests
                 </p>
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
                   {row.other_requests || row.Notes}
                 </p>
               </div>
@@ -340,19 +363,19 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     } else if (row.Source === 'service_requests') {
       return (
         <tr>
-          <td colSpan={7} className="border-t border-gray-200 bg-gray-50 px-4 py-4">
+          <td colSpan={7} className={`border-t px-4 py-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
             {/* Top meta bar */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+                <span className={`text-xs font-semibold uppercase tracking-widest ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   Order #{row.ID}
                 </span>
-                <span className="text-gray-300">·</span>
-                <span className="text-xs text-gray-400">
+                <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>·</span>
+                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>
                   {formatDateCALong(row.Dates)}
                 </span>
               </div>
-              <span className="inline-flex items-center rounded-full bg-teal-50 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold text-teal-700">
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${isDark ? 'bg-teal-900/40 border border-teal-700 text-teal-300' : 'bg-teal-50 border border-teal-200 text-teal-700'}`}>
                 Service Request
               </span>
             </div>
@@ -361,27 +384,30 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
               {/* Card 1: Customer */}
-              <DetailCard title="Customer">
-                <DetailRow label="Name" value={row.Customer} />
-                <DetailRow label="Phone" value={row.phone_number} />
-                <DetailRow label="Email" value={row.email} />
-                <DetailRow label="Device Type" value={row.device_type} />
-                <DetailRow label="Service Type" value={row.service_type || 'No specification.'} />
+              <DetailCard title="Customer" isDark={isDark}>
+                <DetailRow label="Name" value={row.Customer} isDark={isDark} />
+                <DetailRow label="Phone" value={row.phone_number} isDark={isDark} />
+                <DetailRow label="Email" value={row.email} isDark={isDark} />
+                <DetailRow label="Device Type" value={row.device_type} isDark={isDark} />
+                <DetailRow label="Service Type" value={row.service_type || 'No specification.'} isDark={isDark} />
               </DetailCard>
 
               {/* Card 2: Problem Description */}
-              <DetailCard title="Problem Description">
+              <DetailCard title="Problem Description" isDark={isDark}>
                 <DetailRow
                   label="When did the problem start?"
                   value={row.problem_start_date || 'No specification.'}
+                  isDark={isDark}
                 />
                 <DetailRow
                   label="Do you know what caused it?"
                   value={row.problem_cause_idea || 'No specification.'}
+                  isDark={isDark}
                 />
                 <DetailRow
                   label="Additional questions"
                   value={row.additional_questions || 'No specification.'}
+                  isDark={isDark}
                 />
               </DetailCard>
             </div>
@@ -394,7 +420,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
   // ─────────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="rounded-lg bg-red-100 p-4 text-gray-900 shadow-sm hover:shadow-lg hover:border hover:border-pink-300">
+    <div className={`rounded-lg p-4 shadow-sm transition hover:shadow-lg ${isDark ? 'bg-gray-900 text-white border border-gray-700' : 'bg-slate-100 text-gray-900 border border-slate-300'}`}>
       {/* Top controls: search + filter */}
       <div className="mb-4 flex flex-wrap items-center gap-4">
         {/* Search input */}
@@ -404,20 +430,20 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
             value={searchTerm}
             onChange={event => setSearchTerm(event.target.value)}
             placeholder="Search orders"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={`w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${isDark ? 'border-gray-600 bg-gray-800 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'}`}
           />
         </div>
 
         {/* Status filter dropdown */}
-        <label className="flex items-center gap-2 text-sm font-medium text-gray-900">
+        <label className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
           <span>Status</span>
           <select
             value={statusFilter}
             onChange={event => setStatusFilter(event.target.value)}
-            className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={`rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${isDark ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
           >
             {STATUS_FILTER_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value} value={option.value} className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
                 {option.label}
               </option>
             ))}
@@ -425,15 +451,15 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
         </label>
 
         {/* Month filter dropdown */}
-        <label className="flex items-center gap-2 text-sm font-medium text-gray-900">
+        <label className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
           <span>Month</span>
           <select
             value={monthFilter}
             onChange={event => setMonthFilter(event.target.value)}
-            className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={`rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${isDark ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
           >
             {MONTH_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value} value={option.value} className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
                 {option.label}
               </option>
             ))}
@@ -441,15 +467,15 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
         </label>
 
         {/* Sort dropdown */}
-        <label className="flex items-center gap-2 text-sm font-medium text-gray-900">
+        <label className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
           <span>Sort</span>
           <select
             value={sortField}
             onChange={event => setSortField(event.target.value)}
-            className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={`rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${isDark ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
           >
             {SORT_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value} value={option.value} className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
                 {option.label}
               </option>
             ))}
@@ -458,10 +484,10 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
       </div>
 
       {/* Table wrapper with scroll */}
-      <div className="max-h-96 overflow-x-auto overflow-y-auto rounded border border-gray-200 bg-white">
+      <div className={`max-h-96 overflow-x-auto overflow-y-auto rounded border ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
         <table className="min-w-[1100px] w-full table-fixed border-collapse text-left text-sm">
-          <thead className="sticky top-0 bg-gray-50 text-gray-700">
-            <tr className="border-b-2 border-gray-200">
+          <thead className={`sticky top-0 ${isDark ? 'bg-gray-800 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
+            <tr className={`border-b-2 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
               <th className="w-10"></th>
               <th className="w-20 px-3 py-2 font-semibold">ID</th>
               <th className="w-52 px-3 py-2 font-semibold">Customer</th>
@@ -471,10 +497,10 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
               <th className="w-52 px-3 py-2 font-semibold">Source</th>
             </tr>
           </thead>
-          <tbody className="text-gray-900">
+          <tbody className={isDark ? 'text-gray-100' : 'text-gray-900'}>
             {filteredRows.map((row, index) => (
               <React.Fragment key={`${row.Source}-${row.ID ?? index}`}>
-                <tr className="odd:bg-white even:bg-gray-50">
+                <tr className={isDark ? 'odd:bg-gray-900 even:bg-gray-800/60' : 'odd:bg-white even:bg-gray-50'}>
                   <td className="w-10 px-1 py-3 align-top">
                     <button
                       className="text-lg cursor-pointer hover:opacity-70"
@@ -490,6 +516,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                       status={row.Status}
                       row={row}
                       router={router}
+                      isDark={isDark}
                     />
                   </td>
                   <td className="w-40 px-3 py-3 align-top whitespace-nowrap">
@@ -505,7 +532,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
               <tr>
                 <td
                   colSpan={7}
-                  className="px-3 py-6 text-center text-sm text-gray-500"
+                  className={`px-3 py-6 text-center text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
                 >
                   No orders match the search.
                 </td>

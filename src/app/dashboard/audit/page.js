@@ -24,7 +24,7 @@ export default async function AuditLogPage() {
   if (!SUPABASE_URL || !SUPABASE_ANON) {
     // Return a helpful message when the environment is not set, mainly for dev purposes
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 md:p-8 bg-main-bg text-main-text min-h-screen overflow-x-hidden">
         <h1 className="text-xl font-semibold">Audit Log</h1>
         <p className="mt-4 text-red-700">
           Missing Supabase environment variables. Set{" "}
@@ -39,23 +39,21 @@ export default async function AuditLogPage() {
   // Render the admin layout (sidebar + main). The DashboardAuditPanel is a
   // client component (it uses the browser Supabase client and hooks).
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-main-bg overflow-x-hidden">
       <Sidebar />
 
       {/* Main content area */}
-      <main className="flex-1 p-8 bg-main-bg">
+      <main className="flex-1 min-w-0 bg-main-bg px-3 pb-4 pt-24 sm:px-6 sm:pb-6 sm:pt-24 lg:p-8 overflow-x-hidden">
         <h1 className="mb-4 text-3xl text-main-text font-bold">Audit Log</h1>
 
-        {/*
-          DashboardAuditPanel is a client component that:
-            - receives the Supabase URL + anon key to initialize a client
-            - fetches recent audit_logs and displays them
-          Passing env vars from the server to the client via props (safe for anon key).
-        */}
-        <DashboardAuditPanel
-          supabaseUrl={SUPABASE_URL}
-          supabaseAnonKey={SUPABASE_ANON}
-        />
+        <div className="w-full max-w-full overflow-x-auto overflow-y-hidden">
+          <div className="min-w-[900px]">
+            <DashboardAuditPanel
+              supabaseUrl={SUPABASE_URL}
+              supabaseAnonKey={SUPABASE_ANON}
+            />
+          </div>
+        </div>
       </main>
     </div>
   );

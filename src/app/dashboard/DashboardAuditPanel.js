@@ -16,6 +16,26 @@ export default function DashboardAuditPanel() {
   // loading & error UI state
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Fetch the most recent 50 audit log rows on mount
   useEffect(() => {
@@ -48,18 +68,18 @@ export default function DashboardAuditPanel() {
   }, []);
 
   return (
-    <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] rounded-xl shadow-sm">
+    <div className={`p-4 rounded-xl shadow-sm border ${isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-slate-100 border-slate-300 text-gray-900"}`}>
       {/* Simple, clear loading / empty / error states */}
       {loading && <p>Loading audit logs...</p>}
-      {!loading && errorMsg && <p className="text-red-700">{errorMsg}</p>}
-      {!loading && !errorMsg && logs.length === 0 && <p>No audit logs found.</p>}
+      {!loading && errorMsg && <p className="text-red-700 dark:text-red-400">{errorMsg}</p>}
+      {!loading && !errorMsg && logs.length === 0 && <p className={isDark ? "text-gray-300" : ""}>No audit logs found.</p>}
 
       {/* Data table */}
       {!loading && !errorMsg && logs.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#cbd5e1]">
+              <tr className={`border-b ${isDark ? "border-gray-700" : "border-slate-300"}`}>
                 <th className="py-2 pr-4">Time</th>
                 <th className="py-2 pr-4">Actor</th>
                 <th className="py-2 pr-4">Action</th>
@@ -69,10 +89,17 @@ export default function DashboardAuditPanel() {
             </thead>
             <tbody>
               {logs.map((log) => (
-                <tr key={log.id} className="border-b border-[#cbd5e1]">
+                <tr key={log.id} className={`border-b ${isDark ? "border-gray-700" : "border-slate-300"}`}>
                   <td className="py-2 pr-4 whitespace-nowrap">
                     {/* Convert server timestamp to local string for readability */}
-                    {new Date(log.created_at).toLocaleString()}
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-sm">
+                        {new Date(log.created_at).toLocaleDateString()}
+                      </span>
+                      <span className="text-xs opacity-70">
+                        {new Date(log.created_at).toLocaleTimeString()}
+                      </span>
+                    </div>
                   </td>
 
                   {/* Actor email (falls back to an em dash if missing) */}

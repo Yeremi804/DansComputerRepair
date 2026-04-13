@@ -13,10 +13,30 @@ export default function Home() {
     
   const [index, setIndex] = useState(0);
   const [showYelp, setShowYelp] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   const reviews = showYelp ? yelpReviews : localReviews;
 
   useEffect(() => setIndex(0), [showYelp, localReviews.length]);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     async function fetchSiteContent() {
@@ -146,7 +166,7 @@ export default function Home() {
   const prevReview = () => setIndex((index - 1 + reviews.length) % reviews.length);
 
 return (
-  <main className="flex flex-col min-h-screen">
+  <main className="flex flex-col min-h-screen bg-main-bg text-main-text">
     {/* --- Blank space for future content --- */}
       <section className="flex-grow flex items-center justify-center"></section>
 
@@ -171,11 +191,23 @@ return (
           
           {/* General Services Section */}
           <div id="general-services" className="scroll-mt-20">
-            <div className="rounded-xl border border-gray-200 p-8 shadow-sm transition hover:shadow-lg hover:border-pink-300">
-              <h2 className="text-2xl font-semibold text-pink-800 mb-4">
+            <div
+              className="rounded-xl border p-8 shadow-sm transition hover:shadow-lg hover:border-pink-300"
+              style={{
+                borderColor: isDark ? "#374151" : "#e5e7eb",
+                backgroundColor: isDark ? "#0f172a" : "#ffffff",
+              }}
+            >
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: isDark ? "#f472b6" : "#9d174d" }}
+              >
                 Computer Repair & IT Services
               </h2>
-              <p className="text-lg leading-relaxed text-gray-700 mb-6">
+              <p
+                className="text-lg leading-relaxed mb-6"
+                style={{ color: isDark ? "#d1d5db" : "#374151" }}
+              >
                 Reliable, transparent service for laptops and desktops. We diagnose issues 
                 quickly, explain your options, and keep you updated at every step. Reach out 
                 any time to discuss your device.
@@ -183,69 +215,142 @@ return (
               
               <div className="grid gap-6 md:grid-cols-2 mb-6">
                 <div>
-                  <h3 className="text-xl font-semibold text-pink-800 mb-4">Services</h3>
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: isDark ? "#f472b6" : "#9d174d" }}
+                  >
+                    Services
+                  </h3>
                   <ul className="space-y-2">
                     <li className="flex gap-3 items-center">
                       <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
-                      <span className="text-gray-700">PC and Mac diagnostics</span>
+                      <span style={{ color: isDark ? "#d1d5db" : "#374151" }}>PC and Mac diagnostics</span>
                     </li>
                     <li className="flex gap-3 items-center">
                       <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
-                      <span className="text-gray-700">Virus and malware removal</span>
+                      <span style={{ color: isDark ? "#d1d5db" : "#374151" }}>Virus and malware removal</span>
                     </li>
                     <li className="flex gap-3 items-center">
                       <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
-                      <span className="text-gray-700">Hardware upgrades (RAM, SSD, GPU)</span>
+                      <span style={{ color: isDark ? "#d1d5db" : "#374151" }}>Hardware upgrades (RAM, SSD, GPU)</span>
                     </li>
                     <li className="flex gap-3 items-center">
                       <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
-                      <span className="text-gray-700">Data backup and recovery</span>
+                      <span style={{ color: isDark ? "#d1d5db" : "#374151" }}>Data backup and recovery</span>
                     </li>
                     <li className="flex gap-3 items-center">
                       <span className="h-2 w-2 rounded-full bg-pink-700 flex-shrink-0" />
-                      <span className="text-gray-700">Network setup and troubleshooting</span>
+                      <span style={{ color: isDark ? "#d1d5db" : "#374151" }}>Network setup and troubleshooting</span>
                     </li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-pink-800 mb-4">Service Steps</h3>
-                  <ol className="space-y-3 text-gray-700">
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: isDark ? "#f472b6" : "#9d174d" }}
+                  >
+                    Service Steps
+                  </h3>
+                  <ol className="space-y-3">
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">1.</span>
-                      <span className="leading-relaxed">Tell us what you need repaired or built.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        1.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        Tell us what you need repaired or built.
+                      </span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">2.</span>
-                      <span className="leading-relaxed">Schedule drop-off or on-site support.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        2.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        Schedule drop-off or on-site support.
+                      </span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">3.</span>
-                      <span className="leading-relaxed">Receive a clear estimate.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        3.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        Receive a clear estimate.
+                      </span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">4.</span>
-                      <span className="leading-relaxed">We repair, test, and verify your device.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        4.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        We repair, test, and verify your device.
+                      </span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">5.</span>
-                      <span className="leading-relaxed">Pick up or delivery with post-service guidance.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        5.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        Pick up or delivery with post-service guidance.
+                      </span>
                     </li>
                   </ol>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-gray-200 p-6 shadow-sm bg-gray-50">
-                <h3 className="text-xl font-semibold text-pink-800 mb-3">
+              <div
+                className="rounded-xl border p-6 shadow-sm"
+                style={{
+                  borderColor: isDark ? "#374151" : "#e5e7eb",
+                  backgroundColor: isDark ? "#1e293b" : "#f9fafb",
+                }}
+              >
+                <h3
+                  className="text-xl font-semibold mb-3"
+                  style={{ color: isDark ? "#f472b6" : "#9d174d" }}
+                >
                   Unsure of what you need?
                 </h3>
-                <p className="text-gray-700 leading-relaxed mb-4">
+                <p
+                  className="leading-relaxed mb-4"
+                  style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                >
                   Describe your issue and we&apos;ll recommend the right service,
                   timeline, and options to fit your budget.
                 </p>
                 <a
                   href="/service-request"
-                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 text-pink-700 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                  style={{ color: isDark ? "#f472b6" : "#be185d" }}
                 >
                   Start a Service Request
                 </a>
@@ -255,11 +360,23 @@ return (
 
           {/* Computer Configuration Section */}
           <div id="computer-configuration" className="scroll-mt-20">
-            <div className="rounded-xl border border-gray-200 p-8 shadow-sm transition hover:shadow-lg hover:border-pink-300">
-              <h2 className="text-2xl font-semibold text-pink-800 mb-4">
+            <div
+              className="rounded-xl border p-8 shadow-sm transition hover:shadow-lg hover:border-pink-300"
+              style={{
+                borderColor: isDark ? "#374151" : "#e5e7eb",
+                backgroundColor: isDark ? "#0f172a" : "#ffffff",
+              }}
+            >
+              <h2
+                className="text-2xl font-semibold mb-4"
+                style={{ color: isDark ? "#f472b6" : "#9d174d" }}
+              >
                 Custom PC Builds
               </h2>
-              <p className="text-lg leading-relaxed text-gray-700 mb-6">
+              <p
+                className="text-lg leading-relaxed mb-6"
+                style={{ color: isDark ? "#d1d5db" : "#374151" }}
+              >
                 Looking for a custom-built PC tailored to your needs? Whether it&apos;s for gaming, 
                 creative work, or business, we&apos;ll help you design and build the perfect system 
                 within your budget. Our expert team ensures quality parts, proper installation, and 
@@ -268,39 +385,97 @@ return (
               
               <div className="grid gap-6 md:grid-cols-2 mb-6">
                 <div>
-                  <h3 className="text-xl font-semibold text-pink-800 mb-4">Build Steps</h3>
-                  <ol className="space-y-3 text-gray-700">
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: isDark ? "#f472b6" : "#9d174d" }}
+                  >
+                    Build Steps
+                  </h3>
+                  <ol className="space-y-3">
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">1.</span>
-                      <span className="leading-relaxed">Tell us your needs and budget.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        1.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        Tell us your needs and budget.
+                      </span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">2.</span>
-                      <span className="leading-relaxed">We recommend the best components.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        2.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        We recommend the best components.
+                      </span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">3.</span>
-                      <span className="leading-relaxed">We build and test your system.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        3.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        We build and test your system.
+                      </span>
                     </li>
                     <li className="flex gap-3">
-                      <span className="font-semibold text-pink-700">4.</span>
-                      <span className="leading-relaxed">Pick up with setup guidance.</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: isDark ? "#f472b6" : "#be185d" }}
+                      >
+                        4.
+                      </span>
+                      <span
+                        className="leading-relaxed"
+                        style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                      >
+                        Pick up with setup guidance.
+                      </span>
                     </li>
                   </ol>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-gray-200 p-6 shadow-sm bg-gray-50">
-                <h3 className="text-xl font-semibold text-pink-800 mb-3">
+              <div
+                className="rounded-xl border p-6 shadow-sm"
+                style={{
+                  borderColor: isDark ? "#374151" : "#e5e7eb",
+                  backgroundColor: isDark ? "#1e293b" : "#f9fafb",
+                }}
+              >
+                <h3
+                  className="text-xl font-semibold mb-3"
+                  style={{ color: isDark ? "#f472b6" : "#9d174d" }}
+                >
                   Ready to build your dream PC?
                 </h3>
-                <p className="text-gray-700 leading-relaxed mb-4">
+                <p
+                  className="leading-relaxed mb-4"
+                  style={{ color: isDark ? "#d1d5db" : "#374151" }}
+                >
                   Use our Computer Configuration tool to select your components and get started. 
                   We&apos;ll guide you through the process and provide expert recommendations.
                 </p>
                 <a
                   href="/create-computer-configuration-form"
-                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 text-pink-700 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                  className="inline-flex w-full items-center justify-center rounded-md border border-pink-600 px-4 py-3 transition hover:bg-pink-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                  style={{ color: isDark ? "#f472b6" : "#be185d" }}
                 >
                   Go to Computer Configuration
                 </a>
@@ -322,8 +497,11 @@ return (
               <button
                 onClick={() => setShowYelp(!showYelp)}
                 setindex={0}
-            
-                  className="mb-8 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-800 transition"
+                className="mb-8 px-4 py-2 rounded transition"
+                style={{
+                  backgroundColor: isDark ? "#374151" : "#d1d5db",
+                  color: isDark ? "#ffffff" : "#000000",
+                }}
               >
                 {showYelp ? "Show Local Reviews" : "Show Yelp Reviews"}
               </button>
@@ -333,7 +511,11 @@ return (
               {/* < Button */}
               <button
                 onClick={prevReview}
-                className="text-3xl bg-white text-black px-4 py-2 rounded-full hover:bg-gray-700 transition"
+                className="text-3xl px-4 py-2 rounded-full transition"
+                style={{
+                  backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                  color: isDark ? "#ffffff" : "#000000",
+                }}
               >
                 {'<'}
               </button>
@@ -341,9 +523,13 @@ return (
             {/* Review box */}
             <div
   key={index}
-  className={`bg-gray-300 text-black rounded-lg p-8 w-full max-w-3xl min-h-[250px] flex flex-col justify-center text-center shadow-md ${
+  className={`rounded-lg p-8 w-full max-w-3xl min-h-[250px] flex flex-col justify-center text-center shadow-md ${
     showYelp ? "items-center" : ""
   }`}
+  style={{
+    backgroundColor: isDark ? "#1f2937" : "#d1d5db",
+    color: isDark ? "#ffffff" : "#000000",
+  }}
 >
 
   {!reviews[index] ? (
@@ -389,7 +575,11 @@ return (
             {/* > Button */}
             <button
               onClick={nextReview}
-              className="text-3xl bg-white text-black px-4 py-2 rounded-full hover:bg-gray-700 transition"
+              className="text-3xl px-4 py-2 rounded-full transition"
+              style={{
+                backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                color: isDark ? "#ffffff" : "#000000",
+              }}
             >
               {'>'}
             </button>

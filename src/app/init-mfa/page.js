@@ -1,5 +1,5 @@
 "use client";
-import { use, useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react"; // 2 icons for password state
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ export default function InitMFAPage() {
     const [showPassword, setShowPassword] = useState(false);  // hide password by default
     const [email, setEmail] = useState(""); // used by supabase
     const [password, setPassword] = useState(""); // used by supabase
+    const [isDark, setIsDark] = useState(false);
 
     // const [qrSVG, setQrSVG] = useState(null); //  holds the SVG for the QR code that pops up
     const [qrURI, setQrURI] = useState(null); // holds the URI for the MFA factor. A special link
@@ -17,6 +18,25 @@ export default function InitMFAPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        const syncTheme = () => {
+            setIsDark(document.documentElement.classList.contains("dark"));
+        };
+
+        syncTheme();
+
+        const observer = new MutationObserver(() => {
+            syncTheme();
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+
+        return () => observer.disconnect();
+    }, []);
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -79,35 +99,67 @@ export default function InitMFAPage() {
     }
 
     return (
-        <main className="min-h-screen bg-white text-black">
+        <main
+            className="min-h-screen"
+            style={{
+                backgroundColor: isDark ? "#030712" : "#ffffff",
+                color: isDark ? "#ffffff" : "#000000",
+            }}
+        >
             <section className="mx-auto max-w-3xl p-6">
                 <h1 className="text-3xl font-semibold mb-6">Initialize Your Multi-Factor Authentication</h1>
 
-                <div className="border border-neutral-300 rounded-md bg-white">
+                <div
+                    className="border rounded-md"
+                    style={{
+                        borderColor: isDark ? "#374151" : "#d4d4d8",
+                        backgroundColor: isDark ? "#111827" : "#ffffff",
+                    }}
+                >
                     <div className = "p-6 md:p-8">
                         {/* 2 Columns for the layout */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                             {/* The left column. This Holds the Form info. */}
                             <form onSubmit= {handleSubmit} className="space-y-10 flex flex-col justify-center h-full">
                                 <div>
-                                    <label className="block text-sm mb-1">Email address</label>
+                                    <label
+                                        className="block text-sm mb-1"
+                                        style={{ color: isDark ? "#e5e7eb" : "#111827" }}
+                                    >
+                                        Email address
+                                    </label>
                                     <input
                                     type="email"
                                     name="email"
                                     placeholder="Enter email address "
-                                    className="w-full border border-black rounded-sm px-3 py-2"
+                                    className="w-full rounded-sm px-3 py-2"
+                                    style={{
+                                        border: `1px solid ${isDark ? "#4b5563" : "#000000"}`,
+                                        backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                                        color: isDark ? "#ffffff" : "#111827",
+                                    }}
                                     value = {email}
                                     onChange= {(e) => setEmail(e.target.value)}
                                     required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm mb-1">Password</label>
+                                    <label
+                                        className="block text-sm mb-1"
+                                        style={{ color: isDark ? "#e5e7eb" : "#111827" }}
+                                    >
+                                        Password
+                                    </label>
                                         <div className="relative w-full">
                                             <input
                                             type={showPassword ? "text" : "password"}
                                             name="password"
-                                            className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                                            className="w-full rounded-sm px-3 py-2 pr-10"
+                                            style={{
+                                                border: `1px solid ${isDark ? "#4b5563" : "#000000"}`,
+                                                backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                                                color: isDark ? "#ffffff" : "#111827",
+                                            }}
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
@@ -115,7 +167,8 @@ export default function InitMFAPage() {
                                             <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-3 flex items-center text-neutral-500 hover:text-black cursor-pointer"
+                                            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                                            style={{ color: isDark ? "#9ca3af" : "#737373" }}
                                             tabIndex={-1}
                                             >
                                             {showPassword ? (
@@ -128,27 +181,52 @@ export default function InitMFAPage() {
                                 </div>
                                 <button
                                 type="submit"
-                                className="w-full bg-[#8fbd7e] hover:bg-[#6dab5c] text-white font-medium py-2 rounded-sm mt-2 cursor-pointer"
+                                className="w-full text-white font-medium py-2 rounded-sm mt-2 cursor-pointer"
+                                style={{ backgroundColor: "#8fbd7e" }}
                                 >
                                 Initialize a MFA Factor
                                 </button>
                                 {error && ( <div className="text-xs text-red-600 mt-2">{error}</div>)}
                             </form>
-                            <aside className="border border-dashed rounded-md p-4 bg-neutral-50 flex flex-col items-center justify-center aspect-square min-h-[220px] h-full">
+                            <aside
+                                className="border border-dashed rounded-md p-4 flex flex-col items-center justify-center aspect-square min-h-[220px] h-full"
+                                style={{
+                                    borderColor: isDark ? "#4b5563" : "#d4d4d8",
+                                    backgroundColor: isDark ? "#1f2937" : "#fafafa",
+                                }}
+                            >
                                 {qrURI ? (
                                 <div className="flex flex-col items-center break-all">
                                     <QRCodeSVG value={qrURI} size={190}></QRCodeSVG>
                                     <form onSubmit={verifyTOTP} className="flex items-center gap-2 w-full justify-center py-3">
-                                        <input className="border rounded px-2 py-1 text-center"
+                                        <input
+                                            className="rounded px-2 py-1 text-center"
+                                            style={{
+                                                border: `1px solid ${isDark ? "#4b5563" : "#d4d4d8"}`,
+                                                backgroundColor: isDark ? "#111827" : "#ffffff",
+                                                color: isDark ? "#ffffff" : "#111827",
+                                            }}
                                             inputMode="numeric"
                                             pattern="[0-9]{6}"
                                             maxLength={6}
                                             placeholder="123456"
                                             value={code}
                                             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                                            required></input>
+                                            required
+                                        ></input>
                                     </form>
-                                    <button type="submit" onClick={verifyTOTP} className="w-full px-3 py-1 border rounded bg-black text-white hover:opacity-80 cursor-pointer">Verify</button>
+                                    <button
+                                        type="submit"
+                                        onClick={verifyTOTP}
+                                        className="w-full px-3 py-1 rounded cursor-pointer"
+                                        style={{
+                                            border: `1px solid ${isDark ? "#ffffff" : "#000000"}`,
+                                            backgroundColor: isDark ? "#ffffff" : "#000000",
+                                            color: isDark ? "#000000" : "#ffffff",
+                                        }}
+                                    >
+                                        Verify
+                                    </button>
                                     {/* If successful, will show green text here */}
                                     {success && (<div className="text-green-600 text-sm text-center font-medium mt-2">MFA setup was successful. Redirecting…</div>)}
 
@@ -157,7 +235,10 @@ export default function InitMFAPage() {
                                     {error && <div className="text-sm text-center text-red-600">{error}</div>}
                                 </div>
                                 ) : (
-                                <div className="text-sm text-bold text-center text-neutral-600">
+                                <div
+                                    className="text-sm text-bold text-center"
+                                    style={{ color: isDark ? "#d1d5db" : "#525252" }}
+                                >
                                     QR will appear here once a factor is initialized. Please use an app like Google Authenticator
                                 </div>
                                 )}

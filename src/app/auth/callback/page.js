@@ -12,6 +12,26 @@ export default function AuthCallbackPage() {
   // JS version: no type annotation here
   const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
   const [message, setMessage] = useState('Verifying your email… please wait.');
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const run = async () => {
@@ -41,23 +61,52 @@ export default function AuthCallbackPage() {
   }, [router, searchParams]);
 
   return (
-    <div className="min-h-screen grid place-items-center bg-white text-black">
-      <div className="w-[92%] max-w-md rounded-md border border-neutral-300 bg-white px-6 py-5">
+    <div
+      className="min-h-screen grid place-items-center"
+      style={{
+        backgroundColor: isDark ? '#030712' : '#ffffff',
+        color: isDark ? '#ffffff' : '#000000',
+      }}
+    >
+      <div
+        className="w-[92%] max-w-md rounded-md px-6 py-5"
+        style={{
+          border: `1px solid ${isDark ? '#374151' : '#d4d4d8'}`,
+          backgroundColor: isDark ? '#111827' : '#ffffff',
+        }}
+      >
         <div className="flex items-center gap-3">
           {status === 'loading' && (
-            <div className="w-5 h-5 rounded-full border-2 border-neutral-300 border-t-neutral-700 animate-spin" />
+            <div
+              className="w-5 h-5 rounded-full border-2 animate-spin"
+              style={{
+                borderColor: isDark ? '#4b5563' : '#d4d4d8',
+                borderTopColor: isDark ? '#f3f4f6' : '#404040',
+              }}
+            />
           )}
           {status === 'success' && <div className="w-5 h-5 rounded-full bg-green-600" />}
           {status === 'error' && <div className="w-5 h-5 rounded-full bg-red-600" />}
-          <h1 className="text-lg font-semibold">
+          <h1
+            className="text-lg font-semibold"
+            style={{ color: isDark ? '#ffffff' : '#000000' }}
+          >
             {status === 'loading' ? 'Verifying…' : status === 'success' ? 'Verified' : 'Verification issue'}
           </h1>
         </div>
 
         <p
-          className={`mt-3 text-sm ${
-            status === 'error' ? 'text-red-700' : status === 'success' ? 'text-green-700' : 'text-neutral-700'
-          }`}
+          className="mt-3 text-sm"
+          style={{
+            color:
+              status === 'error'
+                ? '#b91c1c'
+                : status === 'success'
+                  ? '#15803d'
+                  : isDark
+                    ? '#d1d5db'
+                    : '#404040',
+          }}
         >
           {message}
         </p>
@@ -66,13 +115,22 @@ export default function AuthCallbackPage() {
           <div className="mt-5 flex flex-col sm:flex-row gap-3">
             <a
               href="/admin-log-in"
-              className="inline-flex justify-center rounded-md bg-neutral-900 px-4 py-2 text-white hover:bg-neutral-800"
+              className="inline-flex justify-center rounded-md px-4 py-2"
+              style={{
+                backgroundColor: isDark ? '#ffffff' : '#171717',
+                color: isDark ? '#000000' : '#ffffff',
+              }}
             >
               Go to Sign in
             </a>
             <a
               href="/create-admin-account"
-              className="inline-flex justify-center rounded-md border border-neutral-300 px-4 py-2 hover:bg-neutral-50"
+              className="inline-flex justify-center rounded-md px-4 py-2"
+              style={{
+                border: `1px solid ${isDark ? '#374151' : '#d4d4d8'}`,
+                backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                color: isDark ? '#ffffff' : '#000000',
+              }}
             >
               Create account
             </a>

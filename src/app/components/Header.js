@@ -317,10 +317,10 @@ export default function Header() {
     <header className="w-full border-b border-gray-200 bg-main-bg text-main-text transition-colors duration-300">
       {/* Notification sound */}
       <audio ref={audioRef} src="/notify.mp3" preload="auto"/>
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
+      <div className="mx-auto flex max-w-screen-2xl items-center gap-3 px-4 py-3 md:py-4">
         {/* Brand */}
         <div
-          className="flex items-center gap-3 min-w-0 cursor-pointer"
+          className="flex min-w-0 flex-shrink cursor-pointer items-center gap-3"
           onClick={() => handleNavigation("/")}
           role="button"
           tabIndex={0}
@@ -332,296 +332,309 @@ export default function Header() {
             height="64"
             className="h-12 w-12 md:h-16 md:w-16 rounded-md object-contain flex-shrink-0"
           />
-          <div className="leading-tight">
-            <h1 className="font-semibold tracking-tight text-main-text">
+          <div className="min-w-0 leading-tight">
+            <h1 className="truncate font-semibold tracking-tight text-main-text">
               Dan&apos;s Computer Repair
             </h1>
-            <p className="text-sm text-main-text">
+            <p className="hidden text-sm text-main-text sm:block">
               IT Services and Computer Repair
             </p>
           </div>
         </div>
 
-        <MotionButton 
-          type="button"
-          onClick={toggleTheme}
-          whileHover={hover}
-          whileTap={tap}
-          className={`ml-4 rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200`}
-        >
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={isDark ? 'light' : 'dark'}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-2"
-            >
-              {isDark ? (
-                <>
-                  <motion.span
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    🌞
-                  </motion.span>
-                  Light Mode
-                </>
-              ) : (
-                <>
-                  <motion.span
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    🌚
-                  </motion.span>
-                  Dark Mode
-                </>
-              )}
-            </motion.span>
-          </AnimatePresence>
-        </MotionButton>
-
-        {/* Desktop Nav */}
-        <nav className="hidden md:block">
-          <ul className="flex items-center gap-4">
-            {links.map((l) => (
-              <li key={l.path}>
-                <MotionButton
-                  type="button"
-                  onClick={() => handleNavigation(l.path)}
-                  whileHover={hover}
-                  whileTap={tap}
-                  className="rounded px-2 py-1 text-main-text hover:text-gray-900 hover:underline hover:bg-red-100"
-                >
-                  {l.label}
-                </MotionButton>
-              </li>
-            ))}
-
-            {/* Notifications (admin pages only) */}
-            {!checking && userPresent && isAdmin && isAdminPage && (
-              <li className="relative">
-                <button
-                  // Notifications button
-                  type="button"
-                  onClick={() => setNotifOpen((v) => !v)}
-                  className="relative rounded p-2 text-gray-700 hover:bg-gray-100"
-                  aria-label="Notifications"
-                >
-                  <Bell className="h-5 w-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-                  )}
-                </button>
-
-                <AnimatePresence>
-                  {notifOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                      transition={{ duration: 0.16, ease: "easeOut" }}
-                      className="absolute right-0 mt-3 w-[360px] overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl z-50"
+        <div className="ml-auto hidden lg:flex items-center gap-2 xl:gap-3">
+          <MotionButton 
+            type="button"
+            onClick={toggleTheme}
+            whileHover={hover}
+            whileTap={tap}
+            className={`rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200`}
+          >
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={isDark ? 'light' : 'dark'}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="flex items-center gap-2"
+              >
+                {isDark ? (
+                  <>
+                    <motion.span
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      {/* Header */}
-                      <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/70 px-4 py-3">
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            Notifications
+                      🌞
+                    </motion.span>
+                    <span className="hidden xl:inline">Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <motion.span
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      🌚
+                    </motion.span>
+                    <span className="hidden xl:inline">Dark Mode</span>
+                  </>
+                )}
+              </motion.span>
+            </AnimatePresence>
+          </MotionButton>
+
+          {/* Desktop Nav */}
+          <nav>
+            <ul className="flex items-center gap-1 xl:gap-2">
+              {links.map((l) => (
+                <li key={l.path}>
+                  <MotionButton
+                    type="button"
+                    onClick={() => handleNavigation(l.path)}
+                    whileHover={hover}
+                    whileTap={tap}
+                    className="rounded px-2 py-1 text-main-text hover:text-gray-900 hover:underline hover:bg-red-100 dark:hover:text-white dark:hover:bg-red-500/40"
+                  >
+                    {l.label}
+                  </MotionButton>
+                </li>
+              ))}
+
+              {/* Notifications (admin pages only) */}
+              {!checking && userPresent && isAdmin && isAdminPage && (
+                <li className="relative">
+                  <button
+                    // Notifications button
+                    type="button"
+                    onClick={() => setNotifOpen((v) => !v)}
+                    className={`relative rounded p-2 transition ${isDark ? "text-gray-200 hover:bg-gray-800" : "text-gray-700 hover:bg-gray-100"}`}
+                    aria-label="Notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className={`absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ${isDark ? "ring-2 ring-gray-900" : "ring-2 ring-white"}`} />
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {notifOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                        transition={{ duration: 0.16, ease: "easeOut" }}
+                        className={`absolute right-0 mt-3 w-[360px] overflow-hidden rounded-2xl border shadow-2xl z-50 ${isDark ? "border-gray-700 bg-gray-900 text-gray-100" : "border-slate-300 bg-[#f3f4f6] text-slate-800"}`}
+                      >
+                        {/* Header */}
+                        <div className={`flex items-center justify-between border-b px-4 py-3 ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-100 bg-gray-50/70"}`}>
+                          <div>
+                            <div className={`font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                              Notifications
+                            </div>
+                            <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                              {unreadCount > 0
+                                ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
+                                : "All caught up"}
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {unreadCount > 0
-                              ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
-                              : "All caught up"}
-                          </div>
+
+                          <button
+                            // "Mark All as Read" button
+                            type="button"
+                            onClick={markAllAsRead}
+                            className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition ${isDark ? "text-gray-300 hover:bg-gray-700 hover:text-white" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`}
+                          >
+                            Mark All as Read
+                          </button>
                         </div>
 
-                        <button
-                          // "Mark All as Read" button
-                          type="button"
-                          onClick={markAllAsRead}
-                          className="rounded-md px-2.5 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          Mark All as Read
-                        </button>
-                      </div>
-
-                      {/* Scrollable Content */}
-                      <div className="max-h-96 overflow-auto px-2 py-2">
-                        {notifications.length === 0 ? (
-                          <div className="px-3 py-6 text-center text-sm text-gray-500">
-                            No notifications yet.
-                          </div>
-                        ) : (
-                          <>
-                            {/* New Notifications (Unread) */}
-                            <div className="px-2 pt-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
-                              New Notifications
+                        {/* Scrollable Content */}
+                        <div className="max-h-96 overflow-auto px-2 py-2">
+                          {notifications.length === 0 ? (
+                            <div className={`px-3 py-6 text-center text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                              No notifications yet.
                             </div>
-
-                            {notifications.filter((n) => !n.read_at).length === 0 ? (
-                              <div className="px-3 pb-4 text-sm text-gray-500">
-                                No new notifications.
+                          ) : (
+                            <>
+                              {/* New Notifications (Unread) */}
+                              <div className={`px-2 pt-2 pb-2 text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+                                New Notifications
                               </div>
-                            ) : (
-                              <div className="space-y-1.5 pb-3">
-                                {notifications
-                                  .filter((n) => !n.read_at)
-                                  .map((n) => (
-                                    <button
-                                      key={n.id}
-                                      type="button"
-                                      onClick={() => markNotificationRead(n.id)}
-                                      className="w-full rounded-xl bg-red-50/40 px-4 py-3 text-left transition hover:bg-red-50"
-                                    >
-                                    <div className="flex items-start justify-between gap-3">
-                                      <div className="min-w-0">
-                                        <div className="text-sm font-medium text-gray-900">
+
+                              {notifications.filter((n) => !n.read_at).length === 0 ? (
+                                <div className={`px-3 pb-4 text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                                  No new notifications.
+                                </div>
+                              ) : (
+                                <div className="space-y-1.5 pb-3">
+                                  {notifications
+                                    .filter((n) => !n.read_at)
+                                    .map((n) => (
+                                      <button
+                                        key={n.id}
+                                        type="button"
+                                        onClick={() => markNotificationRead(n.id)}
+                                        className={`w-full rounded-xl px-4 py-3 text-left transition ${isDark ? "bg-red-900/20 hover:bg-red-900/30" : "bg-red-50/40 hover:bg-red-50"}`}
+                                      >
+                                      <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                          <div className={`text-sm font-medium ${isDark ? "text-white" : "text-gray-900"}`}>
+                                            {n.title}
+                                          </div>
+                                          {n.body && (
+                                            <div className={`mt-1 text-[13px] leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                                              {n.body}
+                                            </div>
+                                          )}
+                                          <div className={`mt-2 text-[11px] ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+                                            {new Date(n.created_at).toLocaleString()}
+                                          </div>
+                                        </div>
+
+                                        <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-red-500" />
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Past Notifications (Read) */}
+                              <div className={`border-t px-2 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-wide ${isDark ? "border-gray-700 text-gray-500" : "border-gray-100 text-gray-400"}`}>
+                                Past Notifications
+                              </div>
+
+                              {notifications.filter((n) => n.read_at).length === 0 ? (
+                                <div className={`px-3 pb-3 text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                                  No past notifications.
+                                </div>
+                              ) : (
+                                <div className="space-y-1.5 pb-2">
+                                  {notifications
+                                    .filter((n) => n.read_at)
+                                    .map((n) => (
+                                      <div
+                                        key={n.id}
+                                        className={`rounded-xl px-4 py-3 transition ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-50"}`}
+                                      >
+                                        <div className={`text-sm font-medium ${isDark ? "text-white" : "text-gray-900"}`}>
                                           {n.title}
                                         </div>
                                         {n.body && (
-                                          <div className="mt-1 text-[13px] leading-5 text-gray-600">
+                                          <div className={`mt-1 text-[13px] leading-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
                                             {n.body}
                                           </div>
                                         )}
-                                        <div className="mt-2 text-[11px] text-gray-400">
+                                        <div className={`mt-2 text-[11px] ${isDark ? "text-gray-500" : "text-gray-400"}`}>
                                           {new Date(n.created_at).toLocaleString()}
                                         </div>
                                       </div>
-
-                                      <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-red-500" />
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Past Notifications (Read) */}
-                            <div className="border-t border-gray-100 px-2 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
-                              Past Notifications
-                            </div>
-
-                            {notifications.filter((n) => n.read_at).length === 0 ? (
-                              <div className="px-3 pb-3 text-sm text-gray-500">
-                                No past notifications.
-                              </div>
-                            ) : (
-                              <div className="space-y-1.5 pb-2">
-                                {notifications
-                                  .filter((n) => n.read_at)
-                                  .map((n) => (
-                                    <div
-                                      key={n.id}
-                                      className="rounded-xl px-4 py-3 transition hover:bg-gray-50"
-                                    >
-                                      <div className="text-sm font-medium text-gray-900">
-                                        {n.title}
-                                      </div>
-                                      {n.body && (
-                                        <div className="mt-1 text-[13px] leading-5 text-gray-600">
-                                          {n.body}
-                                        </div>
-                                      )}
-                                      <div className="mt-2 text-[11px] text-gray-400">
-                                        {new Date(n.created_at).toLocaleString()}
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </li>
-            )}
-
-            {/* Logout button for logged-in users */}
-            {!checking && userPresent && (
-              <li className="relative" ref={profileMenuRef}>
-                <MotionButton
-                  type="button"
-                  onClick={() => setProfileOpen((v) => !v)}
-                  whileHover={hover}
-                  whileTap={tap}
-                  className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-800 shadow-sm hover:border-slate-400"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E2E8F0] text-xs font-semibold text-slate-800">
-                    {initials || "U"}
-                  </span>
-                  <span className="max-w-[130px] truncate text-sm font-medium">
-                    {currentUserName}
-                  </span>
-                  <ChevronDown size={16} className="text-slate-600" />
-                </MotionButton>
-
-                <AnimatePresence>
-                  {profileOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 6 }}
-                      className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl"
-                    >
-                      <div className="bg-[#E2E8F0] px-4 py-4">
-                        <p className="text-sm text-slate-700">Signed in as</p>
-                        <p className="truncate text-lg font-semibold text-slate-900">{currentUserName}</p>
-                      </div>
-
-                      <div className="px-4 pb-4 pt-3">
-                        <p className="mb-3 truncate text-sm text-slate-600">{currentUserEmail}</p>
-
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => handleProfileNavigation("/dashboard")}
-                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-200"
-                          >
-                            <LayoutDashboard size={16} />
-                            Dashboard
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleProfileNavigation("/settings")}
-                            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-200"
-                          >
-                            <Settings size={16} />
-                            Setting
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={handleLogout}
-                            className="flex w-full items-center gap-2 rounded-md bg-red-100 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-200"
-                          >
-                            <LogOut size={16} />
-                            Log out
-                          </button>
+                                    ))}
+                                  </div>
+                              )}
+                            </>
+                          )}
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </li>
-            )}
-          </ul>
-        </nav>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+              )}
 
-        {/* Mobile Hamburger Button */}
-        <div className="md:hidden flex items-center gap-2">
+              {/* Logout button for logged-in users */}
+              {!checking && userPresent && (
+                <li className="relative" ref={profileMenuRef}>
+                  <MotionButton
+                    type="button"
+                    onClick={() => setProfileOpen((v) => !v)}
+                    whileHover={hover}
+                    whileTap={tap}
+                    className={`flex items-center gap-2 rounded-full border px-2 py-1 shadow-sm transition ${isDark ? "border-gray-700 bg-gray-900 text-white hover:border-gray-600" : "border-slate-300 bg-white text-slate-800 hover:border-slate-400"}`}
+                  >
+                    <span className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${isDark ? "bg-gray-800 text-white" : "bg-[#E2E8F0] text-slate-800"}`}>
+                      {initials || "U"}
+                    </span>
+                    <span className="max-w-[130px] truncate text-sm font-medium">
+                      {currentUserName}
+                    </span>
+                    <ChevronDown size={16} className={isDark ? "text-gray-300" : "text-slate-600"} />
+                  </MotionButton>
+
+                  <AnimatePresence>
+                    {profileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        className={`absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border shadow-2xl ${isDark ? "border-gray-700 bg-gray-900 text-white" : "border-slate-300 bg-[#f3f4f6] text-slate-800"}`}
+                      >
+                        <div className={`px-4 py-4 ${isDark ? "bg-gray-800" : "bg-[#E2E8F0]"}`}>
+                          <p className={`text-sm ${isDark ? "text-gray-300" : "text-slate-700"}`}>Signed in as</p>
+                          <p className={`truncate text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>{currentUserName}</p>
+                        </div>
+
+                        <div className="px-4 pb-4 pt-3">
+                          <p className={`mb-3 truncate text-sm ${isDark ? "text-gray-400" : "text-slate-600"}`}>{currentUserEmail}</p>
+
+                          <div className="space-y-2">
+                            <button
+                              type="button"
+                              onClick={() => handleProfileNavigation("/dashboard")}
+                              className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition ${isDark ? "text-white hover:bg-gray-800" : "text-slate-800 hover:bg-slate-200"}`}
+                            >
+                              <LayoutDashboard size={16} />
+                              Dashboard
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleProfileNavigation("/settings")}
+                              className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition ${isDark ? "text-white hover:bg-gray-800" : "text-slate-800 hover:bg-slate-200"}`}
+                            >
+                              <Settings size={16} />
+                              Setting
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleLogout}
+                              className="flex w-full items-center gap-2 rounded-md bg-red-100 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/40"
+                            >
+                              <LogOut size={16} />
+                              Log out
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+              )}
+            </ul>
+          </nav>
+        </div>
+
+        {/* Mobile / tablet controls */}
+        <div className="ml-auto flex items-center gap-2 lg:hidden">
+          <MotionButton 
+            type="button"
+            onClick={toggleTheme}
+            whileHover={hover}
+            whileTap={tap}
+            className={`rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-red-400 transition-colors duration-200`}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? "🌞" : "🌚"}
+          </MotionButton>
+
           {/* Mobile notifications bell (admin pages only) */}
           {!checking && userPresent && isAdmin && isAdminPage && (
             <button
               type="button"
               onClick={() => setNotifOpen((v) => !v)}
-              className="relative rounded p-2 text-gray-700 hover:bg-gray-100"
+              className={`relative rounded p-2 transition ${isDark ? "text-gray-200 hover:bg-gray-800" : "text-gray-700 hover:bg-gray-100"}`}
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5" />
@@ -634,7 +647,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="rounded px-3 py-2 text-main-text hover:bg-gray-100"
+            className="rounded px-3 py-2 text-main-text hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             {open ? "✕" : "☰"}
           </button>
@@ -648,16 +661,16 @@ export default function Header() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden overflow-hidden border-t border-gray-200 bg-main-bg text-main-text transition-colors duration-300"
+            className="lg:hidden overflow-hidden border-t border-gray-200 bg-main-bg text-main-text transition-colors duration-300 dark:border-gray-700"
           >
-            <div className="mx-auto max-w-6xl px-4 py-3">
+            <div className="mx-auto max-w-screen-2xl px-4 py-3">
               <ul className="flex flex-col gap-2">
                 {links.map((l) => (
                   <li key={l.path}>
                     <button
                       type="button"
                       onClick={() => handleNavigation(l.path)}
-                      className="w-full rounded px-3 py-2 text-left text-main-text hover:bg-red-400"
+                      className="w-full rounded px-3 py-2 text-left text-main-text hover:bg-red-400 dark:hover:bg-red-500/40"
                     >
                       {l.label}
                     </button>
@@ -667,7 +680,7 @@ export default function Header() {
                 {!checking && userPresent && (
                   <>
                     <li>
-                      <div className="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                      <div className={`rounded border px-3 py-2 text-sm ${isDark ? "border-gray-700 bg-gray-900 text-gray-200" : "border-slate-200 bg-slate-50 text-slate-700"}`}>
                         Signed in as <span className="font-semibold">{currentUserName}</span>
                       </div>
                     </li>
@@ -676,7 +689,7 @@ export default function Header() {
                       <button
                         type="button"
                         onClick={() => handleNavigation("/dashboard")}
-                        className="w-full rounded px-3 py-2 text-left text-gray-700 hover:bg-red-100"
+                        className={`w-full rounded px-3 py-2 text-left ${isDark ? "text-gray-200 hover:bg-gray-800" : "text-gray-700 hover:bg-red-100"}`}
                       >
                         Dashboard
                       </button>
@@ -686,7 +699,7 @@ export default function Header() {
                       <button
                         type="button"
                         onClick={() => handleNavigation("/settings")}
-                        className="w-full rounded px-3 py-2 text-left text-gray-700 hover:bg-red-100"
+                        className={`w-full rounded px-3 py-2 text-left ${isDark ? "text-gray-200 hover:bg-gray-800" : "text-gray-700 hover:bg-red-100"}`}
                       >
                         Setting
                       </button>
@@ -699,7 +712,7 @@ export default function Header() {
                           setOpen(false);
                           handleLogout();
                         }}
-                        className="w-full rounded px-3 py-2 text-left bg-red-50 text-red-700 hover:bg-red-100"
+                        className="w-full rounded px-3 py-2 text-left bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/40"
                       >
                         Log out
                       </button>
@@ -720,14 +733,14 @@ export default function Header() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="md:hidden px-4 pt-3"
+            className="lg:hidden px-4 pt-3"
           >
-            <div className="overflow-hidden rounded-2xl border border-slate-300 bg-[#f3f4f6] text-slate-800 shadow-2xl">
+            <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? "border-gray-700 bg-gray-900 text-white" : "border-slate-300 bg-[#f3f4f6] text-slate-800"}`}>
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 bg-[#E2E8F0] px-4 py-3">
+              <div className={`flex items-center justify-between border-b px-4 py-3 ${isDark ? "border-gray-700 bg-gray-800" : "border-slate-200 bg-[#E2E8F0]"}`}>
                 <div>
-                  <div className="font-semibold text-slate-900">Notifications</div>
-                  <div className="text-xs text-slate-600">
+                  <div className={`font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Notifications</div>
+                  <div className={`text-xs ${isDark ? "text-gray-400" : "text-slate-600"}`}>
                     {unreadCount > 0
                       ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
                       : "All caught up"}
@@ -737,7 +750,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={markAllAsRead}
-                  className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
+                  className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition ${isDark ? "text-gray-300 hover:bg-gray-700 hover:text-white" : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"}`}
                 >
                   Mark All as Read
                 </button>
@@ -746,18 +759,18 @@ export default function Header() {
               {/* Content */}
               <div className="max-h-96 overflow-auto px-2 py-2">
                 {notifications.length === 0 ? (
-                  <div className="px-3 py-6 text-center text-sm text-slate-500">
+                  <div className={`px-3 py-6 text-center text-sm ${isDark ? "text-gray-400" : "text-slate-500"}`}>
                     No notifications yet.
                   </div>
                 ) : (
                   <>
                     {/* New Notifications */}
-                    <div className="px-2 pt-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                    <div className={`px-2 pt-2 pb-2 text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-gray-500" : "text-slate-400"}`}>
                       New Notifications
                     </div>
 
                     {notifications.filter((n) => !n.read_at).length === 0 ? (
-                      <div className="px-3 pb-4 text-sm text-slate-500">
+                      <div className={`px-3 pb-4 text-sm ${isDark ? "text-gray-400" : "text-slate-500"}`}>
                         No new notifications.
                       </div>
                     ) : (
@@ -769,19 +782,19 @@ export default function Header() {
                               key={n.id}
                               type="button"
                               onClick={() => markNotificationRead(n.id)}
-                              className="w-full rounded-xl bg-red-50 px-4 py-3 text-left transition hover:bg-red-100"
+                              className={`w-full rounded-xl px-4 py-3 text-left transition ${isDark ? "bg-red-900/20 hover:bg-red-900/30" : "bg-red-50 hover:bg-red-100"}`}
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                  <div className="text-sm font-medium text-slate-900">
+                                  <div className={`text-sm font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
                                     {n.title}
                                   </div>
                                   {n.body && (
-                                    <div className="mt-1 text-[13px] leading-5 text-slate-600">
+                                    <div className={`mt-1 text-[13px] leading-5 ${isDark ? "text-gray-300" : "text-slate-600"}`}>
                                       {n.body}
                                     </div>
                                   )}
-                                  <div className="mt-2 text-[11px] text-slate-400">
+                                  <div className={`mt-2 text-[11px] ${isDark ? "text-gray-500" : "text-slate-400"}`}>
                                     {new Date(n.created_at).toLocaleString()}
                                   </div>
                                 </div>
@@ -794,12 +807,12 @@ export default function Header() {
                     )}
 
                     {/* Past Notifications */}
-                    <div className="border-t border-slate-200 px-2 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                    <div className={`border-t px-2 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-wide ${isDark ? "border-gray-700 text-gray-500" : "border-slate-200 text-slate-400"}`}>
                       Past Notifications
                     </div>
 
                     {notifications.filter((n) => n.read_at).length === 0 ? (
-                      <div className="px-3 pb-3 text-sm text-slate-500">
+                      <div className={`px-3 pb-3 text-sm ${isDark ? "text-gray-400" : "text-slate-500"}`}>
                         No past notifications.
                       </div>
                     ) : (
@@ -809,17 +822,17 @@ export default function Header() {
                           .map((n) => (
                             <div
                               key={n.id}
-                              className="rounded-xl px-4 py-3 transition hover:bg-slate-200/60"
+                              className={`rounded-xl px-4 py-3 transition ${isDark ? "hover:bg-gray-800" : "hover:bg-slate-200/60"}`}
                             >
-                              <div className="text-sm font-medium text-slate-900">
+                              <div className={`text-sm font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
                                 {n.title}
                               </div>
                               {n.body && (
-                                <div className="mt-1 text-[13px] leading-5 text-slate-600">
+                                <div className={`mt-1 text-[13px] leading-5 ${isDark ? "text-gray-300" : "text-slate-600"}`}>
                                   {n.body}
                                 </div>
                               )}
-                              <div className="mt-2 text-[11px] text-slate-400">
+                              <div className={`mt-2 text-[11px] ${isDark ? "text-gray-500" : "text-slate-400"}`}>
                                 {new Date(n.created_at).toLocaleString()}
                               </div>
                             </div>

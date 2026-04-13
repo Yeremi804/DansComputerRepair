@@ -13,6 +13,26 @@ const MapComponent = dynamic(() => import("./MapComponent"), {
 
 export function Footer() {
   const [footerContent, setFooterContent] = useState(null); // { hours: [{ day, open, close }], phone, email }
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Fetch footer content from Supabase on mount
   useEffect(() => {
@@ -59,7 +79,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="bg-main-bg text-main-text border-t ">
+    <footer className="bg-main-bg text-main-text border-t dark:border-gray-700">
       <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[auto_1fr_1fr_1fr] gap-8 items-start">
         {/* Social media icons */}
         <div className="flex flex-row gap-4 items-center justify-center md:justify-start">
@@ -76,6 +96,7 @@ export function Footer() {
               width={24}
               height={24}
               className="w-6 h-6"
+              style={{ filter: isDark ? "brightness(0) invert(1)" : "none" }}
             />
           </a>
 
@@ -92,6 +113,7 @@ export function Footer() {
               width={24}
               height={24}
               className="w-6 h-6"
+              style={{ filter: isDark ? "brightness(0) invert(1)" : "none" }}
             />
           </a>
         </div>
@@ -182,13 +204,13 @@ export function Footer() {
 
       {/* Map */}
       <div className="max-w-6xl mx-auto px-6">
-        <div className="mt-4 h-72 md:h-96 w-full rounded overflow-hidden border">
-          <MapComponent />
+        <div className="mt-4 h-72 md:h-96 w-full rounded overflow-hidden border dark:border-gray-700">
+          <MapComponent isDark={isDark} />
         </div>
       </div>
 
       {/* Copyright */}
-      <div className="border-t text-center text-xs text-gray-500 py-4 mt-6">
+      <div className="border-t dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 py-4 mt-6">
         © {new Date().getFullYear()} Dan&apos;s Computer Repair — All rights reserved.
       </div>
     </footer>
