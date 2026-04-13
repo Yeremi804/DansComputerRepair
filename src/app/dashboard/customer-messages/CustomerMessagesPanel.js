@@ -1,14 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState, Fragment } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/lib/supabase/client";
 import dayjs from 'dayjs';
 
-// initialize supabase client with environment variables
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
 
 // options for status filter 
 const STATUS_FILTER_OPTIONS = [

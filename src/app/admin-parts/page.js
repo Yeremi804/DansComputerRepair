@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Pencil, Trash2 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import "./PartsPage.css";
 
 // Categories shown on the Parts page UI.
@@ -36,9 +36,7 @@ const CATEGORY_TO_TABLE = {
 };
 
 export default function AdminPartsPage() {
-  // Supabase browser client (auth/session based in the browser)
-  const supabase = createSupabaseBrowserClient();
-
+  
   /**
    * Parts are stored grouped by category:
    * {

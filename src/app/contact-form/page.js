@@ -1,13 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/client"; 
 
 export default function ContactFormPage() {
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");

@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/lib/supabase/client";
 import Sidebar from "../components/Sidebar";
 import DashboardOrdersPanel from './DashboardOrdersPanel';
 
@@ -24,9 +24,7 @@ export default async function DashboardPage() {
       </div>
     );
   }
-
-  // connect to supabase once env is present
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+ 
 
   // Fetch data from Configuration_Form
   const { data: configRows, error: configError } = await supabase.from('Configuration_Form').select('*');
@@ -109,7 +107,7 @@ export default async function DashboardPage() {
         </section>
 
         <section className="mt-8">
-          <DashboardOrdersPanel supabaseUrl={SUPABASE_URL} supabaseAnonKey={SUPABASE_ANON} />
+          <DashboardOrdersPanel/>
         </section>
       </main>
     </div>
