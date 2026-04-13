@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react"; // Import useState to manage admin status and checking state
+import { useEffect, useRef, useState } from "react"; // Import useState to manage admin status and checking state
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
@@ -333,11 +333,11 @@ export default function Header() {
             height="64"
             className="h-10 w-10 rounded-md object-contain md:h-12 md:w-12 lg:h-14 lg:w-14"
           />
-          <div className="min-w-0 min-w-0 leading-tight">
-            <h1 className="text-xl truncate font-semibold tracking-tight text-main-text sm:text-2xl lg:text-[1.65rem] whitespace-nowrap">
+          <div className="min-w-0 leading-tight">
+            <h1 className="text-xl truncate font-semibold tracking-tight text-main-text sm:text-2xl lg:text-[1.65rem]">
               Dan&apos;s Computer Repair
             </h1>
-            <p className="hidden text-sm text-main-text/80 sm:text-base sm:block whitespace-nowrap">
+            <p className="hidden text-sm text-main-text/80 sm:block sm:text-base">
               IT Services and Computer Repair
             </p>
           </div>
@@ -615,8 +615,6 @@ export default function Header() {
               )}
             </ul>
           </nav>
-        </div>
-
         {/* Mobile / tablet controls */}
         <div className="ml-auto flex items-center gap-2 lg:hidden">
           <MotionButton 

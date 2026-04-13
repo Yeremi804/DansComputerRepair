@@ -89,20 +89,21 @@ export default function Chatbot() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isDark, setIsDark] = useState(false);
-
   const [chatbotVisible, setChatbotVisible] = useState(true);
-  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsLoading, setSettingsLoading] = useState(false);
 
   const messageEndRef = useRef(null);
 
   useEffect(() => {
     async function loadChatbotVisibility() {
+      setSettingsLoading(true);
+
       const { data, error } = await supabase
         .from("site_content")
         .select("published")
         .eq("key", "chatbot_settings")
         .maybeSingle();
-    
+
         if (error) {
           console.error("failed to load chatbot settings:", error);
           setChatbotVisible(true);
@@ -124,6 +125,10 @@ export default function Chatbot() {
 
     syncTheme();
 
+    if (typeof MutationObserver === "undefined") {
+      return undefined;
+    }
+
     const observer = new MutationObserver(() => {
       syncTheme();
     });
@@ -137,7 +142,9 @@ export default function Chatbot() {
   }, []);
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (typeof messageEndRef.current?.scrollIntoView === "function") {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, loading, isOpen]);
 
   async function handleSend() {
@@ -188,12 +195,10 @@ export default function Chatbot() {
     }
   }
 
-  if (settingsLoading) return null;
   if (!chatbotVisible) return null;
 
   return (
     <div className="pointer-events-none fixed bottom-6 right-6 z-[1000] flex flex-col items-end">
-      {/* Toggle button — always visible when chat is closed */}
       {!isOpen && (
         <button
           type="button"
@@ -211,20 +216,20 @@ export default function Chatbot() {
             isDark ? "border-gray-700 bg-gray-900 shadow-black/40" : "border-slate-200 bg-white shadow-slate-900/20"
           }`}
         >
-        <div className="flex items-center justify-between bg-gradient-to-r from-sky-600 to-blue-700 px-4 py-3 text-white">
-          <div>
-            <p className="text-sm font-semibold">Dan&apos;s Assistant</p>
-            <p className="text-xs text-blue-100">Ask about services and support</p>
+          <div className="flex items-center justify-between bg-gradient-to-r from-sky-600 to-blue-700 px-4 py-3 text-white">
+            <div>
+              <p className="text-sm font-semibold">Dan&apos;s Assistant</p>
+              <p className="text-xs text-blue-100">Ask about services and support</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="rounded-md px-2 py-1 text-lg leading-none transition hover:bg-white/20"
+              aria-label="Collapse chatbot"
+            >
+              −
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsOpen(false)}
-            className="rounded-md px-2 py-1 text-lg leading-none transition hover:bg-white/20"
-            aria-label="Collapse chatbot"
-          >
-            −
-          </button>
-        </div>
 
           <div className={`h-80 space-y-3 overflow-y-auto px-3 py-4 ${isDark ? "bg-gray-950" : "bg-slate-50"}`}>
             {messages.length === 0 && (
@@ -238,8 +243,8 @@ export default function Chatbot() {
                 className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
                   message.role === "user"
                     ? "ml-auto bg-blue-600 text-white"
-                  : isDark
-                    ? "mr-auto bg-gray-900 text-gray-100"
+                    : isDark
+                      ? "mr-auto bg-gray-900 text-gray-100"
                       : "mr-auto bg-white text-slate-800"
                 }`}
               >
@@ -282,8 +287,7 @@ export default function Chatbot() {
               </button>
             </div>
           </div>
-          </div>
-      )}
+        </div>
       )}
     </div>
   );
