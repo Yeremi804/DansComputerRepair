@@ -299,6 +299,16 @@ export default function SettingsPage() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
+  const meetsPasswordComplexity = (value) => {
+    const password = String(value || "");
+    return (
+      /[a-z]/.test(password) &&
+      /[A-Z]/.test(password) &&
+      /\d/.test(password) &&
+      /[^A-Za-z0-9]/.test(password)
+    );
+  };
+
   const showEmailFormatHelp = () => {
     window.alert(
       "Please enter a valid email address.\n\nA good email address should contain:\n- A username before @\n- Exactly one @ symbol\n- A domain name after @\n- A dot (.) in the domain, for example: name@example.com"
@@ -330,6 +340,13 @@ export default function SettingsPage() {
     }
     if (newPassword.length < 8) {
       pushToast("error", "Password must be at least 8 characters.");
+      return;
+    }
+    if (!meetsPasswordComplexity(newPassword)) {
+      pushToast(
+        "error",
+        "Password must include upper, lower, number, and symbol."
+      );
       return;
     }
 
