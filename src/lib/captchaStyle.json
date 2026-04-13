@@ -1,0 +1,13 @@
+{
+  "width": 150,
+  "height": 50,
+  "background": "#dbdde1",
+  "textColor": "#0d0d0d",
+  "fontFamily": "Arial, sans-serif",
+  "fontSize": 30,
+  "letterSpacing": 5,
+  "lineColor": "#1cb01e",
+  "lineWidth": 2,
+  "lineOpacity": 0.5,
+  "captchaLength": 5
+}
