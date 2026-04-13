@@ -163,13 +163,15 @@ export default function CustomerMessagesPanel() {
       <div className="mb-4 flex flex-wrap items-center gap-4">
 
         {/* search input */}
-        <input
-          type="text"
-          placeholder="Search messages"
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
-        />
+        <div className="relative flex-1 min-w-[240px] max-w-[420px]">
+          <input
+            type="text"
+            placeholder="Search messages"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            className="w-full rounded border border-gray-400 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-500"
+          />
+        </div>
         {/* status filter dropdown */}
         <label className="flex items-center gap-2 text-sm font-medium">
           Status

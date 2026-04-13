@@ -20,6 +20,10 @@ export default function HomeContentPage() {
     hours: [],
   });
 
+  const [chatbotDraft, setChatbotDraft] = useState({
+    enabled: true,
+  });
+
   const [hoursRows, setHoursRows] = useState([
     { day: "Mon - Sat", open: "7 AM", close: "9 PM" },
   ]);
@@ -78,7 +82,7 @@ export default function HomeContentPage() {
       const { data, error } = await supabase
         .from("site_content")
         .select("key,draft")
-        .in("key", ["home_about", "footer"]);
+        .in("key", ["home_about", "footer", "chatbot_settings"]);
 
       if (error) {
         console.error(error);
@@ -90,9 +94,13 @@ export default function HomeContentPage() {
       const map = new Map((data || []).map((r) => [r.key, r.draft]));
       const about = map.get("home_about") ?? { title: "", body: "" };
       const footer = map.get("footer") ?? { phone: "", email: "", hours: [] };
+      const chatbot = map.get("chatbot_settings") ?? { enabled: true };
 
       setAboutDraft(about);
       setFooterDraft(footer);
+      setChatbotDraft({
+        enabled: Boolean(chatbot.enabled),
+      });
 
       const hours = Array.isArray(footer.hours) ? footer.hours : [];
       setHoursRows(
@@ -116,6 +124,7 @@ export default function HomeContentPage() {
     const updates = [
       { key: "home_about", draft: aboutDraft },
       { key: "footer", draft: { ...footerDraft, hours: cleanHours } },
+      { key: "chatbot_settings", draft: chatbotDraft },
     ];
 
     for (const row of updates) {
@@ -145,6 +154,7 @@ export default function HomeContentPage() {
     const publishRows = [
       { key: "home_about", published: aboutDraft },
       { key: "footer", published: { ...footerDraft, hours: cleanHours } },
+      { key: "chatbot_settings", published: chatbotDraft },
     ];
 
     for (const row of publishRows) {
@@ -240,6 +250,56 @@ export default function HomeContentPage() {
                       placeholder="Write your About Us text..."
                     />
                   </label>
+                </div>
+              </section>
+
+              <div className="my-6 border-t border-slate-200" />
+
+              <section className="pb-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    Chatbot Visibility (Draft)
+                  </h2>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                    chatbot_settings
+                  </span>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <div className="text-sm font-medium text-slate-900">
+                        Website Chatbot
+                      </div>
+                      <p className="mt-1 text-sm text-slate-600">
+                        Enable or disable the chatbot on the live website.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setChatbotDraft((prev) => ({
+                          ...prev,
+                          enabled: !prev.enabled,
+                        }))
+                      }
+                      className={`rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition ${
+                        chatbotDraft.enabled
+                          ? "bg-green-600 hover:bg-green-700"
+                          : "bg-slate-700 hover:bg-slate-800"
+                      }`}
+                    >
+                      {chatbotDraft.enabled ? "Enabled" : "Disabled"}
+                    </button>
+                  </div>
+
+                  <p className="mt-3 text-xs text-slate-500">
+                    Current draft state:{" "}
+                    <span className="font-semibold">
+                      {chatbotDraft.enabled ? "Show chatbot" : "Hide chatbot"}
+                    </span>
+                  </p>
                 </div>
               </section>
 
