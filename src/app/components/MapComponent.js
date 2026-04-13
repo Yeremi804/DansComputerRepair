@@ -54,7 +54,15 @@ function FitToPolygon({ positions }) {
   return null;
 }
 
-export default function MapComponent() {
+export default function MapComponent({ isDark = false }) {
+  const tileUrl = isDark
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+  const attribution = isDark
+    ? '&copy; OpenStreetMap contributors &copy; CARTO'
+    : "&copy; OpenStreetMap contributors";
+
   return (
     <MapContainer
       center={[38.689954, -121.341553]}
@@ -62,20 +70,20 @@ export default function MapComponent() {
       scrollWheelZoom={false}
       className="h-full w-full"
     >
-      // <InvalidateMapSize />
+      {/* <InvalidateMapSize /> */}
 
       <TileLayer
-        attribution="&copy; OpenStreetMap contributors"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution={attribution}
+        url={tileUrl}
       />
 
       <Polygon
         positions={polygonPositions}
         pathOptions={{
-          color: "blue",
+          color: isDark ? "#60a5fa" : "blue",
           weight: 2,
-          fillColor: "blue",
-          fillOpacity: 0.2,
+          fillColor: isDark ? "#60a5fa" : "blue",
+          fillOpacity: isDark ? 0.28 : 0.2,
         }}
       >
         <Popup>Service Area</Popup>
@@ -85,7 +93,7 @@ export default function MapComponent() {
 
       <Marker position={[38.689954, -121.341553]}>
         <Popup>
-          Dan's Computer Repair<br />Sacramento, CA
+          Dan&apos;s Computer Repair<br />Sacramento, CA
         </Popup>
       </Marker>
     </MapContainer>

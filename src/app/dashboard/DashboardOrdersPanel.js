@@ -10,6 +10,26 @@ export default function DashboardOrdersPanel() {
   const [serviceRequestRows, setServiceRequestRows] = useState([]);
   const [filteredConfigRows, setFilteredConfigRows] = useState([]);
   const [filteredServiceRows, setFilteredServiceRows] = useState([]);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Function to build CSV content from rows
   const buildCSVContent = (rows) => {
@@ -236,7 +256,7 @@ useEffect(() => {
         </h2>
         <button
           onClick={() => downloadCSV(filteredConfigRows, "Configuration_Form.csv")}
-          className="px-4 py-2 bg-black text-white rounded-lg shadow hover:opacity-80 transition"
+          className={`px-4 py-2 rounded-lg shadow transition ${isDark ? "bg-white text-black hover:bg-gray-200" : "bg-slate-900 text-white hover:opacity-80"}`}
         >
           Download CSV
         </button>
@@ -251,7 +271,7 @@ useEffect(() => {
         </h2>
         <button
           onClick={() => downloadCSV(filteredServiceRows, "Service_Requests.csv")}
-          className="px-4 py-2 bg-black text-white rounded-lg shadow hover:opacity-80 transition"
+          className={`px-4 py-2 rounded-lg shadow transition ${isDark ? "bg-white text-black hover:bg-gray-200" : "bg-slate-900 text-white hover:opacity-80"}`}
         >
           Download CSV
         </button>

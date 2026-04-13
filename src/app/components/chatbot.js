@@ -88,6 +88,7 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   const [chatbotVisible, setChatbotVisible] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(true);
@@ -114,6 +115,25 @@ export default function Chatbot() {
       }
 
       loadChatbotVisibility();
+  }, []);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -184,9 +204,10 @@ export default function Chatbot() {
         </button>
       )}
 
-      {isOpen && (
       <div
-        className="pointer-events-auto w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 transition-all duration-200"
+        className={`w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border shadow-2xl transition-all duration-200 ${
+          isOpen ? "pointer-events-auto scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
+        } ${isDark ? "border-gray-700 bg-gray-900 shadow-black/40" : "border-slate-200 bg-white shadow-slate-900/20"}`}
       >
         <div className="flex items-center justify-between bg-gradient-to-r from-sky-600 to-blue-700 px-4 py-3 text-white">
           <div>
@@ -203,9 +224,9 @@ export default function Chatbot() {
           </button>
         </div>
 
-        <div className="h-80 space-y-3 overflow-y-auto bg-slate-50 px-3 py-4">
+        <div className={`h-80 space-y-3 overflow-y-auto px-3 py-4 ${isDark ? "bg-gray-950" : "bg-slate-50"}`}>
           {messages.length === 0 && (
-            <p className="rounded-xl bg-white p-3 text-sm text-slate-600 shadow-sm">
+            <p className={`rounded-xl p-3 text-sm shadow-sm ${isDark ? "bg-gray-900 text-gray-300" : "bg-white text-slate-600"}`}>
               Hi, I can help with repair questions, service options, and request steps.
             </p>
           )}
@@ -215,7 +236,9 @@ export default function Chatbot() {
               className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
                 message.role === "user"
                   ? "ml-auto bg-blue-600 text-white"
-                  : "mr-auto bg-white text-slate-800"
+                  : isDark
+                    ? "mr-auto bg-gray-900 text-gray-100"
+                    : "mr-auto bg-white text-slate-800"
               }`}
             >
               <p>{message.text}</p>
@@ -223,7 +246,7 @@ export default function Chatbot() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="mt-1 block font-medium text-blue-700 underline hover:text-blue-800"
+                  className={`mt-1 block font-medium underline ${isDark ? "text-blue-300 hover:text-blue-200" : "text-blue-700 hover:text-blue-800"}`}
                 >
                   {link.label}
                 </a>
@@ -231,17 +254,17 @@ export default function Chatbot() {
             </div>
           ))}
           {loading && (
-            <div className="mr-auto rounded-2xl bg-white px-3 py-2 text-sm text-slate-500 shadow-sm">
+            <div className={`mr-auto rounded-2xl px-3 py-2 text-sm shadow-sm ${isDark ? "bg-gray-900 text-gray-400" : "bg-white text-slate-500"}`}>
               Thinking...
             </div>
           )}
           <div ref={messageEndRef} />
         </div>
 
-        <div className="border-t border-slate-200 bg-white p-3">
+        <div className={`border-t p-3 ${isDark ? "border-gray-700 bg-gray-900" : "border-slate-200 bg-white"}`}>
           <div className="flex gap-2">
             <input
-              className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              className={`flex-1 rounded-xl border px-3 py-2 text-sm outline-none transition ${isDark ? "border-gray-600 bg-gray-800 text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-900" : "border-slate-300 bg-white text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"}`}
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleInputKeyDown}

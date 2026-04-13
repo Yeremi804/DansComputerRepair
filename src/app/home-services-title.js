@@ -1,5 +1,5 @@
 'use client';
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { HardDrive, Cpu, Network, Smartphone, Printer, Phone, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -49,6 +49,27 @@ const services = [
 ];
 
 export default function Services() {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const handleCardClick = (scrollTo) => {
     const element = document.getElementById(scrollTo);
     if (element) {
@@ -87,17 +108,21 @@ export default function Services() {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
                 onClick={() => handleCardClick(service.scrollTo)}
-                className="group relative bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border border-slate-200 hover:border-blue-200 transition-all duration-300 hover:shadow-xl cursor-pointer"
+                className={`group relative rounded-2xl p-6 border transition-all duration-300 hover:shadow-xl cursor-pointer ${
+                  isDark
+                    ? "bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 hover:border-blue-400"
+                    : "bg-gradient-to-br from-slate-50 to-white border-slate-200 hover:border-blue-200"
+                }`}
               >
                 <div className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 
-                <h3 className="text-lg font-bold text-slate-900 mb-2">
+                <h3 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>
                   {service.title}
                 </h3>
                 
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-slate-600"}`}>
                   {service.description}
                 </p>
                 

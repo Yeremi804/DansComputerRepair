@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase/client";
 import Sidebar from "../components/Sidebar";
 import DashboardOrdersPanel from './DashboardOrdersPanel';
+import DashboardStatsCards from './DashboardStatsCards';
 
 export const metadata = {
   title: 'Dashboard',
@@ -15,9 +16,9 @@ export default async function DashboardPage() {
 
   if (!SUPABASE_URL || !SUPABASE_ANON) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 md:p-8 bg-main-bg text-main-text min-h-screen overflow-x-hidden">
         <h1 className="text-xl font-semibold">Dashboard</h1>
-        <p className="mt-4 text-red-700">
+        <p className="mt-4 text-red-700 dark:text-red-400">
           Missing Supabase environment variables. Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and{' '}
           <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in <code>.env.local</code>, then restart the dev server.
         </p>
@@ -81,30 +82,17 @@ export default async function DashboardPage() {
   ).length;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-main-bg overflow-x-hidden">
       <Sidebar />
 
-      <main className="flex-1 p-8 bg-main-bg ">
+      <main className="flex-1 min-w-0 bg-main-bg px-3 pb-4 pt-24 sm:px-6 sm:pb-6 sm:pt-24 lg:p-8 overflow-x-hidden">
         <h1 className="mb-4 text-3xl text-main-text font-bold">Dashboard</h1>
 
-        <section className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
-          <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <h3 className="text-gray-900">Total Orders</h3>
-            <p className="text-2xl my-2 text-gray-900">{totalOrder}</p>
-          </div>
-
-          <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <h3 className="text-gray-900">Ongoing</h3>
-            <p className="text-2xl my-2 text-gray-900">{ongoingOrders}</p>
-            <p className="text-gray-900">Open support tickets</p>
-          </div>
-
-          <div className="p-4 bg-[#E2E8F0] border border-[#cbd5e1] flex flex-col items-center justify-center rounded-xl shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <h3 className="text-gray-900">Completed</h3>
-            <p className="text-2xl my-2 text-gray-900">{completedOrders}</p>
-            <p className="text-gray-900">job(s)</p>
-          </div>
-        </section>
+        <DashboardStatsCards
+          totalOrder={totalOrder}
+          ongoingOrders={ongoingOrders}
+          completedOrders={completedOrders}
+        />
 
         <section className="mt-8">
           <DashboardOrdersPanel/>

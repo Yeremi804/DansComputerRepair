@@ -38,6 +38,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const [emailLoading, setEmailLoading] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   // visibility toggles for inputs
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -60,6 +61,25 @@ export default function SettingsPage() {
   const [unenrollMfaCode, setUnenrollMfaCode] = useState("");
   const [unenrollMfaFactorId, setUnenrollMfaFactorId] = useState(null);
   const [unenrollMfaLoading, setUnenrollMfaLoading] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // small toast helper
   const pushToast = (type, text) => {
@@ -130,13 +150,14 @@ export default function SettingsPage() {
   // Modal focus / escape handling
   // -----------------------------
   useEffect(() => {
-    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen) return;
+    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen && !isMfaUnenrollOpen) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsModalOpen(false);
         setIsNameModalOpen(false);
         setIsEmailModalOpen(false);
+        setIsMfaUnenrollOpen(false);
       }
     };
 
@@ -146,7 +167,7 @@ export default function SettingsPage() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isModalOpen, isNameModalOpen, isEmailModalOpen]);
+  }, [isModalOpen, isNameModalOpen, isEmailModalOpen, isMfaUnenrollOpen]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -704,7 +725,7 @@ export default function SettingsPage() {
     <div className="flex min-h-screen bg-main-bg">
       <Sidebar />
 
-      <main className="flex-1 p-8 settings-main">
+      <main className={`flex-1 p-8 settings-main ${isDark ? "settings-dark" : ""}`}>
         <div className="settings-panel">
           <h2>Profile Name</h2>
           <p>Modify your profile name.</p>

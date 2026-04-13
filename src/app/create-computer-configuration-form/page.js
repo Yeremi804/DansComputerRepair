@@ -16,6 +16,26 @@ export default function CreateComputerConfigurationForm() {
   const [coolings, setCoolings] = useState([]);
   const [operatingSystems, setOperatingSystems] = useState([]);
   const [networkings, setNetworkings] = useState([]);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const types = [
@@ -58,7 +78,7 @@ export default function CreateComputerConfigurationForm() {
     const el = e.target;
     if (!el) return;
     // Update inline color directly since styles are applied via inline style (not Tailwind classes)
-    el.style.color = el.value === '' ? '#94a3b8' : '#0f172a';
+    el.style.color = el.value === '' ? '#94a3b8' : (isDark ? '#e2e8f0' : '#0f172a');
   }
 
   function formatPrice(v) {
@@ -116,11 +136,11 @@ export default function CreateComputerConfigurationForm() {
     width: '100%',
     boxSizing: 'border-box',
     padding: '10px 12px',
-    border: '1px solid #cbd5e1',   /* Matches sidebar/card border color across the site */
+    border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',   /* Matches sidebar/card border color across the site */
     borderRadius: '6px',
     fontSize: '14px',              /* Matches .input font-size in service-request/page.module.css */
-    color: '#1e293b',
-    backgroundColor: '#ffffff',
+    color: isDark ? '#e2e8f0' : '#1e293b',
+    backgroundColor: isDark ? '#0f172a' : '#ffffff',
     outline: 'none',
     transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
   };
@@ -132,7 +152,9 @@ export default function CreateComputerConfigurationForm() {
     WebkitAppearance: 'none',
     MozAppearance: 'none',
     /* Custom dropdown arrow SVG */
-    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E\")",
+    backgroundImage: isDark
+      ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E\")"
+      : "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E\")",
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 12px center',
     backgroundSize: '16px',
@@ -145,7 +167,8 @@ export default function CreateComputerConfigurationForm() {
   };
 
   const dropdownOptionStyle = {
-    color: '#0f172a',
+    color: isDark ? '#e2e8f0' : '#0f172a',
+    backgroundColor: isDark ? '#0f172a' : '#ffffff',
   };
 
   /* Label style consistent with service-request form (.label: 0.875rem / 14px) */
@@ -153,16 +176,16 @@ export default function CreateComputerConfigurationForm() {
     display: 'block',
     fontSize: '0.875rem',          /* Matches .label font-size in service-request/page.module.css */
     fontWeight: '500',
-    color: '#475569',              /* Slate-600, matches service-request label color */
+    color: isDark ? '#cbd5e1' : '#475569',              /* Slate-600, matches service-request label color */
     marginBottom: '6px',
   };
 
   /* Section heading style (h2, h3) */
   const sectionHeadingStyle = {
     fontWeight: '600',
-    color: '#334155',         /* Slate-700 */
+    color: isDark ? '#e2e8f0' : '#334155',         /* Slate-700 */
     paddingBottom: '8px',
-    borderBottom: '1px solid #e2e8f0', /* Subtle divider, matches service-request sectionHeader */
+    borderBottom: isDark ? '1px solid #334155' : '1px solid #e2e8f0', /* Subtle divider, matches service-request sectionHeader */
     marginBottom: '20px',
   };
 
@@ -185,10 +208,10 @@ export default function CreateComputerConfigurationForm() {
 
         {/* Form card: matches .formBox style from service-request form */}
         <div style={{
-          border: '1px solid #e2e8f0',
+          border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
           borderRadius: '8px',
           padding: '32px',
-          backgroundColor: '#ffffff',
+          backgroundColor: isDark ? '#111827' : '#ffffff',
           boxShadow: '0 4px 6px -1px rgba(11, 63, 115, 0.12), 0 2px 4px -1px rgba(11, 63, 115, 0.08)',
         }}>
 
@@ -238,7 +261,7 @@ export default function CreateComputerConfigurationForm() {
                 flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: '0.875rem', color: '#475569', lineHeight: '1.4' }}>
+            <span style={{ fontSize: '0.875rem', color: isDark ? '#cbd5e1' : '#475569', lineHeight: '1.4' }}>
               I agree to receive SMS notifications about my computer configuration status.
             </span>
           </label>
@@ -343,7 +366,7 @@ export default function CreateComputerConfigurationForm() {
           </div>
 
           {/* Status messages: inside the form card, left-aligned to match service-request form style */}
-          {status === 'sending'   && <p style={{ marginTop: '12px', fontSize: '0.875rem', color: '#475569' }}>Sending…</p>}
+          {status === 'sending'   && <p style={{ marginTop: '12px', fontSize: '0.875rem', color: isDark ? '#cbd5e1' : '#475569' }}>Sending…</p>}
           {status === 'submitted' && <p style={{ marginTop: '12px', fontSize: '0.875rem', color: '#065f46' }}>Submitted — we will contact you soon.</p>}
           {status === 'error'     && <p style={{ marginTop: '12px', fontSize: '0.875rem', color: '#9b1c1c' }}>Error sending — try again.</p>}
         </div>

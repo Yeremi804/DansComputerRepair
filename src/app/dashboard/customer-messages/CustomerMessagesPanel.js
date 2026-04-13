@@ -19,14 +19,14 @@ const SORT_OPTIONS = [
 ];
 
 // component for status badge with dropdown to change status
-function StatusBadge({ status, id, refresh, setMessages }) {
+function StatusBadge({ status, id, refresh, setMessages, isDark }) {
   const key = String(status || '').toLowerCase();
 
   // default to blue for unknown statuses, gray for pending, green for checked
   let colorClass = '';
-  if (key.includes('pending')) colorClass = 'bg-gray-200 text-gray-900';
-  else if (key.includes('checked')) colorClass = 'bg-green-200 text-green-900';
-  else colorClass = 'bg-blue-200 text-blue-900';
+  if (key.includes('pending')) colorClass = isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900';
+  else if (key.includes('checked')) colorClass = isDark ? 'bg-green-900 text-green-300' : 'bg-green-200 text-green-900';
+  else colorClass = isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-200 text-blue-900';
 
   // handle status change, update in supabase, then refresh messages
   const handleChange = async (event) => {
@@ -52,10 +52,10 @@ function StatusBadge({ status, id, refresh, setMessages }) {
       <select
         value={status}
         onChange={handleChange}
-        className="bg-transparent"
+        className={`bg-transparent outline-none ${isDark ? 'text-white' : 'text-gray-900'}`}
       >
-        <option value="Pending">Pending</option>
-        <option value="Checked">Checked</option>
+        <option value="Pending" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Pending</option>
+        <option value="Checked" className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>Checked</option>
       </select>
     </span>
   );
@@ -69,9 +69,29 @@ export default function CustomerMessagesPanel() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortField, setSortField] = useState('date');
   const [expandedRow, setExpandedRow] = useState(null);
+  const [isDark, setIsDark] = useState(false);
   
   useEffect(() => {
     fetchMessages();
+  }, []);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   // function to fetch messages from supabase
@@ -135,7 +155,7 @@ export default function CustomerMessagesPanel() {
   function renderDetails(row) {
     return (
       <tr>
-        <td colSpan={6} className="bg-gray-50 p-6 text-left text-sm border-t border-gray-200">
+        <td colSpan={6} className={`p-6 text-left text-sm border-t ${isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
 
           <div className="mb-3">
             <strong>Email:</strong> {row.email}
@@ -157,31 +177,29 @@ export default function CustomerMessagesPanel() {
 
   // render the main panel with controls and table of messages
   return (
-    <div className="rounded-lg bg-red-100 p-4 text-gray-900 shadow-sm hover:shadow-lg">
+    <div className={`rounded-lg p-4 shadow-sm hover:shadow-lg border ${isDark ? 'bg-gray-900 border-gray-700 text-white' : 'bg-slate-100 border-slate-300 text-gray-900'}`}>
 
       {/* Controls */}
       <div className="mb-4 flex flex-wrap items-center gap-4">
 
         {/* search input */}
-        <div className="relative flex-1 min-w-[240px] max-w-[420px]">
-          <input
-            type="text"
-            placeholder="Search messages"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            className="w-full rounded border border-gray-400 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-500"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Search messages"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          className={`rounded border px-3 py-2 text-sm ${isDark ? 'border-gray-600 bg-gray-800 text-white placeholder:text-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder:text-gray-400'}`}
+        />
         {/* status filter dropdown */}
-        <label className="flex items-center gap-2 text-sm font-medium">
+        <label className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
           Status
           <select
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
-            className="rounded border border-gray-300 px-3 py-2"
+            className={`rounded border px-3 py-2 ${isDark ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
           >
             {STATUS_FILTER_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value} value={option.value} className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
                 {option.label}
               </option>
             ))}
@@ -189,15 +207,15 @@ export default function CustomerMessagesPanel() {
         </label>
 
         {/* sort field dropdown */}
-        <label className="flex items-center gap-2 text-sm font-medium">
+        <label className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
           Sort
           <select
             value={sortField}
             onChange={(event) => setSortField(event.target.value)}
-            className="rounded border border-gray-300 px-3 py-2"
+            className={`rounded border px-3 py-2 ${isDark ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
           >
             {SORT_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value} value={option.value} className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
                 {option.label}
               </option>
             ))}
@@ -207,28 +225,28 @@ export default function CustomerMessagesPanel() {
       </div>
 
       {/* Table */}
-      <div className="max-h-[500px] overflow-y-auto rounded border border-gray-200 bg-white">
+      <div className={`max-h-[500px] overflow-x-auto overflow-y-auto rounded border ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
 
-        <table className="w-full border-collapse text-left text-sm">
+        <table className="min-w-[900px] w-full border-collapse text-left text-sm">
           {/* table headers */}
-          <thead className="sticky top-0 bg-gray-50">
-            <tr className="border-b-2 border-gray-200">
-              <th></th>
-              <th className="px-3 py-2 font-semibold">ID</th>
-              <th className="px-3 py-2 font-semibold">Name</th>
-              <th className="px-3 py-2 font-semibold">Email</th>
-              <th className="px-3 py-2 font-semibold">Status</th>
-              <th className="px-3 py-2 font-semibold">Date</th>
+          <thead className={`sticky top-0 ${isDark ? 'bg-gray-800 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
+            <tr className={`border-b-2 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+              <th className="w-10"></th>
+              <th className="w-20 px-3 py-2 font-semibold">ID</th>
+              <th className="w-44 px-3 py-2 font-semibold">Name</th>
+              <th className="w-64 px-3 py-2 font-semibold">Email</th>
+              <th className="w-40 px-3 py-2 font-semibold">Status</th>
+              <th className="w-36 px-3 py-2 font-semibold">Date</th>
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className={isDark ? 'text-gray-100' : 'text-gray-900'}>
             {/* render each message row, with expandable details */}
             {filteredMessages.map((row) => (
               <Fragment key={row.id}>
-                <tr key={row.id} className="odd:bg-white even:bg-gray-50">
+                <tr key={row.id} className={isDark ? 'odd:bg-gray-900 even:bg-gray-800/60' : 'odd:bg-white even:bg-gray-50'}>
 
-                  <td className="px-1 py-3">
+                  <td className="w-10 px-1 py-3 align-top">
                     <button
                       className="text-lg cursor-pointer"
                       onClick={() =>
@@ -239,22 +257,23 @@ export default function CustomerMessagesPanel() {
                     </button>
                   </td>
 
-                  <td className ="px-3 py-3">{row.id}</td>
+                  <td className ="w-20 px-3 py-3 align-top">{row.id}</td>
 
-                  <td className="px-3 py-3">{row.name}</td>
+                  <td className="w-44 px-3 py-3 align-top">{row.name}</td>
 
-                  <td className="px-3 py-3">{row.email}</td>
+                  <td className="w-64 px-3 py-3 align-top whitespace-nowrap">{row.email}</td>
 
-                  <td className="px-3 py-3">
+                  <td className="w-40 px-3 py-3 align-top">
                     <StatusBadge
                       status={row.status}
                       id={row.id}
                       refresh={fetchMessages}
                       setMessages={setMessages}
+                      isDark={isDark}
                     />
                   </td>
 
-                  <td className="px-3 py-3">
+                  <td className="w-36 px-3 py-3 align-top whitespace-nowrap">
                     {dayjs(row.created_at).format('MMM DD YYYY')}
                   </td>
 
@@ -267,7 +286,7 @@ export default function CustomerMessagesPanel() {
             {/* show message if no messages found after filtering */ }
             {filteredMessages.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-3 py-6 text-center text-gray-500">
+                <td colSpan={5} className={`px-3 py-6 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   No messages found
                 </td>
               </tr>

@@ -13,6 +13,7 @@ export default function UpdatePasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isDark, setIsDark] = useState(false);
 
   const [mfaOpen, setMfaOpen] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
@@ -22,6 +23,25 @@ export default function UpdatePasswordPage() {
   const [pendingPassword, setPendingPassword] = useState("");
 
   const router = useRouter();
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const {
@@ -182,17 +202,31 @@ export default function UpdatePasswordPage() {
       <section className="mx-auto max-w-2xl p-6">
         <h1 className="text-3xl font-semibold mb-6">Set New Password</h1>
 
-        <div className="border border-neutral-300 rounded-md bg-white">
+        <div
+          className="border rounded-md"
+          style={{
+            borderColor: isDark ? "#374151" : "#d4d4d8",
+            backgroundColor: isDark ? "#111827" : "#ffffff",
+          }}
+        >
           <div className="p-6 md:p-8">
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div>
-                <label className="block text-black text-sm mb-1">
+                <label
+                  className="block text-sm mb-1"
+                  style={{ color: isDark ? "#e5e7eb" : "#111827" }}
+                >
                   New Password
                 </label>
                 <div className="relative">
                   <input
                     type={showNewPassword ? "text" : "password"}
-                    className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                    className="w-full rounded-sm px-3 py-2 pr-10"
+                    style={{
+                      border: `1px solid ${isDark ? "#4b5563" : "#000000"}`,
+                      backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                      color: isDark ? "#ffffff" : "#111827",
+                    }}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -200,7 +234,8 @@ export default function UpdatePasswordPage() {
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-2.5 text-neutral-500 hover:text-black cursor-pointer"
+                    className="absolute right-3 top-2.5 cursor-pointer"
+                    style={{ color: isDark ? "#9ca3af" : "#737373" }}
                   >
                     {showNewPassword ? (
                       <EyeOff size={18} strokeWidth={1.5} />
@@ -212,13 +247,21 @@ export default function UpdatePasswordPage() {
               </div>
 
               <div>
-                <label className="block text-black text-sm mb-1">
+                <label
+                  className="block text-sm mb-1"
+                  style={{ color: isDark ? "#e5e7eb" : "#111827" }}
+                >
                   Confirm New Password
                 </label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
-                    className="w-full border border-black rounded-sm px-3 py-2 pr-10"
+                    className="w-full rounded-sm px-3 py-2 pr-10"
+                    style={{
+                      border: `1px solid ${isDark ? "#4b5563" : "#000000"}`,
+                      backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                      color: isDark ? "#ffffff" : "#111827",
+                    }}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -228,7 +271,8 @@ export default function UpdatePasswordPage() {
                     onClick={() =>
                       setShowConfirmPassword(!showConfirmPassword)
                     }
-                    className="absolute right-3 top-2.5 text-neutral-500 hover:text-black cursor-pointer"
+                    className="absolute right-3 top-2.5 cursor-pointer"
+                    style={{ color: isDark ? "#9ca3af" : "#737373" }}
                   >
                     {showConfirmPassword ? (
                       <EyeOff size={18} strokeWidth={1.5} />
@@ -247,11 +291,16 @@ export default function UpdatePasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full font-medium py-2 rounded-sm mt-2 cursor-pointer transition-colors ${
-                  loading
-                    ? "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-                    : "bg-black text-white hover:bg-neutral-800"
-                }`}
+                className="w-full font-medium py-2 rounded-sm mt-2 cursor-pointer transition-colors"
+                style={{
+                  backgroundColor: loading
+                    ? (isDark ? "#374151" : "#d4d4d8")
+                    : (isDark ? "#ffffff" : "#000000"),
+                  color: loading
+                    ? (isDark ? "#9ca3af" : "#737373")
+                    : (isDark ? "#000000" : "#ffffff"),
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
               >
                 {loading ? "Updating..." : "Update Password"}
               </button>
@@ -262,9 +311,23 @@ export default function UpdatePasswordPage() {
 
       {mfaOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="w-full max-w-sm bg-white rounded-md p-6 space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold">Two-factor Verification</h2>
-            <p className="text-sm text-black">
+          <div
+            className="w-full max-w-sm rounded-md p-6 space-y-4 shadow-xl"
+            style={{
+              backgroundColor: isDark ? "#111827" : "#ffffff",
+              border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
+            }}
+          >
+            <h2
+              className="text-lg font-semibold"
+              style={{ color: isDark ? "#ffffff" : "#111827" }}
+            >
+              Two-factor Verification
+            </h2>
+            <p
+              className="text-sm"
+              style={{ color: isDark ? "#e5e7eb" : "#000000" }}
+            >
               Enter the 6-digit code from your authenticator app to finish
               resetting your password.
             </p>
@@ -274,7 +337,12 @@ export default function UpdatePasswordPage() {
                 inputMode="numeric"
                 pattern="[0-9]{6}"
                 maxLength={6}
-                className="w-full border border-black rounded-sm px-3 py-2"
+                className="w-full rounded-sm px-3 py-2"
+                style={{
+                  border: `1px solid ${isDark ? "#4b5563" : "#000000"}`,
+                  backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                  color: isDark ? "#ffffff" : "#111827",
+                }}
                 placeholder="123456"
                 value={mfaCode}
                 onChange={(e) => setMfaCode(e.target.value)}
@@ -287,7 +355,12 @@ export default function UpdatePasswordPage() {
               <div className="flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  className="px-3 py-2 border rounded-sm cursor-pointer"
+                  className="px-3 py-2 rounded-sm cursor-pointer"
+                  style={{
+                    border: `1px solid ${isDark ? "#4b5563" : "#000000"}`,
+                    backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                    color: isDark ? "#ffffff" : "#111827",
+                  }}
                   onClick={() => {
                     setMfaOpen(false);
                     setMfaCode("");
@@ -299,7 +372,11 @@ export default function UpdatePasswordPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-2 bg-black text-white rounded-sm cursor-pointer"
+                  className="px-3 py-2 rounded-sm cursor-pointer"
+                  style={{
+                    backgroundColor: isDark ? "#ffffff" : "#000000",
+                    color: isDark ? "#000000" : "#ffffff",
+                  }}
                 >
                   Verify
                 </button>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client"; 
 
 export default function ContactFormPage() {
@@ -9,6 +9,26 @@ export default function ContactFormPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState({});
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const isValidName = (name) => /^[A-Za-z\s'-]+$/.test(name);
 
@@ -131,11 +151,11 @@ export default function ContactFormPage() {
     width: "100%",
     boxSizing: "border-box",
     padding: "10px 12px",
-    border: "1px solid #cbd5e1",
+    border: isDark ? "1px solid #475569" : "1px solid #cbd5e1",
     borderRadius: "6px",
     fontSize: "14px",
-    color: "#1e293b",
-    backgroundColor: "#ffffff",
+    color: isDark ? "#e2e8f0" : "#1e293b",
+    backgroundColor: isDark ? "#0f172a" : "#ffffff",
     outline: "none",
   };
 
@@ -143,15 +163,15 @@ export default function ContactFormPage() {
     display: "block",
     fontSize: "0.875rem",
     fontWeight: "500",
-    color: "#475569",
+    color: isDark ? "#cbd5e1" : "#475569",
     marginBottom: "6px",
   };
 
   const sectionHeadingStyle = {
     fontWeight: "600",
-    color: "#334155",
+    color: isDark ? "#e2e8f0" : "#334155",
     paddingBottom: "8px",
-    borderBottom: "1px solid #e2e8f0",
+    borderBottom: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
     marginBottom: "20px",
   };
 
@@ -173,10 +193,10 @@ export default function ContactFormPage() {
 
         {/* Card */}
         <div style={{
-          border: "1px solid #e2e8f0",
+          border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
           borderRadius: "8px",
           padding: "32px",
-          backgroundColor: "#ffffff",
+          backgroundColor: isDark ? "#111827" : "#ffffff",
           boxShadow: "0 4px 6px -1px rgba(11,63,115,0.12), 0 2px 4px -1px rgba(11,63,115,0.08)",
         }}>
 
@@ -210,7 +230,7 @@ export default function ContactFormPage() {
                 onChange={handleChange}
                 placeholder="Full Name"
                 style={{ ...fieldInputStyle,
-                        borderColor: errors.name ? "#dc2626" : "#cbd5e1" }}
+                        borderColor: errors.name ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1") }}
               />
               {errors.name && (
                 <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
@@ -230,7 +250,7 @@ export default function ContactFormPage() {
                 onChange={handleChange}
                 placeholder="Email Address"
                 style={{ ...fieldInputStyle,
-                        borderColor: errors.email ? "#dc2626" : "#cbd5e1" }}
+                        borderColor: errors.email ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1") }}
               />
               {errors.email && (
                 <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
@@ -250,7 +270,7 @@ export default function ContactFormPage() {
                 onChange={handleChange}
                 placeholder="Phone Number"
                 style={{ ...fieldInputStyle,
-                        borderColor: errors.phone ? "#dc2626" : "#cbd5e1" }}
+                        borderColor: errors.phone ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1") }}
               />
               {errors.phone && (
                 <p style={{ color: "#dc2626", fontSize: "0.75rem", marginTop: "4px" }}>
@@ -276,7 +296,7 @@ export default function ContactFormPage() {
                 ...fieldInputStyle,
                 resize: "vertical",
                 minHeight: "120px",
-                borderColor: errors.message ? "#dc2626" : "#cbd5e1"
+                borderColor: errors.message ? "#dc2626" : (isDark ? "#475569" : "#cbd5e1")
               }}
               maxLength={500}
             />

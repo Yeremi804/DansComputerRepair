@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signUp } from '@/app/(auth)/actions';
 
@@ -63,12 +63,12 @@ const errorInputStyle = {
   border: '1px solid #ef4444',
 };
 
-function InputField({ label, name, type = 'text', placeholder, required, error, onBlurValidate, ...rest }) {
+function InputField({ label, name, type = 'text', placeholder, required, error, onBlurValidate, isDark, ...rest }) {
   const [touched, setTouched] = useState(false);
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+      <label className="block text-sm font-medium mb-1.5" style={{ color: isDark ? '#cbd5e1' : '#475569' }}>
         {label} {required && <span style={{ color: '#ef4444' }}>*</span>}
       </label>
       <input
@@ -76,7 +76,20 @@ function InputField({ label, name, type = 'text', placeholder, required, error, 
         name={name}
         placeholder={placeholder}
         required={required}
-        style={error && touched ? errorInputStyle : baseInputStyle}
+        style={
+          error && touched
+            ? {
+                ...errorInputStyle,
+                color: isDark ? '#e2e8f0' : '#1e293b',
+                backgroundColor: isDark ? '#0f172a' : '#ffffff',
+              }
+            : {
+                ...baseInputStyle,
+                border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',
+                color: isDark ? '#e2e8f0' : '#1e293b',
+                backgroundColor: isDark ? '#0f172a' : '#ffffff',
+              }
+        }
         onFocus={(e) => {
           e.target.style.borderColor = error && touched ? '#ef4444' : '#3b82f6';
           e.target.style.boxShadow = error && touched
@@ -86,7 +99,7 @@ function InputField({ label, name, type = 'text', placeholder, required, error, 
         onBlur={(e) => {
           setTouched(true);
           if (onBlurValidate) onBlurValidate(e.target.value);
-          e.target.style.borderColor = '#cbd5e1';
+          e.target.style.borderColor = error && touched ? '#ef4444' : (isDark ? '#475569' : '#cbd5e1');
           e.target.style.boxShadow = 'none';
         }}
         aria-invalid={!!(error && touched)}
@@ -108,6 +121,26 @@ export default function CreateAdminAccountPage() {
   const [serverSuccess, setServerSuccess] = useState('');
   const [errors, setErrors] = useState({});
   const [isPending, startTransition] = useTransition();
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   function setFieldError(field, msg) {
     setErrors((prev) => ({ ...prev, [field]: msg || '' }));
@@ -193,7 +226,12 @@ export default function CreateAdminAccountPage() {
           <div
             role="status"
             aria-live="polite"
-            className="mb-4 rounded-md border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 motion-safe:animate-fadeIn"
+            className="mb-4 rounded-md border px-4 py-3 text-sm motion-safe:animate-fadeIn"
+            style={{
+              borderColor: isDark ? '#15803d' : '#86efac',
+              backgroundColor: isDark ? '#052e16' : '#f0fdf4',
+              color: isDark ? '#bbf7d0' : '#166534',
+            }}
           >
             {serverSuccess}
           </div>
@@ -204,7 +242,12 @@ export default function CreateAdminAccountPage() {
           <div
             role="alert"
             aria-live="assertive"
-            className="mb-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 motion-safe:animate-shake"
+            className="mb-4 rounded-md border px-4 py-3 text-sm motion-safe:animate-shake"
+            style={{
+              borderColor: isDark ? '#b91c1c' : '#fca5a5',
+              backgroundColor: isDark ? '#450a0a' : '#fef2f2',
+              color: isDark ? '#fecaca' : '#991b1b',
+            }}
           >
             {serverError}
           </div>
@@ -212,9 +255,10 @@ export default function CreateAdminAccountPage() {
 
         {/* Form card */}
         <div
-          className="rounded-lg bg-white"
+          className="rounded-lg"
           style={{
-            border: '1px solid #e2e8f0',
+            border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+            backgroundColor: isDark ? '#111827' : '#ffffff',
             boxShadow: '0 4px 6px -1px rgba(11, 63, 115, 0.12), 0 2px 4px -1px rgba(11, 63, 115, 0.08)',
           }}
         >
@@ -223,7 +267,7 @@ export default function CreateAdminAccountPage() {
 
               {/* First name */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: isDark ? '#cbd5e1' : '#475569' }}>
                   First name <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -231,7 +275,20 @@ export default function CreateAdminAccountPage() {
                   name="firstName"
                   placeholder="First name"
                   required
-                  style={errors.firstName ? errorInputStyle : baseInputStyle}
+                  style={
+                    errors.firstName
+                      ? {
+                          ...errorInputStyle,
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                      : {
+                          ...baseInputStyle,
+                          border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                  }
                   onFocus={(e) => {
                     e.target.style.borderColor = errors.firstName ? '#ef4444' : '#3b82f6';
                     e.target.style.boxShadow = errors.firstName
@@ -240,7 +297,7 @@ export default function CreateAdminAccountPage() {
                   }}
                   onBlur={(e) => {
                     setFieldError('firstName', e.target.value.trim() ? '' : 'First name is required.');
-                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.borderColor = isDark ? '#475569' : '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -251,7 +308,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Last name */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: isDark ? '#cbd5e1' : '#475569' }}>
                   Last name <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -259,7 +316,20 @@ export default function CreateAdminAccountPage() {
                   name="lastName"
                   placeholder="Last name"
                   required
-                  style={errors.lastName ? errorInputStyle : baseInputStyle}
+                  style={
+                    errors.lastName
+                      ? {
+                          ...errorInputStyle,
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                      : {
+                          ...baseInputStyle,
+                          border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                  }
                   onFocus={(e) => {
                     e.target.style.borderColor = errors.lastName ? '#ef4444' : '#3b82f6';
                     e.target.style.boxShadow = errors.lastName
@@ -268,7 +338,7 @@ export default function CreateAdminAccountPage() {
                   }}
                   onBlur={(e) => {
                     setFieldError('lastName', e.target.value.trim() ? '' : 'Last name is required.');
-                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.borderColor = isDark ? '#475569' : '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -279,7 +349,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Email address */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: isDark ? '#cbd5e1' : '#475569' }}>
                   Email address <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -287,7 +357,20 @@ export default function CreateAdminAccountPage() {
                   name="email"
                   placeholder="Email address"
                   required
-                  style={errors.email ? errorInputStyle : baseInputStyle}
+                  style={
+                    errors.email
+                      ? {
+                          ...errorInputStyle,
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                      : {
+                          ...baseInputStyle,
+                          border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                  }
                   onFocus={(e) => {
                     e.target.style.borderColor = errors.email ? '#ef4444' : '#3b82f6';
                     e.target.style.boxShadow = errors.email
@@ -296,7 +379,7 @@ export default function CreateAdminAccountPage() {
                   }}
                   onBlur={(e) => {
                     setFieldError('email', e.target.value.trim() ? '' : 'Email address is required.');
-                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.borderColor = isDark ? '#475569' : '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -307,7 +390,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Phone number */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: isDark ? '#cbd5e1' : '#475569' }}>
                   Phone number <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -315,7 +398,20 @@ export default function CreateAdminAccountPage() {
                   name="phone"
                   placeholder="e.g. 555-123-4567"
                   required
-                  style={errors.phone ? errorInputStyle : baseInputStyle}
+                  style={
+                    errors.phone
+                      ? {
+                          ...errorInputStyle,
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                      : {
+                          ...baseInputStyle,
+                          border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                  }
                   onFocus={(e) => {
                     e.target.style.borderColor = errors.phone ? '#ef4444' : '#3b82f6';
                     e.target.style.boxShadow = errors.phone
@@ -324,7 +420,7 @@ export default function CreateAdminAccountPage() {
                   }}
                   onBlur={(e) => {
                     setFieldError('phone', validatePhone(e.target.value) || '');
-                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.borderColor = isDark ? '#475569' : '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                   aria-invalid={!!errors.phone}
@@ -337,7 +433,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: isDark ? '#cbd5e1' : '#475569' }}>
                   Password <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -345,7 +441,20 @@ export default function CreateAdminAccountPage() {
                   name="password"
                   placeholder="Minimum 10 characters"
                   required
-                  style={errors.password ? errorInputStyle : baseInputStyle}
+                  style={
+                    errors.password
+                      ? {
+                          ...errorInputStyle,
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                      : {
+                          ...baseInputStyle,
+                          border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                  }
                   onFocus={(e) => {
                     e.target.style.borderColor = errors.password ? '#ef4444' : '#3b82f6';
                     e.target.style.boxShadow = errors.password
@@ -354,7 +463,7 @@ export default function CreateAdminAccountPage() {
                   }}
                   onBlur={(e) => {
                     setFieldError('password', validatePassword(e.target.value) || '');
-                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.borderColor = isDark ? '#475569' : '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                   aria-invalid={!!errors.password}
@@ -367,7 +476,7 @@ export default function CreateAdminAccountPage() {
 
               {/* Confirm password */}
               <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#475569' }}>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: isDark ? '#cbd5e1' : '#475569' }}>
                   Confirm password <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
@@ -375,7 +484,20 @@ export default function CreateAdminAccountPage() {
                   name="confirmPassword"
                   placeholder="Minimum 10 characters"
                   required
-                  style={errors.confirmPassword ? errorInputStyle : baseInputStyle}
+                  style={
+                    errors.confirmPassword
+                      ? {
+                          ...errorInputStyle,
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                      : {
+                          ...baseInputStyle,
+                          border: isDark ? '1px solid #475569' : '1px solid #cbd5e1',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                        }
+                  }
                   onFocus={(e) => {
                     e.target.style.borderColor = errors.confirmPassword ? '#ef4444' : '#3b82f6';
                     e.target.style.boxShadow = errors.confirmPassword
@@ -384,7 +506,7 @@ export default function CreateAdminAccountPage() {
                   }}
                   onBlur={(e) => {
                     setFieldError('confirmPassword', e.target.value.trim() ? '' : 'Please confirm your password.');
-                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.borderColor = isDark ? '#475569' : '#cbd5e1';
                     e.target.style.boxShadow = 'none';
                   }}
                   aria-invalid={!!errors.confirmPassword}
@@ -426,14 +548,14 @@ export default function CreateAdminAccountPage() {
           {/* Divider + Sign in */}
           <div
             className="p-6 md:p-8"
-            style={{ borderTop: '1px solid #e2e8f0' }}
+            style={{ borderTop: isDark ? '1px solid #334155' : '1px solid #e2e8f0' }}
           >
             <div className="flex justify-center items-center gap-2">
-              <span className="text-sm" style={{ color: '#64748b' }}>Or</span>
+              <span className="text-sm" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>Or</span>
               <a
                 href="/admin-log-in"
                 style={{
-                  backgroundColor: '#475569',
+                  backgroundColor: isDark ? '#334155' : '#475569',
                   color: '#ffffff',
                   padding: '8px 16px',
                   borderRadius: '6px',
@@ -443,7 +565,7 @@ export default function CreateAdminAccountPage() {
                   transition: 'background-color 0.15s ease',
                 }}
                 onMouseEnter={(e) => { e.target.style.backgroundColor = '#334155'; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = '#475569'; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = isDark ? '#334155' : '#475569'; }}
               >
                 Sign in
               </a>

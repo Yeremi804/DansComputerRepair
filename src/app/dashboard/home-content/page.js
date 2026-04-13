@@ -12,6 +12,7 @@ export default function HomeContentPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [isDark, setIsDark] = useState(false);
 
   const [aboutDraft, setAboutDraft] = useState({ title: "", body: "" });
   const [footerDraft, setFooterDraft] = useState({
@@ -27,6 +28,25 @@ export default function HomeContentPage() {
   const [hoursRows, setHoursRows] = useState([
     { day: "Mon - Sat", open: "7 AM", close: "9 PM" },
   ]);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(() => {
+      syncTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   function updateHourRow(idx, field, value) {
     setHoursRows((prev) =>
@@ -175,11 +195,11 @@ export default function HomeContentPage() {
     setSaving(false);
   }
 
-  if (loading) return <div className="p-8">Loading…</div>;
+  if (loading) return <div className="p-8 bg-main-bg text-main-text">Loading…</div>;
 
   if (!isAdmin) {
     return (
-      <div className="p-8">
+      <div className="p-8 bg-main-bg text-main-text min-h-screen">
         <h1 className="text-2xl font-bold">Home Content</h1>
         <p className="mt-3 text-red-700">
           You are not authorized to view this page.
@@ -199,36 +219,66 @@ export default function HomeContentPage() {
               <h1 className="text-3xl font-semibold text-main-text">
                 Home Content
               </h1>
-              <p className="mt-1 text-sm text-slate-600">
+              <p className="mt-1 text-sm" style={{ color: isDark ? "#9ca3af" : "#475569" }}>
                 Edit drafts, preview changes, and publish updates to the live
                 site.
               </p>
             </div>
 
             {msg && (
-              <div className="mb-6 rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-700 shadow-sm">
+              <div
+                className="mb-6 rounded-lg px-4 py-3 shadow-sm"
+                style={{
+                  border: isDark ? "1px solid #374151" : "1px solid #e2e8f0",
+                  backgroundColor: isDark ? "#111827" : "#ffffff",
+                  color: isDark ? "#e5e7eb" : "#334155",
+                }}
+              >
                 {msg}
               </div>
             )}
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div
+              className="rounded-2xl p-6 shadow-sm"
+              style={{
+                border: isDark ? "1px solid #374151" : "1px solid #e2e8f0",
+                backgroundColor: isDark ? "#0f172a" : "#ffffff",
+              }}
+            >
               <section className="pb-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <h2
+                    className="text-lg font-semibold"
+                    style={{ color: isDark ? "#ffffff" : "#0f172a" }}
+                  >
                     About Us (Draft)
                   </h2>
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                  <span
+                    className="rounded-full px-3 py-1 text-xs font-medium"
+                    style={{
+                      backgroundColor: isDark ? "#1e293b" : "#f1f5f9",
+                      color: isDark ? "#e5e7eb" : "#334155",
+                    }}
+                  >
                     home_about
                   </span>
                 </div>
 
                 <div className="grid gap-4">
                   <label className="block">
-                    <div className="mb-1 text-sm font-medium text-slate-700">
+                    <div
+                      className="mb-1 text-sm font-medium"
+                      style={{ color: isDark ? "#e5e7eb" : "#334155" }}
+                    >
                       Title
                     </div>
                     <input
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+                      className="w-full rounded-lg px-3 py-2 outline-none transition"
+                      style={{
+                        border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                        backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                        color: isDark ? "#ffffff" : "#0f172a",
+                      }}
                       value={aboutDraft.title ?? ""}
                       onChange={(e) =>
                         setAboutDraft({ ...aboutDraft, title: e.target.value })
@@ -238,11 +288,19 @@ export default function HomeContentPage() {
                   </label>
 
                   <label className="block">
-                    <div className="mb-1 text-sm font-medium text-slate-700">
+                    <div
+                      className="mb-1 text-sm font-medium"
+                      style={{ color: isDark ? "#e5e7eb" : "#334155" }}
+                    >
                       Body
                     </div>
                     <textarea
-                      className="w-full min-h-[140px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+                      className="w-full min-h-[140px] rounded-lg px-3 py-2 outline-none transition"
+                      style={{
+                        border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                        backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                        color: isDark ? "#ffffff" : "#0f172a",
+                      }}
                       value={aboutDraft.body ?? ""}
                       onChange={(e) =>
                         setAboutDraft({ ...aboutDraft, body: e.target.value })
@@ -253,7 +311,10 @@ export default function HomeContentPage() {
                 </div>
               </section>
 
-              <div className="my-6 border-t border-slate-200" />
+              <div
+                className="my-6 border-t"
+                style={{ borderColor: isDark ? "#334155" : "#e2e8f0" }}
+              />
 
               <section className="pb-6">
                 <div className="mb-4 flex items-center justify-between">
@@ -307,21 +368,38 @@ export default function HomeContentPage() {
 
               <section className="pb-2">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <h2
+                    className="text-lg font-semibold"
+                    style={{ color: isDark ? "#ffffff" : "#0f172a" }}
+                  >
                     Footer (Draft)
                   </h2>
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                  <span
+                    className="rounded-full px-3 py-1 text-xs font-medium"
+                    style={{
+                      backgroundColor: isDark ? "#1e293b" : "#f1f5f9",
+                      color: isDark ? "#e5e7eb" : "#334155",
+                    }}
+                  >
                     footer
                   </span>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <label className="block">
-                    <div className="mb-1 text-sm font-medium text-slate-700">
+                    <div
+                      className="mb-1 text-sm font-medium"
+                      style={{ color: isDark ? "#e5e7eb" : "#334155" }}
+                    >
                       Phone
                     </div>
                     <input
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+                      className="w-full rounded-lg px-3 py-2 outline-none transition"
+                      style={{
+                        border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                        backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                        color: isDark ? "#ffffff" : "#0f172a",
+                      }}
                       value={footerDraft.phone ?? ""}
                       onChange={(e) =>
                         setFooterDraft({
@@ -334,11 +412,19 @@ export default function HomeContentPage() {
                   </label>
 
                   <label className="block">
-                    <div className="mb-1 text-sm font-medium text-slate-700">
+                    <div
+                      className="mb-1 text-sm font-medium"
+                      style={{ color: isDark ? "#e5e7eb" : "#334155" }}
+                    >
                       Email
                     </div>
                     <input
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+                      className="w-full rounded-lg px-3 py-2 outline-none transition"
+                      style={{
+                        border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                        backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                        color: isDark ? "#ffffff" : "#0f172a",
+                      }}
                       value={footerDraft.email ?? ""}
                       onChange={(e) =>
                         setFooterDraft({
@@ -353,7 +439,10 @@ export default function HomeContentPage() {
 
                 <div className="mt-5">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700">
+                    <span
+                      className="text-sm font-medium"
+                      style={{ color: isDark ? "#e5e7eb" : "#334155" }}
+                    >
                       Business Hours
                     </span>
 
@@ -364,7 +453,8 @@ export default function HomeContentPage() {
                           { day: "Mon - Sat", open: "7 AM", close: "9 PM" },
                         ])
                       }
-                      className="text-xs font-semibold text-slate-700 hover:text-slate-900 underline underline-offset-4"
+                      className="text-xs font-semibold underline underline-offset-4"
+                      style={{ color: isDark ? "#e5e7eb" : "#334155" }}
                     >
                       Quick fill: Mon - Sat 7 AM - 9 PM
                     </button>
@@ -374,11 +464,19 @@ export default function HomeContentPage() {
                     {hoursRows.map((row, idx) => (
                       <div key={idx} className="grid gap-3 items-end md:grid-cols-4">
                         <label className="block">
-                          <div className="mb-1 text-xs font-medium text-slate-600">
+                          <div
+                            className="mb-1 text-xs font-medium"
+                            style={{ color: isDark ? "#9ca3af" : "#475569" }}
+                          >
                             Day(s)
                           </div>
                           <input
-                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+                            className="w-full rounded-lg px-3 py-2 outline-none transition"
+                            style={{
+                              border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                              color: isDark ? "#ffffff" : "#0f172a",
+                            }}
                             value={row.day ?? ""}
                             onChange={(e) =>
                               updateHourRow(idx, "day", e.target.value)
@@ -388,11 +486,19 @@ export default function HomeContentPage() {
                         </label>
 
                         <label className="block">
-                          <div className="mb-1 text-xs font-medium text-slate-600">
+                          <div
+                            className="mb-1 text-xs font-medium"
+                            style={{ color: isDark ? "#9ca3af" : "#475569" }}
+                          >
                             Open
                           </div>
                           <input
-                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+                            className="w-full rounded-lg px-3 py-2 outline-none transition"
+                            style={{
+                              border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                              color: isDark ? "#ffffff" : "#0f172a",
+                            }}
                             value={row.open ?? ""}
                             onChange={(e) =>
                               updateHourRow(idx, "open", e.target.value)
@@ -402,11 +508,19 @@ export default function HomeContentPage() {
                         </label>
 
                         <label className="block">
-                          <div className="mb-1 text-xs font-medium text-slate-600">
+                          <div
+                            className="mb-1 text-xs font-medium"
+                            style={{ color: isDark ? "#9ca3af" : "#475569" }}
+                          >
                             Close
                           </div>
                           <input
-                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+                            className="w-full rounded-lg px-3 py-2 outline-none transition"
+                            style={{
+                              border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                              color: isDark ? "#ffffff" : "#0f172a",
+                            }}
                             value={row.close ?? ""}
                             onChange={(e) =>
                               updateHourRow(idx, "close", e.target.value)
@@ -419,7 +533,12 @@ export default function HomeContentPage() {
                           type="button"
                           onClick={() => removeHourRow(idx)}
                           disabled={hoursRows.length === 1}
-                          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+                          className="rounded-lg px-3 py-2 text-sm font-semibold shadow-sm transition disabled:opacity-50"
+                          style={{
+                            border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                            color: isDark ? "#ffffff" : "#0f172a",
+                          }}
                           title={
                             hoursRows.length === 1 ? "Keep at least one row" : "Remove"
                           }
@@ -433,7 +552,11 @@ export default function HomeContentPage() {
                   <button
                     type="button"
                     onClick={addHourRow}
-                    className="mt-3 rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-200"
+                    className="mt-3 rounded-lg px-3 py-2 text-sm font-semibold transition"
+                    style={{
+                      backgroundColor: isDark ? "#1e293b" : "#f1f5f9",
+                      color: isDark ? "#ffffff" : "#0f172a",
+                    }}
                   >
                     + Add another day range
                   </button>
@@ -444,7 +567,11 @@ export default function HomeContentPage() {
                 <button
                   onClick={saveDraft}
                   disabled={saving}
-                  className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
+                  className="rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition disabled:opacity-50"
+                  style={{
+                    backgroundColor: isDark ? "#ffffff" : "#0f172a",
+                    color: isDark ? "#000000" : "#ffffff",
+                  }}
                 >
                   Save Draft
                 </button>
@@ -453,7 +580,12 @@ export default function HomeContentPage() {
                   href="/?preview=1"
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
+                  className="rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition"
+                  style={{
+                    border: isDark ? "1px solid #334155" : "1px solid #e2e8f0",
+                    backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                    color: isDark ? "#ffffff" : "#0f172a",
+                  }}
                 >
                   Preview Draft
                 </a>
@@ -466,7 +598,14 @@ export default function HomeContentPage() {
                   Publish
                 </button>
 
-                {saving && <span className="text-sm text-slate-500">Working…</span>}
+                {saving && (
+                  <span
+                    className="text-sm"
+                    style={{ color: isDark ? "#9ca3af" : "#64748b" }}
+                  >
+                    Working…
+                  </span>
+                )}
               </div>
             </div>
           </div>
