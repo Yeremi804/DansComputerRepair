@@ -4,44 +4,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /*Chaing this to have it optically change background color to dark mode*/
-  background-color: var(--current-bg); /* Light slate background, consistent with other pages */
+  background-color: var(--current-bg);
   min-height: 100vh;
 }
 
 /* --- Page title: matches text-3xl + font-semibold used across the site --- */
 .title {
-  font-size: 1.875rem; /* 30px (text-3xl) */
+  font-size: 1.875rem;
   font-weight: 600;
   margin-bottom: 24px;
   width: 100%;
   max-width: 960px;
   text-align: left;
-  /*Chaing this to have it optically change text color to dark mode*/
-  color:var(--current-text); /* Dark slate, consistent with other page headings */
+  color: var(--current-text);
 }
 
 /* --- Form card: elevated white card matching settings/admin card style --- */
 .formBox {
   width: 100%;
   max-width: 960px;
-  border: 1px solid #e2e8f0; /* Matches sidebar and card borders across the site */
-  border-radius: 8px;
-  padding: 32px;
-  background: #ffffff;
-  box-shadow: 0 4px 6px -1px rgba(11, 63, 115, 0.12),
-              0 2px 4px -1px rgba(11, 63, 115, 0.08); /* Matches admin-parts card shadow */
+  border: 1px solid var(--form-card-border);
+  border-radius: var(--form-card-radius);
+  padding: var(--form-card-padding);
+  background: var(--form-card-bg);
+  box-shadow: var(--form-card-shadow);
 }
 
-/* --- Section headers inside the form (e.g., "1. Contact Information") --- */
+/* --- Section headers inside the form --- */
 .sectionHeader {
   font-weight: 600;
   font-size: 1rem;
-  color: #334155; /* Slate-700, consistent with other section labels */
+  color: var(--section-heading-color);
   margin-top: 8px;
   margin-bottom: 14px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #e2e8f0; /* Subtle divider line under each section */
+  border-bottom: 1px solid var(--section-heading-border);
 }
 
 /* --- 3-column grid layout for contact fields --- */
@@ -67,36 +64,35 @@
   margin-bottom: 4px;
 }
 
-/* --- Field label text --- */
+/* --- Field label text — delegates to global .form-label token --- */
 .label {
-  font-size: 0.875rem; /* 14px, matches text-sm used on admin labels */
-  font-weight: 500;
-  color: #475569; /* Slate-600, softer than pure black for readability */
-  margin-bottom: 6px;
+  font-size: var(--label-font-size);
+  font-weight: var(--label-font-weight);
+  color: var(--label-color);
+  margin-bottom: var(--label-margin-bottom);
 }
 
 /* --- Shared styles for all input fields and selects --- */
+/* Note: most inputs now use global .form-input class; this keeps module-scoped inputs consistent */
 .input {
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1; /* Matches sidebar border color used across the site */
-  border-radius: 6px;
-  font-size: 14px;
-  color: #1e293b;
-  background-color: #ffffff;
+  padding: var(--input-padding);
+  border: 1px solid var(--input-border);
+  border-radius: var(--input-radius);
+  font-size: var(--input-font-size);
+  color: var(--input-text);
+  background-color: var(--input-bg);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   outline: none;
 }
 
-/* --- Focus state for inputs: blue ring consistent with site's primary color --- */
 .input:focus {
-  border-color: #3b82f6; /* Blue-500 */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--input-border-focus);
+  box-shadow: var(--input-focus-shadow);
 }
 
-/* --- Disabled input state (e.g., device select/text mutual exclusion) --- */
 .input:disabled {
-  background-color: #f1f5f9; /* Light slate background for disabled fields */
-  color: #94a3b8;            /* Muted slate text */
+  background-color: var(--input-bg-disabled);
+  color: var(--input-text-disabled);
   cursor: not-allowed;
   opacity: 0.7;
   border-color: #e2e8f0;
@@ -105,59 +101,26 @@
 /* --- Textarea for "Any other questions" --- */
 .textarea {
   min-height: 120px;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #1e293b;
-  background-color: #ffffff;
-  resize: vertical; /* Allow vertical resize only */
+  padding: var(--input-padding);
+  border: 1px solid var(--input-border);
+  border-radius: var(--input-radius);
+  font-size: var(--input-font-size);
+  color: var(--input-text);
+  background-color: var(--input-bg);
+  resize: vertical;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   outline: none;
 }
 
-/* --- Focus state for textarea --- */
 .textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-/* --- Submit button row --- */
-.actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-/* --- Submit button: matches the green primary action used on the config form --- */
-.submitBtn {
-  background-color: #16a34a; /* Green-600, matches "Submit Configuration" button */
-  color: #ffffff;
-  border: none;
-  padding: 12px 80px;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  transition: background-color 0.15s ease, transform 0.1s ease;
-}
-
-/* --- Submit button hover effect --- */
-.submitBtn:hover:not(:disabled) {
-  background-color: #15803d; /* Green-700 on hover */
-  transform: translateY(-1px);
-}
-
-/* --- Submit button disabled state (while sending) --- */
-.submitBtn:disabled {
-  background-color: #86efac; /* Green-300, muted when disabled */
-  cursor: not-allowed;
+  border-color: var(--input-border-focus);
+  box-shadow: var(--input-focus-shadow);
 }
 
 /* --- Status messages --- */
 .message  { margin-top: 12px; font-size: 0.875rem; }
-.success  { margin-top: 12px; font-size: 0.875rem; color: #065f46; } /* Matches settings success color */
-.error    { margin-top: 12px; font-size: 0.875rem; color: #9b1c1c; } /* Matches settings error color */
+.success  { margin-top: 12px; font-size: 0.875rem; color: #065f46; }
+.error    { margin-top: 12px; font-size: 0.875rem; color: #9b1c1c; }
 
 /* --- SMS consent checkbox row --- */
 .checkboxField {
@@ -168,19 +131,17 @@
   gap: 8px;
 }
 
-/* --- Checkbox input styling --- */
 .checkbox {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #16a34a; /* Green accent to match the submit button */
+  accent-color: var(--btn-primary-bg);
   flex-shrink: 0;
 }
 
-/* --- Checkbox label text --- */
 .checkboxLabel {
-  font-size: 0.875rem;
-  color: #475569;
+  font-size: var(--label-font-size);
+  color: var(--label-color);
   cursor: pointer;
   line-height: 1.4;
 }
@@ -193,11 +154,6 @@
 
   .grid3,
   .grid2 {
-    grid-template-columns: 1fr; /* Single column on small screens */
-  }
-
-  .submitBtn {
-    width: 100%;
-    padding: 12px;
+    grid-template-columns: 1fr;
   }
 }

@@ -44,24 +44,9 @@ function validatePhone(phone) {
   return null;
 }
 
-// Shared input style
-const baseInputStyle = {
-  width: '100%',
-  padding: '10px 12px',
-  border: '1px solid #cbd5e1',
-  borderRadius: '6px',
-  fontSize: '14px',
-  color: '#1e293b',
-  backgroundColor: '#ffffff',
-  outline: 'none',
-  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-  boxSizing: 'border-box',
-};
-
-const errorInputStyle = {
-  ...baseInputStyle,
-  border: '1px solid #ef4444',
-};
+// Shared input style — kept for onFocus/onBlur dynamic border manipulation
+const baseInputStyle = {};
+const errorInputStyle = {};
 
 function InputField({ label, name, type = 'text', placeholder, required, error, onBlurValidate, isDark, ...rest }) {
   const [touched, setTouched] = useState(false);
@@ -520,25 +505,11 @@ export default function CreateAdminAccountPage() {
             </div>
 
             {/* Sign up button */}
-            <div className="mt-8">
+            <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
               <button
                 type="submit"
                 disabled={isPending}
-                style={{
-                  width: '100%',
-                  backgroundColor: '#16a34a',
-                  color: '#ffffff',
-                  border: 'none',
-                  padding: '12px',
-                  borderRadius: '6px',
-                  fontSize: '0.9375rem',
-                  fontWeight: '600',
-                  cursor: isPending ? 'not-allowed' : 'pointer',
-                  opacity: isPending ? 0.6 : 1,
-                  transition: 'background-color 0.15s ease',
-                }}
-                onMouseEnter={(e) => { if (!isPending) e.target.style.backgroundColor = '#15803d'; }}
-                onMouseLeave={(e) => { if (!isPending) e.target.style.backgroundColor = '#16a34a'; }}
+                className={`btn-primary btn-wide${isPending ? ' opacity-60 cursor-not-allowed' : ''}`}
               >
                 {isPending ? 'Creating account…' : 'Sign up'}
               </button>

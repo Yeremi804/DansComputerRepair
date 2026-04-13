@@ -309,6 +309,7 @@ export default function UpdatePasswordPage() {
         </div>
       </section>
 
+      {/* Two-factor Verification Popup */}
       {mfaOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div
@@ -352,7 +353,7 @@ export default function UpdatePasswordPage() {
 
               {mfaError && <div className="text-red-600 text-sm">{mfaError}</div>}
 
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   type="button"
                   className="px-3 py-2 rounded-sm cursor-pointer"

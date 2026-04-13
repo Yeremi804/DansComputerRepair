@@ -3,19 +3,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 
-/**
- * DashboardAuditPanel
- *
- * Client-side component that queries the `audit_logs` table and renders
- * a small table of recent entries
-*/
-
 export default function DashboardAuditPanel() {
-  // logs: array of audit log objects
   const [logs, setLogs] = useState([]);
-  // loading & error UI state
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState("");
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -37,35 +28,35 @@ export default function DashboardAuditPanel() {
     return () => observer.disconnect();
   }, []);
 
-  // Fetch the most recent 50 audit log rows on mount
   useEffect(() => {
     const fetchLogs = async () => {
-      setLoading(true);
-      setErrorMsg("");
+      try {
+        setLoading(true);
+        const { data, error: fetchError } = await supabase
+          .from("audit_logs")
+          .select("id, created_at, actor_email, action, entity_type, entity_id")
+          .order("created_at", { ascending: false })
+          .limit(50);
 
-      // Query: id, created_at, actor_email, action, entity_type, entity_id
-      // Order by created_at descending to show newest first.
-      const { data, error } = await supabase
-        .from("audit_logs")
-        .select("id, created_at, actor_email, action, entity_type, entity_id")
-        .order("created_at", { ascending: false })
-        .limit(50);
+        if (fetchError) {
+          setError(fetchError.message);
+          return;
+        }
 
-      if (error) {
-        // Log error in console and show a helpful message in the UI
-        console.error("Audit logs fetch error:", error);
-        setErrorMsg(error.message ?? "Failed to load audit logs.");
-        setLogs([]);
-      } else {
-        // Normalize missing data to empty array
-        setLogs(data ?? []);
+        setLogs(data || []);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch audit logs");
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchLogs();
   }, []);
+
+  if (loading) return <div className="bg-main-bg text-main-text p-4">Loading...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
 
   return (
     <div className={`p-4 rounded-xl shadow-sm border ${isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-slate-100 border-slate-300 text-gray-900"}`}>
@@ -118,7 +109,22 @@ export default function DashboardAuditPanel() {
             </tbody>
           </table>
         </div>
-      )}
+        <div>
+          {logs.length === 0 ? (
+            <div className="p-4 text-sm text-neutral-500">No audit logs found.</div>
+          ) : (
+            logs.map((log) => (
+              <div key={log.id} className="grid grid-cols-5 border-b border-neutral-300 hover:bg-neutral-50">
+                <div className="p-4 text-sm">{new Date(log.created_at).toLocaleString()}</div>
+                <div className="p-4 text-sm">{log.actor_email ?? "—"}</div>
+                <div className="p-4 text-sm">{log.action}</div>
+                <div className="p-4 text-sm">{log.entity_type}</div>
+                <div className="p-4 text-sm">{log.entity_id ?? "—"}</div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }

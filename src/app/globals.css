@@ -12,7 +12,89 @@
   /* active color variables  that is going to be used*/
   --current-bg: var(--bright-bg);
   --current-text: var(--brightt-text);
+
+  /* ============================================================
+     UNIFIED FORM & BUTTON DESIGN TOKENS
+     ============================================================ */
+
+  /* --- Input fields --- */
+  --input-border: #cbd5e1;
+  --input-border-focus: #3b82f6;
+  --input-border-error: #ef4444;
+  --input-bg: #ffffff;
+  --input-bg-disabled: #f1f5f9;
+  --input-text: #1e293b;
+  --input-text-disabled: #94a3b8;
+  --input-placeholder: #94a3b8;
+  --input-radius: 6px;
+  --input-padding: 10px 12px;
+  --input-font-size: 14px;
+  --input-focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  --input-error-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+
+  /* --- Labels --- */
+  --label-color: #475569;
+  --label-font-size: 0.875rem;
+  --label-font-weight: 500;
+  --label-margin-bottom: 6px;
+
+  /* --- Section headings inside forms --- */
+  --section-heading-color: #334155;
+  --section-heading-border: #e2e8f0;
+
+  /* --- Primary action button (submit / save / confirm) --- */
+  --btn-primary-bg: #16a34a;
+  --btn-primary-bg-hover: #15803d;
+  --btn-primary-bg-disabled: #86efac;
+  --btn-primary-text: #ffffff;
+  --btn-primary-radius: 6px;
+  --btn-primary-padding: 10px 32px;
+  --btn-primary-font-size: 0.9375rem;
+  --btn-primary-font-weight: 600;
+
+  /* --- Secondary / neutral button (cancel / back) --- */
+  --btn-secondary-bg: #f1f5f9;
+  --btn-secondary-bg-hover: #e2e8f0;
+  --btn-secondary-text: #334155;
+  --btn-secondary-border: #cbd5e1;
+  --btn-secondary-radius: 6px;
+  --btn-secondary-padding: 10px 20px;
+  --btn-secondary-font-size: 0.875rem;
+  --btn-secondary-font-weight: 500;
+
+  /* --- Outline / ghost button (sign up link, etc.) --- */
+  --btn-outline-bg: #475569;
+  --btn-outline-bg-hover: #334155;
+  --btn-outline-text: #ffffff;
+  --btn-outline-radius: 6px;
+  --btn-outline-padding: 8px 16px;
+  --btn-outline-font-size: 0.875rem;
+  --btn-outline-font-weight: 500;
+
+  /* --- Danger button (delete / unenroll) --- */
+  --btn-danger-bg: #ef4444;
+  --btn-danger-bg-hover: #dc2626;
+  --btn-danger-text: #ffffff;
+  --btn-danger-radius: 6px;
+
+  /* --- Form card --- */
+  --form-card-border: #e2e8f0;
+  --form-card-radius: 8px;
+  --form-card-padding: 32px;
+  --form-card-bg: #ffffff;
+  --form-card-shadow: 0 4px 6px -1px rgba(11, 63, 115, 0.12),
+                      0 2px 4px -1px rgba(11, 63, 115, 0.08);
+
+  /* --- Shorthand aliases used in CSS modules (settings, admin-parts) --- */
+  --btn-radius: var(--btn-primary-radius);
+  --btn-padding-y: 10px;
+  --btn-padding-x: 20px;
+  --btn-font-size: var(--btn-primary-font-size);
+  --btn-font-weight: var(--btn-primary-font-weight);
+  --btn-primary-hover: var(--btn-primary-bg-hover);
+  --btn-secondary-hover: var(--btn-secondary-bg-hover);
 }
+
 .dark {
   --current-bg: var(--dark-bg);
   --current-text: var(--dark-text);
@@ -40,7 +122,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .yelp-review {
@@ -52,7 +134,27 @@ body {
   color: #0073bb !important;
   text-decoration: underline;
 }
-.yelp-embed-loaded .yelp-review {
+.form-input.input-error {
+  border-color: var(--input-border-error);
+}
+.form-input.input-error:focus {
+  box-shadow: var(--input-error-shadow);
+}
+
+/* Select dropdown arrow */
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
+}
+
+/* Label */
+.form-label {
   display: block;
 }
 
@@ -71,67 +173,293 @@ body {
 .site-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  border-bottom: 1px solid #ddd;
+  justify-content: center;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--btn-primary-bg-hover);
+}
+.btn-primary:disabled {
+  background-color: var(--btn-primary-bg-disabled);
+  cursor: not-allowed;
+  transform: none;
 }
 
-.brand {
-  display: flex;
+/* Secondary button */
+.btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--btn-secondary-border);
+  padding: var(--btn-secondary-padding);
+  border-radius: var(--btn-secondary-radius);
+  font-size: var(--btn-secondary-font-size);
+  font-weight: var(--btn-secondary-font-weight);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: inline-flex;
   align-items: center;
-  gap: 12px; /* space between logo and title */
+  justify-content: center;
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--btn-secondary-bg-hover);
 }
 
-.nav-list {
-  display: flex;
-  gap: 16px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-list a,
-.nav-list button {
+/* Outline button */
+.btn-outline {
+  background-color: var(--btn-outline-bg);
+  color: var(--btn-outline-text);
+  border: none;
+  padding: var(--btn-outline-padding);
+  border-radius: var(--btn-outline-radius);
+  font-size: var(--btn-outline-font-size);
+  font-weight: var(--btn-outline-font-weight);
+  cursor: pointer;
   text-decoration: none;
-  color: inherit;
-  padding: 6px 10px;
-  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--btn-outline-bg-hover);
 }
 
-.nav-list a:hover,
-.nav-list button:hover {
-  background-color: #f2f2f2;
+/* Danger button */
+.btn-danger {
+  background-color: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
+  border: none;
+  padding: var(--btn-secondary-padding);
+  border-radius: var(--btn-danger-radius);
+  font-size: var(--btn-secondary-font-size);
+  font-weight: var(--btn-primary-font-weight);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--btn-danger-bg-hover);
 }
 
-.brand img {
-  height: 60px;
-  width: auto;
+/* Full-width variant */
+.btn-full {
+  width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
+/* Black button — used for Download CSV, etc. */
+.btn-black {
+  background-color: #1e293b;
+  color: #ffffff;
+  border: none;
+  padding: var(--btn-primary-padding);
+  border-radius: var(--btn-primary-radius);
+  font-size: var(--btn-primary-font-size);
+  font-weight: var(--btn-primary-font-weight);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+.btn-black:hover:not(:disabled) {
+  background-color: #0f172a;
 }
 
-.brand-text h1 {
-  margin: 0;
+.btn-grey {
+  background-color: #E0E0E0;
+  color: #1e293b;
+  border: none;
+  padding: var(--btn-primary-padding);
+  border-radius: var(--btn-primary-radius);
+  font-size: var(--btn-primary-font-size);
+  font-weight: var(--btn-primary-font-weight);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+.btn-grey:hover:not(:disabled) {
+  background-color: #424242;
 }
 
-.brand-text p {
-  /* small subtitle under the main title */
-  margin: 4px 0 0;
-  font-size: 0.85rem;
-  line-height: 1.1;
-  color: inherit;
-  opacity: 0.75;
+.btn-pink {
+  background-color: transparent;
+  color: #be185d; /* text-pink-700 */
+  border: 1px solid #db2777; /* border-pink-600 */
+
+  padding: var(--btn-primary-padding);
+  border-radius: var(--btn-primary-radius);
+
+  font-size: var(--btn-primary-font-size);
+  font-weight: var(--btn-primary-font-weight);
+
+  cursor: pointer;
+  transition: all 0.2s;
+
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+
+  outline: none;
+}
+/* hover */
+.btn-pink:hover:not(:disabled) {
+  background-color: #db2777; /* pink-600 */
+  color: #ffffff;
+}
+/* focus-visible */
+.btn-pink:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #ec4899; /* ring-pink-500 */
 }
 
-/* make the main title a bit more prominent */
-.brand-text h1 {
+/* Disabled grey state — used for Sign In before CAPTCHA, etc. */
+.btn-disabled-grey,
+.btn-disabled-grey:disabled {
+  background-color: #94a3b8 !important;
+  color: #ffffff !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* Unified checkbox accent color */
+.checkbox-accent {
+  accent-color: var(--btn-primary-bg);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Wide submit (centered, padded) */
+.btn-wide {
+  padding: 12px 80px;
+}
+
+/* Unified modal card style (used in admin-login popups, settings modals, parts modal) */
+.modal-card {
+  background: var(--form-card-bg);
+  border: 1px solid var(--form-card-border);
+  border-radius: var(--form-card-radius);
+  box-shadow: var(--form-card-shadow);
+  padding: 28px 30px 30px;
+}
+
+.modal-card h2 {
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 6px;
 }
+
+.modal-card p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.yelp-review {
+  display: none;
+}
+
+/* ============================================================
+   DASHBOARD AUDIT PANEL
+   ============================================================ */
+.audit-panel-card {
+  background: var(--form-card-bg);
+  border: 1px solid var(--form-card-border);
+  border-radius: var(--form-card-radius);
+  box-shadow: var(--form-card-shadow);
+  padding: 24px;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+.audit-state-text {
+  color: var(--label-color);
+  font-size: 0.875rem;
+}
+
+.audit-state-error {
+  color: #9b1c1c;
+}
+
+.audit-table-wrap {
+  overflow-x: auto;
+}
+
+.audit-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.audit-thead-row {
+  border-bottom: 2px solid var(--form-card-border);
+}
+
+.audit-th {
+  padding: 10px 16px 10px 0;
+  font-weight: 600;
+  color: var(--section-heading-color);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.audit-tr {
+  border-bottom: 1px solid var(--form-card-border);
+}
+
+.audit-tr:last-child {
+  border-bottom: none;
+}
+
+.audit-td {
+  padding: 10px 16px 10px 0;
+  color: var(--input-text);
+  vertical-align: middle;
+}
+
+.audit-td-muted {
+  color: var(--label-color);
+}
+
+.audit-td-mono {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.audit-action-badge {
+  display: inline-block;
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--btn-primary-bg);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.yelp-embed-loaded .yelp-review {
+  display: block;
+}
+
+
 
 .leaflet-container {
   width: 100%;

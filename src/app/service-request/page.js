@@ -398,9 +398,9 @@ export default function ServiceRequest() {
             <button
               type="submit"
               disabled={status === 'sending'}
-              className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg"
+              className="btn-primary btn-wide"
             >
-              {status === 'sending' ? 'Submitting...' : 'Submit Request'}
+              {status === 'sending' ? 'Submitting...' : 'Submit'}
             </button>
           </div>
 

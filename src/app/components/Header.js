@@ -334,10 +334,10 @@ export default function Header() {
             className="h-10 w-10 rounded-md object-contain md:h-12 md:w-12 lg:h-14 lg:w-14"
           />
           <div className="min-w-0 min-w-0 leading-tight">
-            <h1 className="text-xl truncate font-semibold tracking-tight text-main-text sm:text-2xl lg:text-[1.65rem]">
+            <h1 className="text-xl truncate font-semibold tracking-tight text-main-text sm:text-2xl lg:text-[1.65rem] whitespace-nowrap">
               Dan&apos;s Computer Repair
             </h1>
-            <p className="hidden text-sm text-main-text/80 sm:text-base sm:block">
+            <p className="hidden text-sm text-main-text/80 sm:text-base sm:block whitespace-nowrap">
               IT Services and Computer Repair
             </p>
           </div>

@@ -39,13 +39,14 @@ export default function AdminLoginPage() {
     loadCaptcha();
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     const rememberedPassword = localStorage.getItem('rememberedPassword');
-    if (rememberedEmail) {
+    // Only pre-fill fields if Remember Me was explicitly checked before
+    const wasRemembered = localStorage.getItem('rememberMeChecked') === 'true';
+    if (wasRemembered && rememberedEmail) {
       setEmail(rememberedEmail);
       setRememberMe(true);
     }
-    if (rememberedPassword) {
+    if (wasRemembered && rememberedPassword) {
       setPassword(rememberedPassword);
-      setRememberMe(true);
     }
   }, []);
 
@@ -163,9 +164,11 @@ export default function AdminLoginPage() {
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', emailTrimmed);
         localStorage.setItem('rememberedPassword', password);
+        localStorage.setItem('rememberMeChecked', 'true');
       } else {
         localStorage.removeItem('rememberedEmail');
         localStorage.removeItem('rememberedPassword');
+        localStorage.removeItem('rememberMeChecked');
       }
 
 
@@ -363,7 +366,7 @@ export default function AdminLoginPage() {
               <div
                 // When the user clicks this box, it sets showCaptcha to true, which triggers the drawer to open with the captcha inside.
                 onClick={() => setShowCaptcha(true)}
-                className={`border p-4 rounded-sm flex items-center gap-3 cursor-pointer mb-2 ${isDark ? "border-gray-700 bg-gray-800" : "border-slate-300 bg-slate-50"}`}
+                className={`border p-4 rounded-md flex items-center gap-3 cursor-pointer mb-2 ${isDark ? "border-gray-700 bg-gray-800" : "border-slate-300 bg-slate-50"}`}
               >
                 <div className={`w-6 h-6 border-2 rounded-sm flex items-center justify-center ${isDark ? "border-gray-500" : "border-slate-400"}`}>
                   {showCaptcha && <div className={`w-3 h-3 rounded-sm ${isDark ? "bg-white" : "bg-black"}`} />}
@@ -376,10 +379,10 @@ export default function AdminLoginPage() {
 
             {/*This pops open when showCaptcha is true */}
             {showCaptcha && !captchaVerified && (
-              <div className={`border p-4 mb-4 space-y-4 animate-in slide-in-from-top-1 ${isDark ? "border-gray-700 bg-gray-900" : "border-slate-300 bg-white"}`}>
+              <div className={`border p-4 mb-4 space-y-3 rounded-md animate-in slide-in-from-top-1 ${isDark ? "border-gray-700 bg-gray-900" : "border-slate-300 bg-white"}`}>
                 {/* The SVG Image open from the string of line to have it shown on clients*/}
                 <div
-                  className={`p-2 rounded-sm flex justify-center pointer-events-none ${isDark ? "bg-gray-800" : "bg-slate-100"}`}
+                  className={`p-2 rounded-md flex justify-center pointer-events-none ${isDark ? "bg-gray-800" : "bg-slate-100"}`}
                   dangerouslySetInnerHTML={{ __html: captchaSvg }}
                 />
 
@@ -535,7 +538,7 @@ export default function AdminLoginPage() {
               />
               {mfaError && <div className="text-red-600 text-sm">{mfaError}</div>}
 
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   type="button"
                   className={`px-3 py-2 rounded-sm cursor-pointer border ${isDark ? "border-gray-600 text-white hover:bg-gray-800" : "border-slate-300 text-slate-900 hover:bg-slate-100"}`}

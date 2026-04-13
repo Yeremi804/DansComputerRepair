@@ -9,6 +9,7 @@ import {
   EyeOff,
   ShieldCheck,
   Mail,
+  X,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import "./SettingsPage.css";
@@ -149,14 +150,19 @@ export default function SettingsPage() {
   // -----------------------------
   // Modal focus / escape handling
   // -----------------------------
+  const closeAllModals = () => {
+    setIsModalOpen(false);
+    setIsNameModalOpen(false);
+    setIsEmailModalOpen(false);
+    setIsMfaUnenrollOpen(false);
+  };
+
   useEffect(() => {
-    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen && !isMfaUnenrollOpen) return;
+    if (!isModalOpen && !isNameModalOpen && !isEmailModalOpen && !isMfaUnenrollOpen && !isMfaUnenrollOpen) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setIsModalOpen(false);
-        setIsNameModalOpen(false);
-        setIsEmailModalOpen(false);
+        closeAllModals();
         setIsMfaUnenrollOpen(false);
       }
     };
@@ -167,7 +173,7 @@ export default function SettingsPage() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isModalOpen, isNameModalOpen, isEmailModalOpen, isMfaUnenrollOpen]);
+  }, [isModalOpen, isNameModalOpen, isEmailModalOpen, isMfaUnenrollOpen, isMfaUnenrollOpen]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -725,7 +731,8 @@ export default function SettingsPage() {
     <div className="flex min-h-screen bg-main-bg">
       <Sidebar />
 
-      <main className={`flex-1 p-8 settings-main ${isDark ? "settings-dark" : ""}`}>
+      <div className="flex-1 relative">
+      <main className={`p-8 settings-main ${isDark ? "settings-dark" : ""}`}>
         <div className="settings-panel">
           <h2>Profile Name</h2>
           <p>Modify your profile name.</p>
@@ -774,11 +781,20 @@ export default function SettingsPage() {
             Unenroll MFA
           </button>
         </div>
+      </main>
 
-        {isModalOpen && (
+      {isModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsModalOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <div className="settings-card__icon">
                     <ShieldCheck size={26} />
@@ -895,33 +911,31 @@ export default function SettingsPage() {
                       <span className="helper-text">
                         Enter the 6-digit code from your authenticator app, then verify.
                       </span>
-                      <motion.button
+                      <button
                         type="button"
                         className="save-btn"
-                        whileHover={{ scale: 1.02 }}
                         disabled={mfaLoading}
                         onClick={handleVerifyMfaAndUpdate}
                       >
                         {mfaLoading ? "Verifying..." : "Verify MFA and update password"}
-                      </motion.button>
+                      </button>
                     </div>
                   )}
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                     disabled={loading}
                   >
                     {loading ? "Saving..." : "Update password"}
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {isMfaUnenrollOpen && (
+      {isMfaUnenrollOpen && (
           <div
             className="modal-backdrop"
             onClick={() => setIsMfaUnenrollOpen(false)}
@@ -931,6 +945,14 @@ export default function SettingsPage() {
               onClick={(event) => event.stopPropagation()}
             >
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsMfaUnenrollOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <div className="settings-card__icon">
                     <ShieldCheck size={26} />
@@ -996,35 +1018,41 @@ export default function SettingsPage() {
                             />
                           </div>
 
-                          <motion.button
+                          <button
                             type="button"
                             className="save-btn"
-                            whileHover={{ scale: 1.02 }}
                             disabled={unenrollMfaLoading}
                             onClick={handleVerifyMfaAndUnenroll}
                           >
                             {unenrollMfaLoading ? "Verifying..." : "Verify MFA and Unenroll"}
-                          </motion.button>
+                          </button>
                         </div>
                       )}
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                   >
                     Confirm Unenroll
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {isNameModalOpen && (
+      {isNameModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsNameModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsNameModalOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <h2>Update Name</h2>
                   <p>Enter your preferred first and last name for the header profile display.</p>
@@ -1059,24 +1087,31 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                     disabled={nameLoading}
                   >
                     {nameLoading ? "Saving..." : "Save Name"}
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {isEmailModalOpen && (
+      {isEmailModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsEmailModalOpen(false)}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
               <div className="settings-card">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setIsEmailModalOpen(false)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
                 <div className="settings-card__header">
                   <div className="settings-card__icon">
                     <Mail size={26} />
@@ -1123,26 +1158,25 @@ export default function SettingsPage() {
                     </span>
                   </div>
 
-                  <motion.button
+                  <button
                     type="submit"
                     className="save-btn"
-                    whileHover={{ scale: 1.02 }}
                     disabled={emailLoading}
                   >
                     {emailLoading ? "Saving..." : "Update Email"}
-                  </motion.button>
+                  </button>
                 </form>
               </div>
             </div>
           </div>
         )}
 
-        {toast && (
+      {toast && (
           <div className={`toast ${toast.type === "error" ? "toast--error" : "toast--success"}`}>
             {toast.text}
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

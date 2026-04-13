@@ -213,14 +213,21 @@ export default function ContactFormPage() {
           )}
 
           {/* Section */}
-          <h2 style={{ ...sectionHeadingStyle, fontSize: "1rem" }}>
+          <h2 style={{
+            fontWeight: "600",
+            fontSize: "1rem",
+            color: "var(--section-heading-color)",
+            paddingBottom: "8px",
+            borderBottom: "1px solid var(--section-heading-border)",
+            marginBottom: "20px",
+          }}>
             Contact Information
           </h2>
 
           {/* Inputs */}
           <div style={gridStyle}>
             <div>
-              <label htmlFor="name" style={labelStyle}>
+              <label htmlFor="name" className="form-label">
                 Name
               </label>
               <input
@@ -240,7 +247,7 @@ export default function ContactFormPage() {
             </div>
 
             <div>
-              <label htmlFor="email" style={labelStyle}>
+              <label htmlFor="email" className="form-label">
                 Email Address
               </label>
               <input
@@ -260,7 +267,7 @@ export default function ContactFormPage() {
             </div>
 
             <div>
-              <label htmlFor="phone" style={labelStyle}>
+              <label htmlFor="phone" className="form-label">
                 Phone Number (optional)
               </label>
               <input
@@ -282,7 +289,7 @@ export default function ContactFormPage() {
 
           {/* Message */}
           <div style={{ marginTop: "20px" }}>
-            <label htmlFor="message" style={labelStyle}>
+            <label htmlFor="message" className="form-label">
               Message
             </label>
             <textarea
@@ -311,16 +318,7 @@ export default function ContactFormPage() {
           <div style={{ marginTop: "24px", display: "flex", justifyContent: "center" }}>
             <button
               type="submit"
-              style={{
-                backgroundColor: "#16a34a",
-                color: "#ffffff",
-                border: "none",
-                padding: "12px 80px",
-                borderRadius: "6px",
-                fontSize: "0.9375rem",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
+              className="btn-primary btn-wide"
             >
               Submit
             </button>

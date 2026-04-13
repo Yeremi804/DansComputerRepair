@@ -13,29 +13,89 @@ try {
   global.Request = global.Request || NodeRequest;
   global.Response = global.Response || NodeResponse;
   global.Headers = global.Headers || NodeHeaders;
-} catch {
-  // In environments without undici, use lightweight built-ins.
-  if (typeof global.Request === "undefined") {
-    global.Request = class {
-      constructor(url) { this.url = url; }
+
+  // Ensure Response.json exists even if undici version is older
+  if (global.Response && !global.Response.json) {
+    global.Response.json = (data, init = {}) => {
+      const body = JSON.stringify(data);
+      const headers = new global.Headers(init.headers);
+      if (!headers.has("content-type")) {
+        headers.set("content-type", "application/json");
+      }
+      const res = new global.Response(body, { ...init, headers });
+      // Attach the body to the response object for our polyfilled json() method
+      res._body = body;
+      return res;
     };
   }
+  
+  // Ensure instance.json() works correctly
+  if (global.Response && global.Response.prototype && !global.Response.prototype.json) {
+    global.Response.prototype.json = async function() {
+      if (this._body) return JSON.parse(this._body);
+      // If undici's Response doesn't expose body easily, we might need to read it
+      const text = await this.text();
+      return JSON.parse(text);
+    };
+  }
+} catch {
+  // In environments without undici, use lightweight built-ins.
+  if (typeof global.Headers === "undefined") {
+    global.Headers = class {
+      constructor(init = {}) {
+        this._headers = new Map();
+        if (init) {
+          if (init instanceof Map || init instanceof global.Headers) {
+            init.forEach((v, k) => this._headers.set(k.toLowerCase(), v));
+          } else {
+            Object.entries(init).forEach(([k, v]) => this._headers.set(k.toLowerCase(), v));
+          }
+        }
+      }
+      get(key) { return this._headers.get(key.toLowerCase()) || null; }
+      set(key, value) { this._headers.set(key.toLowerCase(), value); }
+      has(key) { return this._headers.has(key.toLowerCase()); }
+      forEach(cb) { this._headers.forEach((v, k) => cb(v, k)); }
+    };
+  }
+
   if (typeof global.Response === "undefined") {
     global.Response = class {
       constructor(body, init = {}) {
         this._body = body;
         this.status = init.status || 200;
-        this.headers = init.headers || {};
+        this.headers = new global.Headers(init.headers);
       }
-      async json() { return JSON.parse(this._body); }
-      text() { return Promise.resolve(this._body); }
+      async json() { 
+        if (!this._body) return null;
+        return JSON.parse(this._body); 
+      }
+      async text() { return this._body; }
+      static json(data, init = {}) {
+        const body = JSON.stringify(data);
+        const headers = new global.Headers(init.headers);
+        if (!headers.has("content-type")) {
+          headers.set("content-type", "application/json");
+        }
+        return new global.Response(body, { ...init, headers });
+      }
     };
   }
-  if (typeof global.Headers === "undefined") {
-    global.Headers = class {
-      constructor(init = {}) { this._headers = init; }
-      get(key) { return this._headers[key.toLowerCase()]; }
+
+  if (typeof global.Request === "undefined") {
+    global.Request = class {
+      constructor(url, init = {}) {
+        this.url = url;
+        this.method = init.method || "GET";
+        this.headers = new global.Headers(init.headers);
+      }
     };
   }
 }
 
+// Polyfill for scrollIntoView which is missing in jsdom
+if (typeof window !== "undefined") {
+  if (!window.Element.prototype.scrollIntoView) {
+    window.Element.prototype.scrollIntoView = jest.fn();
+  }
+}

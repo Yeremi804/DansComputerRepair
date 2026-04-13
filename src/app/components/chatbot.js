@@ -5,7 +5,7 @@ import { askGemini } from "../actions";
 import { supabase } from "@/lib/supabase/client";
 
 export const UNKNOWN_RESPONSE =
-  "I’m not sure based on that. Please submit a service request with your device details and issue summary so the team can follow up with the right next steps.";
+  "I'm not sure based on that. Please submit a service request with your device details and issue summary so the team can follow up with the right next steps.";
 
 const CHAT_SHORTCUTS = [
   {
@@ -192,12 +192,13 @@ export default function Chatbot() {
   if (!chatbotVisible) return null;
 
   return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-[1000]">
+    <div className="pointer-events-none fixed bottom-6 right-6 z-[1000] flex flex-col items-end">
+      {/* Toggle button — always visible when chat is closed */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="pointer-events-auto fixed bottom-6 right-6 z-[1000] h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-xl shadow-blue-500/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="pointer-events-auto h-14 w-14 flex items-center justify-center rounded-full bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-xl shadow-blue-500/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           aria-label="Open chatbot"
         >
           <span className="text-2xl leading-none">✦</span>
@@ -225,63 +226,64 @@ export default function Chatbot() {
           </button>
         </div>
 
-        <div className={`h-80 space-y-3 overflow-y-auto px-3 py-4 ${isDark ? "bg-gray-950" : "bg-slate-50"}`}>
-          {messages.length === 0 && (
-            <p className={`rounded-xl p-3 text-sm shadow-sm ${isDark ? "bg-gray-900 text-gray-300" : "bg-white text-slate-600"}`}>
-              Hi, I can help with repair questions, service options, and request steps.
-            </p>
-          )}
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
-                message.role === "user"
-                  ? "ml-auto bg-blue-600 text-white"
+          <div className={`h-80 space-y-3 overflow-y-auto px-3 py-4 ${isDark ? "bg-gray-950" : "bg-slate-50"}`}>
+            {messages.length === 0 && (
+              <p className={`rounded-xl p-3 text-sm shadow-sm ${isDark ? "bg-gray-900 text-gray-300" : "bg-white text-slate-600"}`}>
+                Hi, I can help with repair questions, service options, and request steps.
+              </p>
+            )}
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+                  message.role === "user"
+                    ? "ml-auto bg-blue-600 text-white"
                   : isDark
                     ? "mr-auto bg-gray-900 text-gray-100"
-                    : "mr-auto bg-white text-slate-800"
-              }`}
-            >
-              <p>{message.text}</p>
-              {message.links?.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className={`mt-1 block font-medium underline ${isDark ? "text-blue-300 hover:text-blue-200" : "text-blue-700 hover:text-blue-800"}`}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          ))}
-          {loading && (
-            <div className={`mr-auto rounded-2xl px-3 py-2 text-sm shadow-sm ${isDark ? "bg-gray-900 text-gray-400" : "bg-white text-slate-500"}`}>
-              Thinking...
-            </div>
-          )}
-          <div ref={messageEndRef} />
-        </div>
-
-        <div className={`border-t p-3 ${isDark ? "border-gray-700 bg-gray-900" : "border-slate-200 bg-white"}`}>
-          <div className="flex gap-2">
-            <input
-              className={`flex-1 rounded-xl border px-3 py-2 text-sm outline-none transition ${isDark ? "border-gray-600 bg-gray-800 text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-900" : "border-slate-300 bg-white text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"}`}
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              onKeyDown={handleInputKeyDown}
-              placeholder="Type a question..."
-            />
-            <button
-              type="button"
-              onClick={handleSend}
-              className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-              disabled={loading || !input.trim()}
-            >
-              Send
-            </button>
+                      : "mr-auto bg-white text-slate-800"
+                }`}
+              >
+                <p>{message.text}</p>
+                {message.links?.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className={`mt-1 block font-medium underline ${isDark ? "text-blue-300 hover:text-blue-200" : "text-blue-700 hover:text-blue-800"}`}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            ))}
+            {loading && (
+              <div className={`mr-auto rounded-2xl px-3 py-2 text-sm shadow-sm ${isDark ? "bg-gray-900 text-gray-400" : "bg-white text-slate-500"}`}>
+                Thinking...
+              </div>
+            )}
+            <div ref={messageEndRef} />
           </div>
-        </div>
-        </div>
+
+          <div className={`border-t p-3 ${isDark ? "border-gray-700 bg-gray-900" : "border-slate-200 bg-white"}`}>
+            <div className="flex gap-2">
+              <input
+                className={`flex-1 rounded-xl border px-3 py-2 text-sm outline-none transition ${isDark ? "border-gray-600 bg-gray-800 text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-900" : "border-slate-300 bg-white text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"}`}
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={handleInputKeyDown}
+                placeholder="Type a question..."
+              />
+              <button
+                type="button"
+                onClick={handleSend}
+                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                disabled={loading || !input.trim()}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+          </div>
+      )}
       )}
     </div>
   );

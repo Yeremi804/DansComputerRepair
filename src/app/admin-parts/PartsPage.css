@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .dashboard {
@@ -27,12 +27,12 @@ body {
 
 /* Container + cards */
 .parts-container {
-  background-color: #E2E8F0;
+  background: var(--form-card-bg);
+  border: 1px solid var(--form-card-border);
   padding: 20px;
-  border: none;
-  box-shadow: 0 4px 6px -1px rgba(11, 63, 115, 0.25),
-    0 2px 4px -1px rgba(11, 63, 115, 0.15);
-  border-radius: 8px;
+  box-shadow: var(--form-card-shadow);
+  border-radius: var(--form-card-radius);
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .category {
@@ -70,16 +70,17 @@ body {
   justify-content: space-between;
   gap: 10px;
 
-  background-color: #E2E8F0;
-  color: black;
+  background-color: #f1f5f9;
+  color: var(--input-text);
   margin: 5px;
   padding: 12px 14px;
-  border-radius: 6px;
+  border-radius: var(--input-radius);
   cursor: pointer;
-  border: 1px solid #e5e7eb;
-  font-size: 14px;
+  border: 1px solid var(--input-border);
+  font-size: var(--input-font-size);
   font-weight: 600;
   max-width: 520px;
+  font-family: inherit;
 }
 
 /* Text truncation inside flex */
@@ -146,31 +147,21 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  background-color: #22c55e;
-  color: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-
-  padding: 14px 26px;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: none;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
   margin: 6px;
   cursor: pointer;
-  border-radius: 10px;
-
-  font-size: 15px;
-  font-weight: 800;
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
   letter-spacing: 0.2px;
-
-  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.25);
-  transition: transform 120ms ease, filter 120ms ease;
+  transition: background-color 0.15s ease;
 }
 
 .add-btn:hover {
-  filter: brightness(0.95);
-  transform: translateY(-1px);
-}
-
-.add-btn:active {
-  transform: translateY(0px);
+  background: var(--btn-primary-hover);
 }
 
 /* Modal */
@@ -186,12 +177,13 @@ body {
 }
 
 .modal-content {
-  background: #BECFD3;
-  border-radius: 14px;
+  background: var(--form-card-bg);
+  border: 1px solid var(--form-card-border);
+  border-radius: var(--form-card-radius);
   width: min(720px, 96vw);
-  padding: 22px;
-  border: 3px solid #546e7a;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+  padding: 28px 30px 30px;
+  box-shadow: var(--form-card-shadow);
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .modal-header {
@@ -204,24 +196,30 @@ body {
 
 .modal-title {
   margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--section-heading-color);
+  font-family: inherit;
 }
 
 .close-btn {
-  background: #e8eaf6;
-  border: 1px solid #999;
-  font-size: 22px;
+  background: transparent;
+  border: 1px solid var(--input-border);
+  font-size: 18px;
   cursor: pointer;
-  color: #000;
-  width: 44px;
-  height: 40px;
-  border-radius: 10px;
+  color: var(--label-color);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--input-radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .close-btn:hover {
-  background: #d1d5e8;
+  background: #fee2e2;
+  border-color: #fca5a5;
   color: #b91c1c;
 }
 
@@ -245,20 +243,26 @@ body {
 }
 
 .field-label {
-  font-size: 14px;
-  font-weight: 800;
-  color: #0f172a;
+  font-size: var(--label-font-size);
+  font-weight: var(--label-font-weight);
+  color: var(--label-color);
 }
 
 .field-input {
   width: 100%;
-  padding: 14px;
-  border: 3px solid #546e7a;
-  border-radius: 12px;
-  background: #fff;
-  font-size: 16px;
-  color: #0f172a;
+  padding: var(--input-padding);
+  border: 1px solid var(--input-border);
+  border-radius: var(--input-radius);
+  background: var(--input-bg);
+  font-size: var(--input-font-size);
+  color: var(--input-text);
   box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field-input:focus {
+  border-color: var(--input-border-focus);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .field-input::placeholder {
@@ -274,52 +278,61 @@ body {
 }
 
 .btn-secondary {
-  background: #e5e7eb;
-  color: #0f172a;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 800;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--btn-secondary-border);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border-radius: var(--btn-radius);
+  font-weight: var(--btn-font-weight);
+  font-size: var(--btn-font-size);
   cursor: pointer;
+  transition: background-color 0.15s ease;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .btn-secondary:hover {
-  filter: brightness(0.97);
+  background: var(--btn-secondary-hover);
 }
 
 .btn-primary {
-  background: #C4B581;
-  color: #0f172a;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 900;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: none;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border-radius: var(--btn-radius);
+  font-weight: var(--btn-font-weight);
+  font-size: var(--btn-font-size);
   cursor: pointer;
+  transition: background-color 0.15s ease;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .btn-primary:hover {
-  filter: brightness(0.97);
+  background: var(--btn-primary-hover);
 }
 
 .btn-danger {
   background: #ef4444;
-  color: white;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 900;
+  color: #ffffff;
+  border: none;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border-radius: var(--btn-radius);
+  font-weight: var(--btn-font-weight);
+  font-size: var(--btn-font-size);
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 .btn-danger:hover {
-  filter: brightness(0.95);
+  background: #dc2626;
 }
 
 .confirm-text {
   margin: 8px 0 0 0;
-  color: #0f172a;
-  font-size: 16px;
-  line-height: 1.4;
+  color: var(--input-text);
+  font-size: var(--input-font-size);
+  line-height: 1.5;
+  font-family: inherit;
 }
 
 /* Dark mode */
