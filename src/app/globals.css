@@ -44,10 +44,28 @@ body {
 }
 
 .yelp-review {
-  display: none;
+  display: block !important;
+  color: black !important;
+}
+
+.yelp-review a {
+  color: #0073bb !important;
+  text-decoration: underline;
 }
 .yelp-embed-loaded .yelp-review {
   display: block;
+}
+
+.yelp-wrapper iframe {
+  width: 100% !important;
+  min-height: 150px !important;
+  display: block !important;
+}
+
+.yelp-wrapper {
+  display: block !important;
+  width: 100% !important;
+  overflow: visible !important;
 }
 
 .site-header {

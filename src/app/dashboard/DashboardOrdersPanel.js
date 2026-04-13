@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import OrdersPanel from "./OrdersPanel";
+import { supabase } from "@/lib/supabase/client";
 
-export default function DashboardOrdersPanel({ supabaseUrl, supabaseAnonKey }) {
+export default function DashboardOrdersPanel() {
   const RUN_TESTS = true; // Set to true to enable testing logs in the console
   const hasRunTests = useRef(false); // To prevent double test runs
   const [configFormRows, setConfigFormRows] = useState([]);
@@ -45,7 +46,7 @@ const downloadCSV = (rows, filename) => {
 
 
   useEffect(() => {
-    const supabase = require("@supabase/supabase-js").createClient(supabaseUrl, supabaseAnonKey);
+    
     let interval = setInterval(async () => {
       // Fetch Configuration_Form
       const { data: configRows } = await supabase.from("Configuration_Form").select("*");
@@ -79,7 +80,7 @@ const downloadCSV = (rows, filename) => {
       );
     }, 1000);
     return () => clearInterval(interval);
-  }, [supabaseUrl, supabaseAnonKey]);
+  }, []);
   // Function to build export row based on source type
   const buildExportRow = (row) => {
     // Base fields included in all exports

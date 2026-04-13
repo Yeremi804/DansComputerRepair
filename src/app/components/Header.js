@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"; // Import useState
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"; // Import the function to create a Supabase client for browser use
+import { supabase } from "@/lib/supabase/client"; // Import the function to create a Supabase client for browser use
 import { ChevronDown, LayoutDashboard, LogOut, Settings } from "lucide-react";
 
 export default function Header() {
@@ -17,8 +17,6 @@ export default function Header() {
     pathname?.startsWith(prefix)
   );
 
-  // Create Supabase client once
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);

@@ -1,20 +1,17 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/lib/supabase/client";
 import { Star, Eye, EyeOff, Filter, ArrowUpDown } from 'lucide-react';
 import dayjs from 'dayjs';
 
-export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnonKey }) {
+export default function ReviewsPanel({ initialReviews}) {
   const [reviews, setReviews] = useState([]);
   const [filterSource, setFilterSource] = useState('all');
   const [sortOrder, setSortOrder] = useState('date-desc');
   const [loading, setLoading] = useState(false);
 
-  const supabase = useMemo(
-    () => createClient(supabaseUrl, supabaseAnonKey),
-    [supabaseUrl, supabaseAnonKey]
-  );
+ 
 
   useEffect(() => {
     const loadData = async () => {
@@ -33,7 +30,7 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
         real_id: row.id,
         name: row.name || 'Yelp Review',
         rating: Number(row.rating || 5),
-        review_text: row.review_text || 'Embedded Yelp review',
+        review_text: row.embed || 'Embedded Yelp review',
         created_at: row.created_at || new Date().toISOString(),
         source: 'Yelp',
         show_on_site: row.show_on_site !== false,
@@ -94,6 +91,26 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
 
     return result;
   }, [reviews, filterSource, sortOrder]);
+
+  useEffect(() => {
+    const existing = document.getElementById('yelp-embed-script');
+
+  
+    if (existing) {
+      existing.remove();
+    }
+
+    const script = document.createElement('script');
+    script.id = 'yelp-embed-script';
+    script.src = 'https://www.yelp.com/embed/widgets.js';
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, [filteredAndSortedReviews]); 
 
   return (
     <main className="flex-1 p-8 bg-main-bg">
@@ -165,19 +182,30 @@ export default function ReviewsPanel({ initialReviews, supabaseUrl, supabaseAnon
                   </button>
                 </div>
 
-                <div className="flex mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className={`${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
-                    />
-                  ))}
-                </div>
+                {review.source !== 'Yelp' && (
+                  <div className="flex mb-3">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        className={`${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+                      />
+                    ))}
+                  </div>
+                )}
 
-                <p className="text-gray-600 text-sm leading-relaxed flex-1">
-                  "{review.review_text || review.comment}"
-                </p>
+                {review.source === 'Yelp' ? (
+                  <div className="flex-1 min-h-[180px]">
+                    <div
+                      className="yelp-wrapper block w-full overflow-visible"
+                      dangerouslySetInnerHTML={{ __html: review.review_text }}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-gray-600 text-sm leading-relaxed flex-1">
+                    "{review.review_text || review.comment}"
+                  </p>
+                )}
               </div>
             ))
           )}
