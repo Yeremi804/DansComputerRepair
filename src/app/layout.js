@@ -1,6 +1,7 @@
 // src/app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from '@vercel/analytics/next';
 import Header from "./components/Header.js";
 import { Footer } from "./components/footer.js";
 import Chatbot from "./components/chatbot.js";
@@ -44,6 +45,9 @@ export default function RootLayout({ children }) {
 
         {/* Vercel Speed Insights */}
         <SpeedInsights />
+
+        {/* Vercel Web Analytics */}
+        <Analytics />
       </body>
     </html>
   );
