@@ -227,7 +227,7 @@ export default function ReviewsPanel({ initialReviews}) {
                   </div>
                 ) : (
                   <p className={`text-sm leading-relaxed flex-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    "{review.review_text || review.comment}"
+                    &ldquo;{review.review_text || review.comment}&rdquo;
                   </p>
                 )}
               </div>

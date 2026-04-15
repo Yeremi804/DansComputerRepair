@@ -109,21 +109,6 @@ export default function DashboardAuditPanel() {
             </tbody>
           </table>
         </div>
-        <div>
-          {logs.length === 0 ? (
-            <div className="p-4 text-sm text-neutral-500">No audit logs found.</div>
-          ) : (
-            logs.map((log) => (
-              <div key={log.id} className="grid grid-cols-5 border-b border-neutral-300 hover:bg-neutral-50">
-                <div className="p-4 text-sm">{new Date(log.created_at).toLocaleString()}</div>
-                <div className="p-4 text-sm">{log.actor_email ?? "—"}</div>
-                <div className="p-4 text-sm">{log.action}</div>
-                <div className="p-4 text-sm">{log.entity_type}</div>
-                <div className="p-4 text-sm">{log.entity_id ?? "—"}</div>
-              </div>
-            ))
-          )}
-        </div>
       </div>
     </div>
   );
