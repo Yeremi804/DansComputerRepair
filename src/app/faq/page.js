@@ -33,7 +33,7 @@ export default function FAQPage() {
         },
         {
             question: "Do you provide warranties on your repairs?",
-            answer: "Yes, we offer a warranty on our repairs. The length of the warranty depends on the type of repair performed. Please ask for details when you bring in your device."
+            answer: "Yes, we offer a 6 month warranty on our repairs that is labor free, but you would need to pay for any needed parts."
         }
     ];
 

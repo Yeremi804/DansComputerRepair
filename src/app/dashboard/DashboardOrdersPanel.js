@@ -88,6 +88,22 @@ export default function DashboardOrdersPanel() {
     )].map(row => row.join(',')).join('\n');
   };
 
+  // Delete a completed order from its source table
+  const handleDeleteOrder = async (row) => {
+    if (!window.confirm(`Delete order #${row.ID}? This cannot be undone.`)) return;
+    const tableName = row.Source === 'Configuration_Form' ? 'Configuration_Form' : 'service_requests';
+    const { error } = await supabase.from(tableName).delete().eq('id', row.id);
+    if (error) {
+      alert('Failed to delete order.');
+      return;
+    }
+    if (row.Source === 'Configuration_Form') {
+      setConfigFormRows(prev => prev.filter(r => r.id !== row.id));
+    } else {
+      setServiceRequestRows(prev => prev.filter(r => r.id !== row.id));
+    }
+  };
+
   // Function to trigger CSV download
   const downloadCSV = (rows, filename) => {
     const csvContent = buildCSVContent(rows); // Build CSV content from rows
@@ -256,7 +272,7 @@ export default function DashboardOrdersPanel() {
             Download CSV
           </button>
         </div>
-        <OrdersPanel rows={configFormRows} onFilteredChange={setFilteredConfigRows} />
+        <OrdersPanel rows={configFormRows} onFilteredChange={setFilteredConfigRows} onDeleteOrder={handleDeleteOrder} />
       </section>
       <section className="mt-8">
         <div className="flex items-center justify-between mb-4">
@@ -272,7 +288,7 @@ export default function DashboardOrdersPanel() {
             Download CSV
           </button>
         </div>
-        <OrdersPanel rows={serviceRequestRows} onFilteredChange={setFilteredServiceRows} />
+        <OrdersPanel rows={serviceRequestRows} onFilteredChange={setFilteredServiceRows} onDeleteOrder={handleDeleteOrder} />
       </section>
     </>
   );

@@ -601,7 +601,7 @@ export default function Header() {
                             <button
                               type="button"
                               onClick={handleLogout}
-                              className="flex w-full items-center gap-2 rounded-md bg-red-100 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/40"
+                              className="flex w-full items-center gap-2 rounded-md bg-red-600 px-3 py-2 text-left text-sm text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
                             >
                               <LogOut size={16} />
                               Log out
@@ -711,7 +711,7 @@ export default function Header() {
                           setOpen(false);
                           handleLogout();
                         }}
-                        className="w-full rounded px-3 py-2 text-left bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/40"
+                        className="w-full rounded px-3 py-2 text-left bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
                       >
                         Log out
                       </button>

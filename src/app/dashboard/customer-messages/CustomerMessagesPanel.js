@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, Fragment } from 'react';
 import { supabase } from "@/lib/supabase/client";
+import { Trash2 } from 'lucide-react';
 import dayjs from 'dayjs';
 
 
@@ -94,6 +95,21 @@ export default function CustomerMessagesPanel() {
     return () => observer.disconnect();
   }, []);
 
+  // function to delete a message via server-side API (bypasses RLS)
+  const handleDeleteMessage = async (row) => {
+    if (!window.confirm(`Delete message from ${row.name}? This cannot be undone.`)) return;
+    const res = await fetch('/api/delete-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: row.id }),
+    });
+    if (!res.ok) {
+      alert('Failed to delete message.');
+      return;
+    }
+    setMessages(prev => prev.filter(m => m.id !== row.id));
+  };
+
   // function to fetch messages from supabase
   const fetchMessages = async () => {
     const { data, error } = await supabase
@@ -155,7 +171,7 @@ export default function CustomerMessagesPanel() {
   function renderDetails(row) {
     return (
       <tr>
-        <td colSpan={6} className={`p-6 text-left text-sm border-t ${isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+        <td colSpan={7} className={`p-6 text-left text-sm border-t ${isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
 
           <div className="mb-3">
             <strong>Email:</strong> {row.email}
@@ -237,6 +253,7 @@ export default function CustomerMessagesPanel() {
               <th className="w-64 px-3 py-2 font-semibold">Email</th>
               <th className="w-40 px-3 py-2 font-semibold">Status</th>
               <th className="w-36 px-3 py-2 font-semibold">Date</th>
+              <th className="w-16 px-3 py-2 font-semibold">Actions</th>
             </tr>
           </thead>
 
@@ -277,6 +294,19 @@ export default function CustomerMessagesPanel() {
                     {dayjs(row.created_at).format('MMM DD YYYY')}
                   </td>
 
+                  <td className="w-16 px-3 py-3 align-top">
+                    {String(row.status || '').toLowerCase().includes('checked') && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMessage(row)}
+                        className={`rounded p-1.5 transition ${isDark ? 'text-red-400 hover:bg-red-900/40 hover:text-red-300' : 'text-red-500 hover:bg-red-50 hover:text-red-700'}`}
+                        title="Delete message"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </td>
+
                 </tr>
 
                 {expandedRow === row.id && renderDetails(row)}
@@ -286,7 +316,7 @@ export default function CustomerMessagesPanel() {
             {/* show message if no messages found after filtering */ }
             {filteredMessages.length === 0 && (
               <tr>
-                <td colSpan={5} className={`px-3 py-6 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                <td colSpan={7} className={`px-3 py-6 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   No messages found
                 </td>
               </tr>

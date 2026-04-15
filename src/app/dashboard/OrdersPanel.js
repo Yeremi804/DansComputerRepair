@@ -2,6 +2,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState, useEffect } from 'react';
+import { Trash2 } from 'lucide-react';
 // Convert UTC timestamp to California time using Intl.DateTimeFormat
 // Intl is built-in (Node.js + browser) and handles DST automatically — no extra packages needed
 const CA_TZ = 'America/Los_Angeles';
@@ -184,13 +185,14 @@ function SpecChip({ label, value, isDark }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 //main tile component
-export default function OrdersPanel({ rows, onFilteredChange }) {
+export default function OrdersPanel({ rows, onFilteredChange, onDeleteOrder }) {
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortField, setSortField] = useState('az');
   const [monthFilter, setMonthFilter] = useState('all');
+  const [yearFilter, setYearFilter] = useState('all');
   const [expandedRow, setExpandedRow] = useState(null);
   const [isDark, setIsDark] = useState(false);
 
@@ -213,6 +215,22 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     return () => observer.disconnect();
   }, []);
 
+  const yearOptions = useMemo(() => {
+    const years = new Set();
+    rows.forEach(row => {
+      if (row?.Dates) {
+        const d = new Date(toUTCIso(row.Dates));
+        if (!isNaN(d.getTime())) {
+          years.add(new Intl.DateTimeFormat('en-US', { timeZone: CA_TZ, year: 'numeric' }).format(d));
+        }
+      }
+    });
+    return [
+      { value: 'all', label: 'All years' },
+      ...[...years].sort((a, b) => b - a).map(y => ({ value: y, label: y })),
+    ];
+  }, [rows]);
+
   const filteredRows = useMemo(() => {
     const byStatus =
       statusFilter === 'all'
@@ -229,17 +247,28 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
         : byStatus.filter(row => {
             const raw = row?.Dates;
             if (!raw) return false;
-            // Both sources: UTC timestamp → California month via toUTCIso() (consistent)
             const d = new Date(toUTCIso(raw));
             if (isNaN(d.getTime())) return false;
             const mon = new Intl.DateTimeFormat('en-US', { timeZone: CA_TZ, month: 'short' }).format(d);
             return mon === monthFilter;
           });
 
+    const byYear =
+      yearFilter === 'all'
+        ? byMonth
+        : byMonth.filter(row => {
+            const raw = row?.Dates;
+            if (!raw) return false;
+            const d = new Date(toUTCIso(raw));
+            if (isNaN(d.getTime())) return false;
+            const yr = new Intl.DateTimeFormat('en-US', { timeZone: CA_TZ, year: 'numeric' }).format(d);
+            return yr === yearFilter;
+          });
+
     const term = searchTerm.trim().toLowerCase();
     const searched = !term
-      ? byMonth
-      : byMonth.filter(row =>
+      ? byYear
+      : byYear.filter(row =>
           ['ID', 'Customer', 'Status', 'Dates', 'Notes'].some(field =>
             normalizeValue(row, field).toLowerCase().includes(term)
           )
@@ -274,7 +303,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     });
 
     return sorted;
-  }, [rows, searchTerm, statusFilter, sortField, monthFilter]);
+  }, [rows, searchTerm, statusFilter, sortField, monthFilter, yearFilter]);
 
   useEffect(() => {
   if (onFilteredChange) {
@@ -287,7 +316,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     if (row.Source === 'Configuration_Form') {
       return (
         <tr>
-          <td colSpan={6} className={`border-t px-4 py-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+          <td colSpan={8} className={`border-t px-4 py-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
             {/* Top meta bar — order ID + date stamp (Shopify/Stripe header pattern) */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -363,7 +392,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
     } else if (row.Source === 'service_requests') {
       return (
         <tr>
-          <td colSpan={6} className={`border-t px-4 py-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+          <td colSpan={8} className={`border-t px-4 py-4 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
             {/* Top meta bar */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -466,6 +495,22 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
           </select>
         </label>
 
+        {/* Year filter dropdown */}
+        <label className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <span>Year</span>
+          <select
+            value={yearFilter}
+            onChange={event => setYearFilter(event.target.value)}
+            className={`rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${isDark ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
+          >
+            {yearOptions.map(option => (
+              <option key={option.value} value={option.value} className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
         {/* Sort dropdown */}
         <label className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
           <span>Sort</span>
@@ -495,6 +540,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
               <th className="w-40 px-3 py-2 font-semibold">Date</th>
               <th className="w-[28%] min-w-[220px] px-3 py-2 font-semibold whitespace-nowrap">Notes</th>
               <th className="w-[18%] min-w-[170px] px-3 py-2 font-semibold whitespace-nowrap">Source</th>
+              <th className="w-16 px-3 py-2 font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody className={isDark ? 'text-gray-100' : 'text-gray-900'}>
@@ -532,6 +578,18 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
                       {row.Source}
                     </div>
                   </td>
+                  <td className="w-16 px-3 py-3 align-top">
+                    {(String(row.Status || '').toLowerCase().includes('complete') || String(row.Status || '').toLowerCase().includes('cancel')) && onDeleteOrder && (
+                      <button
+                        type="button"
+                        onClick={() => onDeleteOrder(row)}
+                        className={`rounded p-1.5 transition ${isDark ? 'text-red-400 hover:bg-red-900/40 hover:text-red-300' : 'text-red-500 hover:bg-red-50 hover:text-red-700'}`}
+                        title="Delete order"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </td>
                 </tr>
                 {expandedRow === row.ID && renderDetails(row)}
               </React.Fragment>
@@ -539,7 +597,7 @@ export default function OrdersPanel({ rows, onFilteredChange }) {
             {filteredRows.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={8}
                   className={`px-3 py-6 text-center text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
                 >
                   No orders match the search.
