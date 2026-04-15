@@ -109,7 +109,7 @@ export default function DashboardAuditPanel() {
             </tbody>
           </table>
         </div>
-      </div>
+      )}
     </div>
   );
 }
