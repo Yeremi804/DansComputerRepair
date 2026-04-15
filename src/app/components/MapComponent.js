@@ -70,7 +70,7 @@ export default function MapComponent({ isDark = false }) {
       scrollWheelZoom={false}
       className="h-full w-full"
     >
-      {/* <InvalidateMapSize /> */}
+      <InvalidateMapSize />
 
       <TileLayer
         attribution={attribution}

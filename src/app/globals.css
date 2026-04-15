@@ -134,6 +134,25 @@ body {
   color: #0073bb !important;
   text-decoration: underline;
 }
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--input-padding);
+  border: 1px solid var(--input-border);
+  border-radius: var(--input-radius);
+  font-size: var(--input-font-size);
+  color: var(--input-text);
+  background-color: var(--input-bg);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.form-input:focus {
+  border-color: var(--input-border-focus);
+  box-shadow: var(--input-focus-shadow);
+}
+.form-input::placeholder {
+  color: var(--input-placeholder);
+}
 .form-input.input-error {
   border-color: var(--input-border-error);
 }
@@ -156,6 +175,10 @@ body {
 /* Label */
 .form-label {
   display: block;
+  font-size: var(--label-font-size);
+  font-weight: var(--label-font-weight);
+  color: var(--label-color);
+  margin-bottom: var(--label-margin-bottom);
 }
 
 .yelp-wrapper iframe {
@@ -174,6 +197,22 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* Primary button */
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: none;
+  padding: var(--btn-primary-padding);
+  border-radius: var(--btn-primary-radius);
+  font-size: var(--btn-primary-font-size);
+  font-weight: var(--btn-primary-font-weight);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-geist-sans), 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 .btn-primary:hover:not(:disabled) {
   background-color: var(--btn-primary-bg-hover);
