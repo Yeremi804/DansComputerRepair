@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -43,7 +43,6 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      const supabase = createSupabaseBrowserClient();
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
