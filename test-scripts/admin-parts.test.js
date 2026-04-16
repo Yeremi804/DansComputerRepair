@@ -26,15 +26,14 @@ jest.mock("lucide-react", () => ({
 
 const mockGetUser = jest.fn();
 const mockFrom = jest.fn();
-const mockSupabaseClient = {
-  auth: {
-    getUser: mockGetUser,
-  },
-  from: mockFrom,
-};
 
 jest.mock("@/lib/supabase/client", () => ({
-  createSupabaseBrowserClient: jest.fn(() => mockSupabaseClient),
+  supabase: {
+    auth: {
+      getUser: (...args) => mockGetUser(...args),
+    },
+    from: (...args) => mockFrom(...args),
+  },
 }));
 
 describe("AdminPartsPage", () => {
