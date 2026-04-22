@@ -1,7 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AdminPartsPage from "../src/app/admin-parts/page";
-import { createSupabaseBrowserClient } from "../src/lib/supabase/client";
 
 jest.mock("../src/app/admin-parts/PartsPage.css", () => ({}));
 
@@ -31,15 +30,13 @@ const mockAuditInsert = jest.fn();
 const mockGetUser = jest.fn();
 const mockFrom = jest.fn();
 
-const mockSupabaseClient = {
-  auth: {
-    getUser: mockGetUser,
+jest.mock("@/lib/supabase/client", () => ({
+  supabase: {
+    auth: {
+      getUser: (...args) => mockGetUser(...args),
+    },
+    from: (...args) => mockFrom(...args),
   },
-  from: mockFrom,
-};
-
-jest.mock("../src/lib/supabase/client", () => ({
-  createSupabaseBrowserClient: jest.fn(() => mockSupabaseClient),
 }));
 
 describe("AdminPartsPage audit log tests", () => {
