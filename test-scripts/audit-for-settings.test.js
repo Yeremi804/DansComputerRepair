@@ -25,6 +25,7 @@ jest.mock("lucide-react", () => ({
   EyeOff: () => <span>EyeOff</span>,
   ShieldCheck: () => <span>ShieldCheck</span>,
   Mail: () => <span>Mail</span>,
+  X: () => <span>X</span>,
 }));
 
 jest.mock("../src/lib/supabase/client", () => ({
