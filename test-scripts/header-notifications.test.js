@@ -154,6 +154,7 @@ function makeSupabaseMock() {
 }
 
 jest.mock("../src/lib/supabase/client", () => ({
+  supabase: makeSupabaseMock(),
   createSupabaseBrowserClient: () => makeSupabaseMock(),
 }));
 
