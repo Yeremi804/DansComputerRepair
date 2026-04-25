@@ -34,7 +34,7 @@ describe("CreateAdminAccountPage", () => {
     expect(screen.getByPlaceholderText(/first name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/last name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/phone number/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("e.g. 555-123-4567")).toBeInTheDocument();
   });
 
   test("shows password validation error and does not submit if password is too short", async () => {
@@ -69,7 +69,7 @@ describe("CreateAdminAccountPage", () => {
     await user.type(screen.getByPlaceholderText(/first name/i), "Jane");
     await user.type(screen.getByPlaceholderText(/last name/i), "Admin");
     await user.type(screen.getByPlaceholderText(/email address/i), "jane@test.com");
-    await user.type(screen.getByPlaceholderText(/phone number/i), "5551234567");
+    await user.type(screen.getByPlaceholderText("e.g. 555-123-4567"), "5552345678");
 
     const passwordInputs = screen.getAllByPlaceholderText(/minimum 10 characters/i);
     await user.type(passwordInputs[0], "strongpass123");
@@ -94,7 +94,10 @@ describe("CreateAdminAccountPage", () => {
 
     render(<CreateAdminAccountPage />);
 
+    await user.type(screen.getByPlaceholderText(/first name/i), "Jane");
+    await user.type(screen.getByPlaceholderText(/last name/i), "Admin");
     await user.type(screen.getByPlaceholderText(/email address/i), "existing@test.com");
+    await user.type(screen.getByPlaceholderText("e.g. 555-123-4567"), "5552345678");
 
     const passwordInputs = screen.getAllByPlaceholderText(/minimum 10 characters/i);
     await user.type(passwordInputs[0], "strongpass123");
@@ -115,7 +118,10 @@ describe("CreateAdminAccountPage", () => {
 
     render(<CreateAdminAccountPage />);
 
+    await user.type(screen.getByPlaceholderText(/first name/i), "Jane");
+    await user.type(screen.getByPlaceholderText(/last name/i), "Admin");
     await user.type(screen.getByPlaceholderText(/email address/i), "bademail");
+    await user.type(screen.getByPlaceholderText("e.g. 555-123-4567"), "5552345678");
 
     const passwordInputs = screen.getAllByPlaceholderText(/minimum 10 characters/i);
     await user.type(passwordInputs[0], "strongpass123");
@@ -137,9 +143,13 @@ describe("CreateAdminAccountPage", () => {
 
     render(<CreateAdminAccountPage />);
 
-    const emailInput = screen.getByPlaceholderText(/email address/i);
+    await user.type(screen.getByPlaceholderText(/first name/i), "Jane");
+    await user.type(screen.getByPlaceholderText(/last name/i), "Admin");
 
+    const emailInput = screen.getByPlaceholderText(/email address/i);
     await user.type(emailInput, "confirm@test.com");
+
+    await user.type(screen.getByPlaceholderText("e.g. 555-123-4567"), "5552345678");
 
     const passwordInputs = screen.getAllByPlaceholderText(/minimum 10 characters/i);
     await user.type(passwordInputs[0], "strongpass123");
@@ -170,7 +180,10 @@ describe("CreateAdminAccountPage", () => {
 
       render(<CreateAdminAccountPage />);
 
+      await user.type(screen.getByPlaceholderText(/first name/i), "Jane");
+      await user.type(screen.getByPlaceholderText(/last name/i), "Admin");
       await user.type(screen.getByPlaceholderText(/email address/i), "new@test.com");
+      await user.type(screen.getByPlaceholderText("e.g. 555-123-4567"), "5552345678");
 
       const passwordInputs = screen.getAllByPlaceholderText(/minimum 10 characters/i);
       await user.type(passwordInputs[0], "strongpass123");
@@ -197,7 +210,10 @@ describe("CreateAdminAccountPage", () => {
 
     render(<CreateAdminAccountPage />);
 
+    await user.type(screen.getByPlaceholderText(/first name/i), "Jane");
+    await user.type(screen.getByPlaceholderText(/last name/i), "Admin");
     await user.type(screen.getByPlaceholderText(/email address/i), "test@test.com");
+    await user.type(screen.getByPlaceholderText("e.g. 555-123-4567"), "5552345678");
 
     const passwordInputs = screen.getAllByPlaceholderText(/minimum 10 characters/i);
     await user.type(passwordInputs[0], "strongpass123");

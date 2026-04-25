@@ -216,15 +216,7 @@ export default function CreateComputerConfigurationForm() {
         }}>
 
           {/* Section 1: Customer Information */}
-          <h2 style={{
-            fontWeight: '600',
-            fontSize: '1rem',
-            color: 'var(--section-heading-color)',
-            paddingBottom: '8px',
-            borderBottom: '1px solid var(--section-heading-border)',
-            marginBottom: '20px',
-            marginTop: '4px',
-          }}>
+          <h2 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '4px' }}>
             1. Customer Information
           </h2>
 
@@ -242,6 +234,7 @@ export default function CreateComputerConfigurationForm() {
                   name={label}
                   placeholder={label}
                   className="form-input"
+                  style={fieldInputStyle}
                 />
               </div>
             ))}
@@ -261,15 +254,7 @@ export default function CreateComputerConfigurationForm() {
           </label>
 
           {/* Section 2: Core Components */}
-          <h3 style={{
-            fontWeight: '600',
-            fontSize: '1rem',
-            color: 'var(--section-heading-color)',
-            paddingBottom: '8px',
-            borderBottom: '1px solid var(--section-heading-border)',
-            marginBottom: '20px',
-            marginTop: '28px',
-          }}>
+          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
             2. Core Components
           </h3>
 
@@ -289,6 +274,7 @@ export default function CreateComputerConfigurationForm() {
                   name={name}
                   onChange={handleSelectChange}
                   className="form-input form-select"
+                  style={fieldSelectStyle}
                 >
                   <option value="">{placeholder}</option>
                   {list.map((i) => (
@@ -302,15 +288,7 @@ export default function CreateComputerConfigurationForm() {
           </div>
 
           {/* Section 3: Additional Options */}
-          <h3 style={{
-            fontWeight: '600',
-            fontSize: '1rem',
-            color: 'var(--section-heading-color)',
-            paddingBottom: '8px',
-            borderBottom: '1px solid var(--section-heading-border)',
-            marginBottom: '20px',
-            marginTop: '28px',
-          }}>
+          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
             3. Additional Options
           </h3>
 
@@ -326,6 +304,7 @@ export default function CreateComputerConfigurationForm() {
                   name={name}
                   onChange={handleSelectChange}
                   className="form-input form-select"
+                  style={fieldSelectStyle}
                 >
                   <option value="">{placeholder}</option>
                   {list.map((i) => (
@@ -339,15 +318,7 @@ export default function CreateComputerConfigurationForm() {
           </div>
 
           {/* Section 4: Other Requests / Questions */}
-          <h3 style={{
-            fontWeight: '600',
-            fontSize: '1rem',
-            color: 'var(--section-heading-color)',
-            paddingBottom: '8px',
-            borderBottom: '1px solid var(--section-heading-border)',
-            marginBottom: '20px',
-            marginTop: '28px',
-          }}>
+          <h3 style={{ ...sectionHeadingStyle, fontSize: '1rem', marginTop: '28px' }}>
             4. Other Requests / Questions
           </h3>
 
@@ -356,7 +327,7 @@ export default function CreateComputerConfigurationForm() {
             rows={6}
             placeholder="Additional info, special requests, or questions"
             className="form-input"
-            style={{ resize: 'vertical', minHeight: '120px' }}
+            style={{ ...fieldInputStyle, resize: 'vertical', minHeight: '120px' }}
           />
 
           {/* Submit button row: centered inside the form card */}

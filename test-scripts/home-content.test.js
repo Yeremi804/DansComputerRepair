@@ -89,6 +89,10 @@ const CONTENT_DATA = [
       hours: [{ day: "Mon - Sat", open: "7 AM", close: "9 PM" }],
     },
   },
+  {
+    key: "chatbot_settings",
+    draft: { enabled: true },
+  },
 ];
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -343,7 +347,8 @@ describe("HomeContentPage", () => {
     await user.click(screen.getByRole("button", { name: /save draft/i }));
 
     await waitFor(() => {
-      expect(mockUpdateEq).toHaveBeenCalledTimes(2);
+      // 3 update calls: home_about, footer, chatbot_settings
+      expect(mockUpdateEq).toHaveBeenCalledTimes(3);
       expect(mockUpdateEq).toHaveBeenCalledWith(
         expect.objectContaining({
           draft: expect.objectContaining({ title: "About Us" }),
@@ -357,6 +362,13 @@ describe("HomeContentPage", () => {
         }),
         "key",
         "footer"
+      );
+      expect(mockUpdateEq).toHaveBeenCalledWith(
+        expect.objectContaining({
+          draft: expect.objectContaining({ enabled: true }),
+        }),
+        "key",
+        "chatbot_settings"
       );
     });
   });
@@ -394,7 +406,8 @@ describe("HomeContentPage", () => {
     await user.click(screen.getByRole("button", { name: /^publish$/i }));
 
     await waitFor(() => {
-      expect(mockUpdateEq).toHaveBeenCalledTimes(2);
+      // 3 update calls: home_about, footer, chatbot_settings
+      expect(mockUpdateEq).toHaveBeenCalledTimes(3);
       expect(mockUpdateEq).toHaveBeenCalledWith(
         expect.objectContaining({
           published: expect.objectContaining({ title: "About Us" }),
@@ -408,6 +421,13 @@ describe("HomeContentPage", () => {
         }),
         "key",
         "footer"
+      );
+      expect(mockUpdateEq).toHaveBeenCalledWith(
+        expect.objectContaining({
+          published: expect.objectContaining({ enabled: true }),
+        }),
+        "key",
+        "chatbot_settings"
       );
     });
   });

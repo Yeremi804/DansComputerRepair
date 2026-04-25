@@ -51,7 +51,7 @@ describe("ServiceRequestPage", () => {
       )
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /submit request/i })
+      screen.getByRole("button", { name: /^submit$/i })
     ).toBeInTheDocument();
   });
 
@@ -99,7 +99,7 @@ describe("ServiceRequestPage", () => {
       }
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /submit request/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^submit$/i }));
 
     await waitFor(() => {
       expect(
@@ -135,7 +135,7 @@ describe("ServiceRequestPage", () => {
       target: { value: "Repair" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /submit request/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^submit$/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/error sending form\./i)).toBeInTheDocument();
@@ -161,7 +161,7 @@ describe("ServiceRequestPage", () => {
       target: { value: "Repair" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /submit request/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^submit$/i }));
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith(
@@ -189,7 +189,7 @@ describe("ServiceRequestPage", () => {
       "Laptop battery issue"
     );
 
-    await user.click(screen.getByRole("button", { name: /submit request/i }));
+    await user.click(screen.getByRole("button", { name: /^submit$/i }));
 
     await waitFor(() => {
       expect(insertMock).toHaveBeenCalledWith([
@@ -223,7 +223,7 @@ describe("ServiceRequestPage", () => {
     fireEvent.change(deviceInput, { target: { value: "Desktop" } });
     fireEvent.change(serviceInput, { target: { value: "Repair" } });
 
-    fireEvent.click(screen.getByRole("button", { name: /submit request/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^submit$/i }));
 
     await waitFor(() => {
       expect(nameInput.value).toBe("");
