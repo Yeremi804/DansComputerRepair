@@ -1,10 +1,14 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ContactFormPage from "../src/app/contact-form/page";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/client";
 import userEvent from "@testing-library/user-event";
 import { act } from "react";
 
-jest.mock("@supabase/supabase-js");
+jest.mock("@/lib/supabase/client", () => ({
+  supabase: {
+    from: jest.fn(),
+  },
+}));
 
 jest.spyOn(console, "error").mockImplementation(() => {});
 jest.spyOn(console, "log").mockImplementation(() => {});
@@ -15,11 +19,9 @@ describe("ContactFormPage", () => {
   beforeEach(() => {
     insertMock = jest.fn();
 
-    createClient.mockReturnValue({
-      from: () => ({
-        insert: insertMock,
-      }),
-    });
+    supabase.from = jest.fn(() => ({
+      insert: insertMock,
+    }));
   });
 
   test("renders all form fields", () => {

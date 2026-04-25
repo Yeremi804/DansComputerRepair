@@ -265,6 +265,7 @@ export default function CustomerMessagesPanel() {
 
                   <td className="w-10 px-1 py-3 align-top">
                     <button
+                      aria-label='expand-row'
                       className="text-lg cursor-pointer"
                       onClick={() =>
                         setExpandedRow(expandedRow === row.id ? null : row.id)
