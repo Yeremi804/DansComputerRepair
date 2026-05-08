@@ -339,7 +339,8 @@ export default function AdminLoginPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className={`w-full border rounded-sm px-3 py-2 pr-10 ${isDark ? "border-gray-600 bg-gray-800 text-white" : "border-slate-300 bg-white text-slate-900"}`}
+                  placeholder="Enter password"
+                  className={`w-full border rounded-sm px-3 py-2 pr-10 ${isDark ? "border-gray-600 bg-gray-800 text-white placeholder:text-gray-400" : "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400"}`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
