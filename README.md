@@ -194,22 +194,29 @@ src/app/services/layout.js
 ```
 ---
 # 🎨 Live Demo 
-| 🏠 Home Page                                                                                                              | 📦 Products page                                                                                                            |
+| 🏠 Home Page                                                                                                              | 📊 Admin Dashboard                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| <img width="350" alt="Home Page" alt="image" src="https://github.com/user-attachments/assets/8614f00e-fe78-476a-bcfb-14d415717b9a" />| <img width="350" alt="Products Page" src="https://github.com/user-attachments/assets/c51e6012-a257-47c9-9919-3f9f30b9d2be" /> |
+| <img width="350" alt="DC_Homepage_2" src="https://github.com/user-attachments/assets/cb4e042a-586e-4cd8-876d-e2c7bcbcc218" />| <img width="350" alt="Admin_Dashboard" src="https://github.com/user-attachments/assets/fab53717-7402-4259-9ff5-6be0605ae4f8" />
+
+ 
 
 | 🛠️ Admin – Parts                                                                                                           | 💻 Custom PC Form                                                                                                              |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| <img width="350" alt="Admin Parts" src="https://github.com/user-attachments/assets/bd5ff907-ad3a-4ccc-bcd4-21c7e7786dd3" /> | <img width="350" alt="Custom PC Form" src="https://github.com/user-attachments/assets/95018f2a-dd55-44e5-a4c1-9f86823f519e" /> |
+ <img width="350" alt="Admin_Parts" src="https://github.com/user-attachments/assets/642d466a-523e-47d2-8eae-c4ca9ded4864" /> | <img width="350" alt="Custom-PC-Form" src="https://github.com/user-attachments/assets/209db1ac-2261-4c7f-9b70-a1f3bed635ea" />
+
+
+| 📝 Admin - Review                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------------------- |
+<img width="350" alt="Admin_Review" src="https://github.com/user-attachments/assets/65623fa9-fead-4155-ac3a-62babff2c75c" />  |
+
+
+ 
   
 ---
 # 🔁 Flow Diagram 
 <img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/efecc552-5a7c-4105-a270-001a40153d30" />
 
 ---
-# 🔁 Live Demo 
-**Homepage**
-![alt text](image-1.png)
 
 # ⌚ Timeline
 
