@@ -247,7 +247,77 @@ These items were found in the backlog but extend beyond the MVP.
 
 # 🧪 Testing
 
-Testing guidelines and procedures will be documented in CSC 191.
+This project uses **[Jest](https://jestjs.io/)** and **[React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)** for unit and integration testing. The test suite covers critical user flows, administrative functions, and backend logic.
+
+## 📁 Test Structure
+
+All test files are located in the [test-scripts/](./test-scripts/) directory. The tests are organized by feature:
+
+### 🔐 Authentication & Security
+- [admin-log-in.test.js](./test-scripts/admin-log-in.test.js) — Covers login flows, Captcha, and MFA.
+- [change-password.test.js](./test-scripts/change-password.test.js) — Validates password updates and MFA requirements.
+- [password-change.test.js](./test-scripts/password-change.test.js) — Additional test coverage for the Change Credentials modal on the Settings page.
+- [create-admin.test.js](./test-scripts/create-admin.test.js) — Tests the admin account creation process.
+- [middleware.test.js](./test-scripts/middleware.test.js) — Validates route protection and session handling.
+- [session-middleware.test.js](./test-scripts/session-middleware.test.js) — Tests session refresh and cookie sync logic.
+- [session-sync-route.test.js](./test-scripts/session-sync-route.test.js) — Covers the session sync API route.
+
+### 🖥️ Admin Dashboard
+- [admin-dashboard.test.js](./test-scripts/admin-dashboard.test.js) — Validates the main admin interface.
+- [admin-parts.test.js](./test-scripts/admin-parts.test.js) — Tests the PC parts management system.
+- [audit-for-admin-parts.test.js](./test-scripts/audit-for-admin-parts.test.js) — Additional test coverage for the admin parts management page.
+- [audit-for-settings.test.js](./test-scripts/audit-for-settings.test.js) — Additional test coverage for the Settings page.
+- [settings-page.test.js](./test-scripts/settings-page.test.js) — Covers site-wide configuration settings.
+- [captcha-setting.test.js](./test-scripts/captcha-setting.test.js) — Tests the toggle logic for Captcha security.
+- [header-notifications.test.js](./test-scripts/header-notifications.test.js) — Validates the admin notification bell and dropdown.
+- [dashboard-reviews-panel.test.js](./test-scripts/dashboard-reviews-panel.test.js) — Tests the reviews management panel.
+- [CustomerMessagesPanel.test.js](./test-scripts/CustomerMessagesPanel.test.js) — Validates the customer messages panel.
+
+### 👥 Customer Features
+- [service-request.test.js](./test-scripts/service-request.test.js) — Validates the repair intake form.
+- [create-computer-configuration-form.test.js](./test-scripts/create-computer-configuration-form.test.js) — Tests the custom PC configuration form.
+- [review-form.test.js](./test-scripts/review-form.test.js) — Tests the customer review submission flow.
+- [contact-form.test.js](./test-scripts/contact-form.test.js) — Covers the general contact inquiry form.
+
+### ⚙️ System Logic
+- [sms-notification.test.js](./test-scripts/sms-notification.test.js) — Validates Twilio SMS integration and status-triggered messages.
+- [api-options.test.js](./test-scripts/api-options.test.js) — Tests the /api/options route for PC parts data.
+- [home-content.test.js](./test-scripts/home-content.test.js) — Covers the home page content editor.
+- [faq-page.test.js](./test-scripts/faq-page.test.js) — Tests the FAQ page rendering and content.
+- [chatbot.test.js](./test-scripts/chatbot.test.js) — Validates the AI chatbot response logic.
+- [navigation.test.js](./test-scripts/navigation.test.js) — Tests header and sidebar navigation links.
+
+## 🚀 How to Run Tests
+
+### 1. Run All Tests
+
+```bash
+npm test
+```
+
+### 2. Run a Specific Test File
+
+```bash
+npx jest test-scripts/admin-log-in.test.js
+```
+
+### 3. Watch Mode
+
+```bash
+npx jest --watch
+```
+
+### 4. View Test Results
+
+The project outputs test results to [jest-results.json](./jest-results.json). You can inspect this file to see detailed pass/fail data for each assertion.
+
+## 🛠️ Test Configuration
+
+- **Framework:** Jest with `jest-environment-jsdom`
+- **Config file:** [jest.config.js](./jest.config.js) — sets the test environment, file patterns, and `@/` path alias mapped to `src/`.
+- **Setup file:** [jest.setup.js](./jest.setup.js) — imports `@testing-library/jest-dom` matchers and provides polyfills for `Request`, `Response`, and `Headers` to support Next.js server actions and route handlers in the test environment.
+- **Mocking:** The test suite uses `jest.mock()` for external services including **Supabase Auth**, **Next.js Navigation (`next/navigation`)**, and **Global Fetch** so that tests run without real API keys or a live database connection.
+- **Coverage:** Tests validate UI states, user flows (Captcha/MFA), error handling (network failures, auth errors), form validation, and navigation redirects.
 
 ---
 
