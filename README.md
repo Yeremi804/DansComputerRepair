@@ -218,33 +218,6 @@ src/app/services/layout.js
 
 ---
 
-# ⌚ Timeline
-
-## ✅ Past Work (Completed Fall 2025)
-Our focus during this semester was to create the Minimum Viable Product (MVP) and adjust based on client feedback.
-
-- Sprint 2: UI Development (47 stories)
-  - Built all visual components and page layouts
-
-- Sprint 3: Backend Integration (13 stories)
-  - Connected frontend to the Supabase database and implemented core functionality
-
-- Sprint 4: Refinement (17 stories)
-  - Integrated client feedback, improved UX, and polished features
-
----
-
-## 🚀 Future Work (To Be Done in Spring 2026)
-These items were found in the backlog but extend beyond the MVP.
-
-- Email Notification System (maintain consistency across all user interactions)
-- Testing & Bug Fixes
-- Fine tune the authentication system
-- Make adjustments to the website appearance based on client feedback
-- **Estimated Completion Time:** May 2026
-
----
-
 # 🧪 Testing
 
 This project uses **[Jest](https://jestjs.io/)** and **[React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)** for unit and integration testing. The test suite covers critical user flows, administrative functions, and backend logic.
@@ -321,9 +294,51 @@ The project outputs test results to [jest-results.json](./jest-results.json). Yo
 
 ---
 
-# 🚀 Deployment
+# 🚀 Download, Setup, and Deployment
 
-Deployment instructions will be finalized in CSC 191.
+## Download
+
+```bash
+git clone https://github.com/BrandonMLeyva/DansComputerRepair.git
+cd DansComputerRepair
+```
+
+## Setup
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Configure environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Open `.env.local` and fill in your Supabase URL, Anon Key, and any other required values. See the [Local Setup Instructions](#local-setup-instructions-and-project-structure-information) section above for details on obtaining Supabase credentials.
+
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   Visit [http://localhost:3000](http://localhost:3000) to view the application.
+
+## Production Build
+
+To create and run a production build locally:
+
+```bash
+npm run build
+npm start
+```
+
+## Deploy to Vercel (Recommended)
+
+This project is built with Next.js, which deploys seamlessly on [Vercel](https://vercel.com/):
+
+1. Push your repository to GitHub.
+2. Import the project on [Vercel](https://vercel.com/new).
+3. Add the required environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, etc.) in the Vercel project settings.
+4. Vercel will automatically build and deploy on every push to the `main` branch.
 
 ---
 
