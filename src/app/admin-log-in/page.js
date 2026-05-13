@@ -114,8 +114,13 @@ export default function AdminLoginPage() {
     }
 
     try {
+      const redirectTo =
+        process.env.NEXT_PUBLIC_SITE_URL
+          ? `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`
+          : `${window.location.origin}/update-password`;
+
       const { error } = await supabase.auth.resetPasswordForEmail(emailToReset, {
-        redirectTo: `${window.location.origin}/update-password`,
+        redirectTo,
       });
 
       if (error) {
