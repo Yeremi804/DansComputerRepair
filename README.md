@@ -194,59 +194,151 @@ src/app/services/layout.js
 ```
 ---
 # 🎨 Live Demo 
-| 🏠 Home Page                                                                                                              | 📦 Products page                                                                                                            |
+| 🏠 Home Page                                                                                                              | 📊 Admin Dashboard                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| <img width="350" alt="Home Page" alt="image" src="https://github.com/user-attachments/assets/8614f00e-fe78-476a-bcfb-14d415717b9a" />| <img width="350" alt="Products Page" src="https://github.com/user-attachments/assets/c51e6012-a257-47c9-9919-3f9f30b9d2be" /> |
+| <img width="350" alt="DC_Homepage_2" src="https://github.com/user-attachments/assets/cb4e042a-586e-4cd8-876d-e2c7bcbcc218" />| <img width="350" alt="Admin_Dashboard" src="https://github.com/user-attachments/assets/fab53717-7402-4259-9ff5-6be0605ae4f8" />
+
+ 
 
 | 🛠️ Admin – Parts                                                                                                           | 💻 Custom PC Form                                                                                                              |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| <img width="350" alt="Admin Parts" src="https://github.com/user-attachments/assets/bd5ff907-ad3a-4ccc-bcd4-21c7e7786dd3" /> | <img width="350" alt="Custom PC Form" src="https://github.com/user-attachments/assets/95018f2a-dd55-44e5-a4c1-9f86823f519e" /> |
+ <img width="350" alt="Admin_Parts" src="https://github.com/user-attachments/assets/642d466a-523e-47d2-8eae-c4ca9ded4864" /> | <img width="350" alt="Custom-PC-Form" src="https://github.com/user-attachments/assets/209db1ac-2261-4c7f-9b70-a1f3bed635ea" />
+
+
+| 📝 Admin - Review                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------------------- |
+<img width="350" alt="Admin_Review" src="https://github.com/user-attachments/assets/65623fa9-fead-4155-ac3a-62babff2c75c" />  |
+
+
+ 
   
 ---
 # 🔁 Flow Diagram 
 <img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/efecc552-5a7c-4105-a270-001a40153d30" />
 
 ---
-# 🔁 Live Demo 
-**Homepage**
-![alt text](image-1.png)
-
-# ⌚ Timeline
-
-## ✅ Past Work (Completed Fall 2025)
-Our focus during this semester was to create the Minimum Viable Product (MVP) and adjust based on client feedback.
-
-- Sprint 2: UI Development (47 stories)
-  - Built all visual components and page layouts
-
-- Sprint 3: Backend Integration (13 stories)
-  - Connected frontend to the Supabase database and implemented core functionality
-
-- Sprint 4: Refinement (17 stories)
-  - Integrated client feedback, improved UX, and polished features
-
----
-
-## 🚀 Future Work (To Be Done in Spring 2026)
-These items were found in the backlog but extend beyond the MVP.
-
-- Email Notification System (maintain consistency across all user interactions)
-- Testing & Bug Fixes
-- Fine tune the authentication system
-- Make adjustments to the website appearance based on client feedback
-- **Estimated Completion Time:** May 2026
-
----
 
 # 🧪 Testing
 
-Testing guidelines and procedures will be documented in CSC 191.
+This project uses **[Jest](https://jestjs.io/)** and **[React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)** for unit and integration testing. The test suite covers critical user flows, administrative functions, and backend logic.
+
+## 📁 Test Structure
+
+All test files are located in the [test-scripts/](./test-scripts/) directory. The tests are organized by feature:
+
+### 🔐 Authentication & Security
+- [admin-log-in.test.js](./test-scripts/admin-log-in.test.js) — Covers login flows, Captcha, and MFA.
+- [change-password.test.js](./test-scripts/change-password.test.js) — Validates password updates and MFA requirements.
+- [password-change.test.js](./test-scripts/password-change.test.js) — Additional test coverage for the Change Credentials modal on the Settings page.
+- [create-admin.test.js](./test-scripts/create-admin.test.js) — Tests the admin account creation process.
+- [middleware.test.js](./test-scripts/middleware.test.js) — Validates route protection and session handling.
+- [session-middleware.test.js](./test-scripts/session-middleware.test.js) — Tests session refresh and cookie sync logic.
+- [session-sync-route.test.js](./test-scripts/session-sync-route.test.js) — Covers the session sync API route.
+
+### 🖥️ Admin Dashboard
+- [admin-dashboard.test.js](./test-scripts/admin-dashboard.test.js) — Validates the main admin interface.
+- [admin-parts.test.js](./test-scripts/admin-parts.test.js) — Tests the PC parts management system.
+- [audit-for-admin-parts.test.js](./test-scripts/audit-for-admin-parts.test.js) — Additional test coverage for the admin parts management page.
+- [audit-for-settings.test.js](./test-scripts/audit-for-settings.test.js) — Additional test coverage for the Settings page.
+- [settings-page.test.js](./test-scripts/settings-page.test.js) — Covers site-wide configuration settings.
+- [captcha-setting.test.js](./test-scripts/captcha-setting.test.js) — Tests the toggle logic for Captcha security.
+- [header-notifications.test.js](./test-scripts/header-notifications.test.js) — Validates the admin notification bell and dropdown.
+- [dashboard-reviews-panel.test.js](./test-scripts/dashboard-reviews-panel.test.js) — Tests the reviews management panel.
+- [CustomerMessagesPanel.test.js](./test-scripts/CustomerMessagesPanel.test.js) — Validates the customer messages panel.
+
+### 👥 Customer Features
+- [service-request.test.js](./test-scripts/service-request.test.js) — Validates the repair intake form.
+- [create-computer-configuration-form.test.js](./test-scripts/create-computer-configuration-form.test.js) — Tests the custom PC configuration form.
+- [review-form.test.js](./test-scripts/review-form.test.js) — Tests the customer review submission flow.
+- [contact-form.test.js](./test-scripts/contact-form.test.js) — Covers the general contact inquiry form.
+
+### ⚙️ System Logic
+- [sms-notification.test.js](./test-scripts/sms-notification.test.js) — Validates Twilio SMS integration and status-triggered messages.
+- [api-options.test.js](./test-scripts/api-options.test.js) — Tests the /api/options route for PC parts data.
+- [home-content.test.js](./test-scripts/home-content.test.js) — Covers the home page content editor.
+- [faq-page.test.js](./test-scripts/faq-page.test.js) — Tests the FAQ page rendering and content.
+- [chatbot.test.js](./test-scripts/chatbot.test.js) — Validates the AI chatbot response logic.
+- [navigation.test.js](./test-scripts/navigation.test.js) — Tests header and sidebar navigation links.
+
+## 🚀 How to Run Tests
+
+### 1. Run All Tests
+
+```bash
+npm test
+```
+
+### 2. Run a Specific Test File
+
+```bash
+npx jest test-scripts/admin-log-in.test.js
+```
+
+### 3. Watch Mode
+
+```bash
+npx jest --watch
+```
+
+### 4. View Test Results
+
+The project outputs test results to [jest-results.json](./jest-results.json). You can inspect this file to see detailed pass/fail data for each assertion.
+
+## 🛠️ Test Configuration
+
+- **Framework:** Jest with `jest-environment-jsdom`
+- **Config file:** [jest.config.js](./jest.config.js) — sets the test environment, file patterns, and `@/` path alias mapped to `src/`.
+- **Setup file:** [jest.setup.js](./jest.setup.js) — imports `@testing-library/jest-dom` matchers and provides polyfills for `Request`, `Response`, and `Headers` to support Next.js server actions and route handlers in the test environment.
+- **Mocking:** The test suite uses `jest.mock()` for external services including **Supabase Auth**, **Next.js Navigation (`next/navigation`)**, and **Global Fetch** so that tests run without real API keys or a live database connection.
+- **Coverage:** Tests validate UI states, user flows (Captcha/MFA), error handling (network failures, auth errors), form validation, and navigation redirects.
 
 ---
 
-# 🚀 Deployment
+# 🚀 Download, Setup, and Deployment
 
-Deployment instructions will be finalized in CSC 191.
+## Download
+
+```bash
+git clone https://github.com/BrandonMLeyva/DansComputerRepair.git
+cd DansComputerRepair
+```
+
+## Setup
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Configure environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Open `.env.local` and fill in your Supabase URL, Anon Key, and any other required values. See the [Local Setup Instructions](#local-setup-instructions-and-project-structure-information) section above for details on obtaining Supabase credentials.
+
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   Visit [http://localhost:3000](http://localhost:3000) to view the application.
+
+## Production Build
+
+To create and run a production build locally:
+
+```bash
+npm run build
+npm start
+```
+
+## Deploy to Vercel (Recommended)
+
+This project is built with Next.js, which deploys seamlessly on [Vercel](https://vercel.com/):
+
+1. Push your repository to GitHub.
+2. Import the project on [Vercel](https://vercel.com/new).
+3. Add the required environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, etc.) in the Vercel project settings.
+4. Vercel will automatically build and deploy on every push to the `main` branch.
 
 ---
 

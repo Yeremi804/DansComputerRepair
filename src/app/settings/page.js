@@ -832,9 +832,8 @@ export default function SettingsPage() {
             Unenroll MFA
           </button>
         </div>
-      </main>
 
-        <div className= "settings-panel">
+        <div className="settings-panel">
           <h2>Captcha Style</h2>
           <p>Customize the appearance of your CAPTCHA challenges.</p>
           <button
@@ -845,6 +844,7 @@ export default function SettingsPage() {
             Edit Captcha Style
           </button>
         </div>
+      </main>
 
       {isModalOpen && (
           <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
